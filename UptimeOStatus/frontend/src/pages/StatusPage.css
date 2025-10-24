@@ -1,0 +1,27 @@
+.status-page {
+  padding: 20px;
+}
+
+.filters {
+  margin-bottom: 20px;
+}
+
+.filters input, .filters select {
+  margin-right: 10px;
+  padding: 5px;
+}
+
+.status-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.status-table th, .status-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.status-table th {
+  background-color: #f2f2f2;
+}

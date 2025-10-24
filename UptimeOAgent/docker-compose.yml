@@ -1,0 +1,56 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: inframirror
+      POSTGRES_PASSWORD: inframirror
+      POSTGRES_DB: inframirror
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./tmp/pgdata:/var/lib/postgresql/data
+      - ./sql/inframirror.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - ./sql/data.sql:/docker-entrypoint-initdb.d/02-data.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U inframirror -d inframirror"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  agent-va:
+    image: uptimeo-agent:latest
+    container_name: agent-va
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATACENTER_ID: 1
+      DB_CONN_STRING: "postgres://inframirror:inframirror@postgres:5432/inframirror?sslmode=disable"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pgrep agent || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "8080:8080"
+
+  agent-ny:
+    image: uptimeo-agent:latest
+    container_name: agent-ny
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATACENTER_ID: 2
+      DB_CONN_STRING: "postgres://inframirror:inframirror@postgres:5432/inframirror?sslmode=disable"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pgrep agent || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "8080:8080"

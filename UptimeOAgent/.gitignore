@@ -1,0 +1,35 @@
+# Binaries
+/agent
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Build output
+/build/
+bin/
+*.out
+
+# Dependency directories
+/vendor/
+
+# Go modules
+go.sum
+
+# IDE/editor files
+*.swp
+*.swo
+*.idea/
+.vscode/
+*.log
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Test cache
+*.test
+
+# Docker/Postgres data
+tmp/
+tmp/pgdata/

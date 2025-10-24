@@ -1,0 +1,85 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: inframirror
+      POSTGRES_PASSWORD: inframirror
+      POSTGRES_DB: inframirror
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./tmp/pgdata:/var/lib/postgresql/data
+      - ../plan/sql/inframirror.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - ../plan/sql/data.sql:/docker-entrypoint-initdb.d/02-data.sql:ro
+  agent-va:
+    image: uptimeo-agent:latest
+    container_name: agent-va
+    environment:
+      DATACENTER_ID: "1"
+      DB_CONN_STRING: "postgres://inframirror:inframirror@postgres:5432/inframirror?sslmode=disable"
+    restart: unless-stopped
+
+  agent-ny:
+    image: uptimeo-agent:latest
+    container_name: agent-ny
+    environment:
+      DATACENTER_ID: "2"
+      DB_CONN_STRING: "postgres://inframirror:inframirror@postgres:5432/inframirror?sslmode=disable"
+    restart: unless-stopped
+  agent-rdn:
+    image: uptimeo-agent:latest
+    container_name: agent-rdn
+    environment:
+      DATACENTER_ID: "3"
+      DB_CONN_STRING: "postgres://inframirror:inframirror@postgres:5432/inframirror?sslmode=disable"
+    restart: unless-stopped
+
+  agent-chi:
+    image: uptimeo-agent:latest
+    container_name: agent-chi
+    environment:
+      DATACENTER_ID: "4"
+      DB_CONN_STRING: "postgres://inframirror:inframirror@postgres:5432/inframirror?sslmode=disable"
+    restart: unless-stopped
+
+  agent-sf:
+    image: uptimeo-agent:latest
+    container_name: agent-sf
+    environment:
+      DATACENTER_ID: "5"
+      DB_CONN_STRING: "postgres://inframirror:inframirror@postgres:5432/inframirror?sslmode=disable"
+    restart: unless-stopped
+
+  agent-lon:
+    image: uptimeo-agent:latest
+    container_name: agent-lon
+    environment:
+      DATACENTER_ID: "6"
+      DB_CONN_STRING: "postgres://inframirror:inframirror@postgres:5432/inframirror?sslmode=disable"
+    restart: unless-stopped
+
+  agent-dam:
+    image: uptimeo-agent:latest
+    container_name: agent-dam
+    environment:
+      DATACENTER_ID: "7"
+      DB_CONN_STRING: "postgres://inframirror:inframirror@postgres:5432/inframirror?sslmode=disable"
+    restart: unless-stopped
+
+  agent-sto:
+    image: uptimeo-agent:latest
+    container_name: agent-sto
+    environment:
+      DATACENTER_ID: "8"
+      DB_CONN_STRING: "postgres://inframirror:inframirror@postgres:5432/inframirror?sslmode=disable"
+    restart: unless-stopped
+
+  agent-syd:
+    image: uptimeo-agent:latest
+    container_name: agent-syd
+    environment:
+      DATACENTER_ID: "9"
+      DB_CONN_STRING: "postgres://inframirror:inframirror@postgres:5432/inframirror?sslmode=disable"
+    restart: unless-stopped

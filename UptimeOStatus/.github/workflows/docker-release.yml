@@ -1,0 +1,84 @@
+name: Build and Publish Backend+Frontend
+permissions:
+  contents: read
+  packages: write
+  id-token: write
+
+on:
+  push:
+    branches:
+      - main
+      - release-*
+    paths:
+      - 'backend/**'
+      - 'frontend/**' 
+      - 'docker/**'
+      - 'Dockerfile'
+      - 'package*.json'
+      - '.github/workflows/docker-release.yml'
+  pull_request:
+    paths:
+      - 'backend/**'
+      - 'frontend/**'
+      - 'docker/**' 
+      - 'Dockerfile'
+      - 'package*.json'
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: inframirror
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set lowercase organization name
+        id: lowercase
+        run: |
+          echo "org_lower=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
+
+      - name: Extract metadata for Backend+Frontend
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ steps.lowercase.outputs.org_lower }}/${{ env.IMAGE_NAME }}
+          tags: |
+            # latest tag for main branch
+            type=raw,value=latest,enable={{is_default_branch}}
+            # branch name
+            type=ref,event=branch
+            # version tags for release branches  
+            type=ref,event=branch,prefix=v,suffix=,pattern=release-(.+)
+            # short commit hash for PRs and development
+            type=sha,prefix={{branch}}-,format=short
+            # PR number for pull requests
+            type=ref,event=pr,prefix=pr-
+
+      - name: Build and push Backend+Frontend image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: ${{ github.event_name != 'pull_request' }}
+          platforms: linux/amd64,linux/arm64
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

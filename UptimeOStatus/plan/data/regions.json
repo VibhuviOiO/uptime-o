@@ -1,0 +1,206 @@
+{
+  "schedules": [
+    {
+      "id": 1,
+      "name": "60s GET",
+      "interval": 60,
+      "include_response_body": true,
+      "thresholds_warning": 300,
+      "thresholds_critical": 800
+    },
+    {
+      "id": 2,
+      "name": "120s GET",
+      "interval": 120,
+      "include_response_body": true,
+      "thresholds_warning": 500,
+      "thresholds_critical": 1000
+    },
+    {
+      "id": 3,
+      "name": "200s POST",
+      "interval": 200,
+      "include_response_body": true,
+      "thresholds_warning": 700,
+      "thresholds_critical": 1500
+    }
+  ],
+  "apiMonitors": [
+    {
+      "id": 1,
+      "name": "IPfy Public IP Info",
+      "method": "GET",
+      "type": "HTTPS",
+      "url": "https://api.ipify.org?format=json",
+      "scheduleId": 1
+    },
+    {
+      "id": 2,
+      "name": "Official Joke API",
+      "method": "GET",
+      "type": "HTTPS",
+      "url": "https://official-joke-api.appspot.com/random_joke",
+      "scheduleId": 1
+    },
+    {
+      "id": 3,
+      "name": "Realty US Search 60s POST",
+      "method": "POST",
+      "type": "HTTPS",
+      "url": "https://realty-in-us.p.rapidapi.com/properties/v3/list",
+      "scheduleId": 3,
+      "headers": {
+        "Content-Type": "application/json",
+        "x-rapidapi-host": "realty-in-us.p.rapidapi.com"
+      },
+      "body": {
+        "limit": 200,
+        "offset": 0,
+        "postal_code": "90004",
+        "status": [
+          "for_sale",
+          "ready_to_build"
+        ],
+        "sort": {
+          "direction": "desc",
+          "field": "list_date"
+        }
+      }
+    },
+    {
+      "id": 4,
+      "name": "Realty Auto-Complete",
+      "method": "GET",
+      "type": "HTTPS",
+      "url": "https://realty-in-us.p.rapidapi.com/locations/v2/auto-complete?input=new%20york&limit=10",
+      "scheduleId": 1,
+      "headers": {
+        "x-rapidapi-host": "realty-in-us.p.rapidapi.com",
+        "x-rapidapi-key": "YOUR_RAPIDAPI_KEY"
+      }
+    }
+  ],
+  "regions": [
+    { "id": 1, "name": "US East", "regionCode": "us-east-1", "group": "US" },
+    { "id": 2, "name": "US West", "regionCode": "us-west-1", "group": "US" },
+    { "id": 3, "name": "Europe West", "regionCode": "eu-west-2", "group": "Europe" },
+    { "id": 4, "name": "Europe North", "regionCode": "eu-north-1", "group": "Europe" },
+    { "id": 5, "name": "Oceania", "regionCode": "ap-southeast-2", "group": "Oceania" }
+  ],
+  "datacenters": [
+    { "id": 1, "code": "va", "name": "Virginia", "regionId": 1, "apiMonitorIds": [1,2,3,4] },
+    { "id": 2, "code": "ny", "name": "New York", "regionId": 1, "apiMonitorIds": [1,2,3,4] },
+    { "id": 3, "code": "rdn", "name": "Richardson", "regionId": 1, "apiMonitorIds": [1,2,3,4] },
+    { "id": 4, "code": "chi", "name": "Chicago", "regionId": 1, "apiMonitorIds": [1,2,3,4] },
+    { "id": 5, "code": "sf", "name": "San Francisco", "regionId": 2, "apiMonitorIds": [1,2,3,4] },
+    { "id": 6, "code": "lon", "name": "London", "regionId": 3, "apiMonitorIds": [1,2,3,4] },
+    { "id": 7, "code": "dam", "name": "Amsterdam", "regionId": 3, "apiMonitorIds": [1,2,3,4] },
+    { "id": 8, "code": "sto", "name": "Stockholm", "regionId": 4, "apiMonitorIds": [1,2,3,4] },
+    { "id": 9, "code": "syd", "name": "Sydney", "regionId": 5, "apiMonitorIds": [1,2,3,4] }
+  ],
+  "agents": [
+    { "id": 1, "name": "VA Agent", "datacenterId": 1 },
+    { "id": 2, "name": "NY Agent", "datacenterId": 2 },
+    { "id": 3, "name": "RDN Agent", "datacenterId": 3 },
+    { "id": 4, "name": "CHI Agent", "datacenterId": 4 },
+    { "id": 5, "name": "SF Agent", "datacenterId": 5 },
+    { "id": 6, "name": "LON Agent", "datacenterId": 6 },
+    { "id": 7, "name": "DAM Agent", "datacenterId": 7 },
+    { "id": 8, "name": "STO Agent", "datacenterId": 8 },
+    { "id": 9, "name": "SYD Agent", "datacenterId": 9 }
+  ],
+  "apiHeartbeats": [
+    {
+      "id": 1,
+      "monitorId": 1,
+      "monitorName": "IPfy Public IP Info",
+      "method": "GET",
+      "type": "HTTPS",
+      "url": "https://api.ipify.org?format=json",
+      "scheduleId": 1,
+      "scheduleName": "60s GET",
+      "interval": 60,
+      "thresholdsWarning": 300,
+      "thresholdsCritical": 800,
+      
+      "agentId": 1,
+      "agentName": "VA Agent",
+      "datacenterId": 1,
+      "datacenterName": "Virginia",
+      "regionId": 1,
+      "regionName": "US East",
+      
+      // Heartbeat / execution data
+      "executedAt": "2025-10-24T10:45:00Z",
+      "success": true,
+      "responseTimeMs": 123,
+      "responseSizeBytes": 22,
+      "responseStatusCode": 200,
+      "responseContentType": "application/json",
+      "responseServer": "cloudflare",
+      "responseCacheStatus": "DYNAMIC",
+      "dnsLookupMs": 12,
+      "tcpConnectMs": 34,
+      "tlsHandshakeMs": 56,
+      "timeToFirstByteMs": 78,
+      "warningThresholdMs": 300,
+      "criticalThresholdMs": 800,
+      
+      "errorType": null,
+      "errorMessage": null,
+      "rawRequestHeaders": {
+        "User-Agent": "CustomMonitor/1.0"
+      },
+      "rawResponseHeaders": {
+        "Date": "Fri, 24 Oct 2025 10:45:00 GMT",
+        "Content-Type": "application/json",
+        "Server": "cloudflare",
+        "CF-Cache-Status": "DYNAMIC"
+      },
+      "rawResponseBody": "{\"ip\":\"45.112.49.166\"}"
+    },
+    {
+      "id": 2,
+      "monitorId": 2,
+      "monitorName": "Official Joke API",
+      "method": "GET",
+      "type": "HTTPS",
+      "url": "https://official-joke-api.appspot.com/random_joke",
+      "scheduleId": 1,
+      "scheduleName": "60s GET",
+      "interval": 60,
+      "agentId": 2,
+      "thresholds_warning": 300,
+      "thresholds_critical": 800,
+      "agentName": "NY Agent",
+      "datacenterId": 2,
+      "datacenterName": "New York",
+      "regionId": 1,
+      "regionName": "US East",
+      "executedAt": "2025-10-24T10:46:00Z",
+      "success": true,
+      "responseTimeMs": 98,
+      "responseSizeBytes": 245,
+      "responseStatusCode": 200,
+      "responseContentType": "application/json",
+      "responseServer": "nginx",
+      "responseCacheStatus": null,
+      "dnsLookupMs": 15,
+      "tcpConnectMs": 20,
+      "tlsHandshakeMs": 35,
+      "timeToFirstByteMs": 50,
+      
+      "errorType": null,
+      "errorMessage": null,
+      "rawRequestHeaders": { 
+        "User-Agent": "CustomMonitor/1.0"
+      },
+      "rawResponseHeaders": { /// gets saved only when include_response_body is true
+        "Date": "Fri, 24 Oct 2025 10:46:00 GMT",
+        "Content-Type": "application/json",
+        "Server": "nginx"
+      },
+      "rawResponseBody": "{\"id\":123,\"setup\":\"Why did...\",\"punchline\":\"...\"}"
+    }
+  ]
+}

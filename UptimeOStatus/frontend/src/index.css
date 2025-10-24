@@ -1,0 +1,146 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Modern Admin Dashboard Design System. All colors, gradients, fonts, etc defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    /* Core Colors - Modern neutral palette */
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+    
+    /* Card */
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+    
+    /* Popover */
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+    
+    /* Primary - Modern blue accent */
+    --primary: 240 5.9% 10%;
+    --primary-foreground: 0 0% 98%;
+    
+    /* Secondary - Subtle gray */
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+    
+    /* Muted - Light gray backgrounds */
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+    
+    /* Accent - Interactive elements */
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
+    
+    /* Status colors */
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+    
+    /* Border - Very subtle */
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    
+    /* Ring */
+    --ring: 240 5% 64.9%;
+    
+    /* Dashboard specific colors - Infrastructure Management Theme */
+    --dashboard-bg: 220 14% 96%; /* Subtle blue-gray for enterprise feel */
+  --sidebar-bg: 0 0% 100%; /* Pure white sidebar */
+  --sidebar-border: 220 13% 91%; /* Professional border */
+  --sidebar-hover: 220 14% 96%; /* Light hover state */
+  --sidebar-active: 217 91% 60%; /* Professional blue for active items */
+  --sidebar-active-bg: 217 100% 97%; /* Light blue background for active */
+    --header-bg: 0 0% 100%;
+    --card-bg: 0 0% 100%;
+  --nav-group: 215 16% 47%; /* Professional steel blue for headers */
+  --infra-primary: 217 91% 60%; /* Main infrastructure blue */
+  --infra-secondary: 142 71% 45%; /* Infrastructure green for success states */
+  --infra-warning: 43 96% 56%; /* Infrastructure amber for warnings */
+  --infra-danger: 0 84% 60%; /* Infrastructure red for errors */
+    
+    /* Shadows - Subtle depth */
+    --shadow-subtle: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-moderate: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+
+    --radius: 0.75rem;
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+    
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    
+    --primary: 0 0% 98%;
+    --primary-foreground: 240 5.9% 10%;
+    
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
+    
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 240 4.9% 83.9%;
+    
+    /* Dashboard dark colors - Infrastructure Management Dark Theme */
+    --dashboard-bg: 220 27% 4%; /* Deep professional dark */
+    --sidebar-bg: 220 39% 11%; /* Darker sidebar with blue undertone */
+    --sidebar-border: 215 25% 27%; /* Professional dark border */
+    --sidebar-hover: 215 25% 27%; /* Consistent hover */
+    --sidebar-active: 217 91% 60%; /* Same blue for consistency */
+    --sidebar-active-bg: 217 91% 15%; /* Darker active background */
+    --header-bg: 220 39% 11%;
+    --card-bg: 220 39% 11%;
+    --nav-group: 215 20% 65%; /* Muted text in dark theme */
+  --infra-primary: 217 91% 60%; /* Consistent primary across themes */
+  --infra-secondary: 142 71% 45%; /* Consistent secondary */
+  --infra-warning: 43 96% 56%; /* Consistent warning */
+  --infra-danger: 0 84% 60%; /* Consistent danger */
+    
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
