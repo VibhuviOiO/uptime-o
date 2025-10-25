@@ -1,5 +1,3 @@
-import { MetricsCard } from './MetricsCard';
-import { ChartCard } from './ChartCard';
 import { Users, Package, TrendingUp, TrendingDown } from 'lucide-react';
 
 export const DashboardContent = () => {

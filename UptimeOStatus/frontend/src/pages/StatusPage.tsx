@@ -3,10 +3,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { useStatus } from "@/hooks/useStatus";
-import { Sparkline } from "@/components/Sparkline";
 import { useRegions, Region } from "@/hooks/useRegions";
 import { useDatacenters, Datacenter } from "@/hooks/useDatacenters";
 import { useConfig } from "@/hooks/useConfig";
+import { Sparkline } from "@/components/status/Sparkline";
 
 const getStatusBadge = (status: string) => {
   const baseClasses = "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border shadow-sm";
