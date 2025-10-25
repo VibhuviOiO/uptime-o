@@ -67,7 +67,7 @@ services:
     restart: unless-stopped
 
   uptimeo-app:
-    image: uptimeo-app:latest  # Build your JHipster app image
+    image: uptimeo:latest 
     container_name: uptimeo-app
     depends_on:
       postgres:
