@@ -1,4 +1,4 @@
-name: Build and Publish Infragent
+name: Build and Publish Uptime O Agent Docker Image
 permissions:
   contents: read
   packages: write
@@ -9,14 +9,14 @@ on:
       - main
       - release-*
     paths:
-      - 'infragent/**'
+      - 'uptime-o-agent/**'
   pull_request:
     paths:
-      - 'infragent/**'
+      - 'uptime-o-agent/**'
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: infragent
+  IMAGE_NAME: uptime-o-agent
 
 jobs:
   build-and-push:

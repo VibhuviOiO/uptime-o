@@ -1,5 +1,5 @@
 {
-  "name": "inframirror-backend",
+  "name": "uptime-o-status-page-backend",
   "version": "1.0.0",
   "main": "dist/index.js",
   "type": "module",

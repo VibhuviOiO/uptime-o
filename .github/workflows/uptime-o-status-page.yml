@@ -1,4 +1,4 @@
-name: Build and Publish Backend+Frontend
+name: Build and Publish Uptime O Status Page Docker Image
 permissions:
   contents: read
   packages: write
@@ -10,23 +10,21 @@ on:
       - main
       - release-*
     paths:
-      - 'backend/**'
-      - 'frontend/**' 
-      - 'docker/**'
-      - 'Dockerfile'
-      - 'package*.json'
-      - '.github/workflows/docker-release.yml'
+      - 'uptime-o-status-page/backend/**'
+      - 'uptime-o-status-page/frontend/**'
+      - 'uptime-o-status-page/Dockerfile'
+      - 'uptime-o-status-page/package*.json'
+      - '.github/workflows/uptime-o-status-page-image-release.yml'
   pull_request:
     paths:
-      - 'backend/**'
-      - 'frontend/**'
-      - 'docker/**' 
-      - 'Dockerfile'
-      - 'package*.json'
+      - 'uptime-o-status-page/backend/**'
+      - 'uptime-o-status-page/frontend/**'
+      - 'uptime-o-status-page/Dockerfile'
+      - 'uptime-o-status-page/package*.json'
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: inframirror
+  IMAGE_NAME: uptime-o-status-page
 
 jobs:
   build-and-push:
