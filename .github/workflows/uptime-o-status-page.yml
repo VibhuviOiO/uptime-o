@@ -5,22 +5,14 @@ permissions:
   id-token: write
 
 on:
-  push:
-    branches:
-      - main
-      - release-*
-    paths:
-      - 'uptime-o-status-page/backend/**'
-      - 'uptime-o-status-page/frontend/**'
-      - 'uptime-o-status-page/Dockerfile'
-      - 'uptime-o-status-page/package*.json'
-      - '.github/workflows/uptime-o-status-page-image-release.yml'
+  workflow_dispatch:
   pull_request:
     paths:
       - 'uptime-o-status-page/backend/**'
       - 'uptime-o-status-page/frontend/**'
       - 'uptime-o-status-page/Dockerfile'
       - 'uptime-o-status-page/package*.json'
+      - '.github/workflows/uptime-o-status-page.yml'
 
 env:
   REGISTRY: ghcr.io

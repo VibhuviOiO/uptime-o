@@ -5,17 +5,7 @@ permissions:
   id-token: write
 
 on:
-  push:
-    branches:
-      - main
-      - release-*
-    paths:
-      - 'uptime-o/**'
-      - '.github/workflows/uptime-o-app.yml'
-  pull_request:
-    paths:
-      - 'uptime-o/**'
-      - 'uptime-o/package*.json'
+  workflow_dispatch:
 
 env:
   REGISTRY: ghcr.io
