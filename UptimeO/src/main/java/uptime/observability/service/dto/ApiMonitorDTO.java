@@ -28,10 +28,8 @@ public class ApiMonitorDTO implements Serializable {
     @Lob
     private String url;
 
-    @Lob
     private String headers;
 
-    @Lob
     private String body;
 
     private ScheduleDTO schedule;

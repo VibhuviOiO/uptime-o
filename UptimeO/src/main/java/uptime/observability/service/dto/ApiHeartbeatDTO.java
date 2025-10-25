@@ -49,16 +49,12 @@ public class ApiHeartbeatDTO implements Serializable {
     @Size(max = 50)
     private String errorType;
 
-    @Lob
     private String errorMessage;
 
-    @Lob
     private String rawRequestHeaders;
 
-    @Lob
     private String rawResponseHeaders;
 
-    @Lob
     private String rawResponseBody;
 
     private ApiMonitorDTO monitor;

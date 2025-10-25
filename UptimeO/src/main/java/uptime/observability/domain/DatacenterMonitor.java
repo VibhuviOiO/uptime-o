@@ -3,6 +3,7 @@ package uptime.observability.domain;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * A DatacenterMonitor.
@@ -21,10 +22,12 @@ public class DatacenterMonitor implements Serializable {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "datacenter_id")
     @JsonIgnoreProperties(value = { "agents", "datacenterMonitors", "region" }, allowSetters = true)
     private Datacenter datacenter;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "monitor_id")
     @JsonIgnoreProperties(value = { "apiHeartbeats", "datacenterMonitors", "schedule" }, allowSetters = true)
     private ApiMonitor monitor;
 
@@ -71,6 +74,7 @@ public class DatacenterMonitor implements Serializable {
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
 
+    // Update equals and hashCode to use id
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -84,7 +88,6 @@ public class DatacenterMonitor implements Serializable {
 
     @Override
     public int hashCode() {
-        // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
         return getClass().hashCode();
     }
 

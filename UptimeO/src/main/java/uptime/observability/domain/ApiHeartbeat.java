@@ -73,19 +73,16 @@ public class ApiHeartbeat implements Serializable {
     private String errorType;
 
     @Lob
-    @Column(name = "error_message")
+    @Column(name = "error_message",columnDefinition = "text")
     private String errorMessage;
 
-    @Lob
-    @Column(name = "raw_request_headers")
+    @Column(name = "raw_request_headers", columnDefinition = "jsonb")
     private String rawRequestHeaders;
 
-    @Lob
-    @Column(name = "raw_response_headers")
+    @Column(name = "raw_response_headers", columnDefinition = "jsonb")
     private String rawResponseHeaders;
 
-    @Lob
-    @Column(name = "raw_response_body")
+    @Column(name = "raw_response_body", columnDefinition = "jsonb")
     private String rawResponseBody;
 
     @ManyToOne(fetch = FetchType.LAZY)
