@@ -2,18 +2,18 @@ import { Router } from 'express';
 import { pool } from '../db.js';
 import { StatusFilters } from '../models/filters.js';
 
-function parseWindow(window: string | undefined): string {
-  switch (window) {
-    case "5m": return "5 minutes";
-    case "15m": return "15 minutes";
-    case "30m": return "30 minutes";
-    case "1h": return "1 hour";
-    case "4h": return "4 hours";
-    case "24h": return "24 hours";
-    case "1w": return "1 week";
-    case "2w": return "2 weeks";
-    default: return "1 hour";
-  }
+function parseWindow(window?: string) {
+  const map: Record<string, [number, string]> = {
+    "5m": [5, "minute"],
+    "15m": [15, "minute"],
+    "30m": [30, "minute"],
+    "1h": [1, "hour"],
+    "4h": [4, "hour"],
+    "24h": [24, "hour"],
+    "1w": [1, "week"],
+    "2w": [2, "week"],
+  };
+  return map[window ?? "1h"] ?? map["1h"];
 }
 
 const router = Router();

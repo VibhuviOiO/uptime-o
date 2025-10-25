@@ -34,8 +34,6 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-    ports:
-      - "8080:8080"
 
   agent-ny:
     image: uptimeo-agent:latest
@@ -52,5 +50,3 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-    ports:
-      - "8080:8080"
