@@ -22,20 +22,19 @@ UptimeOAgent is a Go-based monitoring agent that performs HTTP requests based on
 
 1. **Clone and Setup Project**:
    ```bash
-   cd /Users/jinnabalaiah/algonomy/practice/rrstatus
-   git clone <repo> UptimeOAgent  # If not already cloned
-   cd UptimeOAgent
+   git clone <repo> uptime-o-agent
+   cd uptime-o-agent
    go mod tidy
    ```
 
 2. **Setup PostgreSQL**:
-   - Install PostgreSQL locally or use Docker: `docker run -d --name postgres -e POSTGRES_USER=inframirror -e POSTGRES_PASSWORD=inframirror -e POSTGRES_DB=inframirror -p 5432:5432 postgres:17`
-   - Execute SQL: `psql -h localhost -U inframirror -d inframirror -f ../plan/sql/inframirror.sql` and `psql -h localhost -U inframirror -d inframirror -f ../plan/sql/data.sql`
+   - Install PostgreSQL locally or use Docker: `docker run -d --name postgres -e POSTGRES_USER=uptimeo -e POSTGRES_PASSWORD=uptimeo -e POSTGRES_DB=uptimeo -p 5432:5432 postgres:17`
+   - Execute SQL: `psql -h localhost -U uptimeo -d uptimeo -f ../plan/sql/uptimeo.sql` and `psql -h localhost -U uptimeo -d uptimeo -f ../plan/sql/data.sql`
 
 3. **Run the Agent**:
    ```bash
-   export DB_CONN_STRING="postgres://inframirror:inframirror@localhost:5432/inframirror?sslmode=disable"
-   export DATACENTER_ID=1  # For VA datacenter
+   export DB_CONN_STRING="postgres://uptimeo:uptimeo@localhost:5432/uptimeo?sslmode=disable"
+   export DATACENTER_ID=5
    go run cmd/agent/main.go
    ```
 
@@ -56,7 +55,7 @@ go build -o agent ./cmd/agent
 ## Running Locally
 
 1. Ensure PostgreSQL is running and populated.
-2. Set environment variables: `export DB_CONN_STRING="postgres://inframirror:inframirror@localhost:5432/inframirror?sslmode=disable"` and `DATACENTER_ID=1`
+2. Set environment variables: `export DB_CONN_STRING="postgres://uptimeo:uptimeo@localhost:5432/uptimeo?sslmode=disable"` and `DATACENTER_ID=1`
 3. Run: `./agent`
 
 ## Docker
@@ -125,3 +124,59 @@ Implement the `MonitorInterface` for new monitor types (e.g., TCP, Ping) in `int
 - Restrict DB access to trusted agents.
 - Use secrets management for DB credentials.
 - Monitor for unauthorized access or unusual heartbeat patterns.
+
+## Partition Management for api_heartbeats
+
+The `api_heartbeats` table is partitioned by `executed_at` (daily ranges) to handle high-volume time-series data efficiently.
+
+### Advantages of Partitioning
+- **Performance**: Faster queries, inserts, and deletes on date ranges (e.g., last 24 hours).
+- **Maintenance**: Easy to archive/drop old partitions (e.g., delete data older than 90 days).
+- **Scalability**: Reduces index size and improves vacuum/analyze operations on large tables.
+- **Storage**: Better for time-series data like heartbeats, avoiding full table scans.
+
+### One-Time Setup vs. Daily Management
+- **One-Time**: Create the `create_partition_for_date` function once in PostgreSQL.
+- **Daily/Automated**: Partitions are created as needed (e.g., by the agent on startup). Manual creation is only for troubleshooting.
+
+### Checking Partitions in PostgreSQL
+
+Run in `psql`:
+```sql
+-- List partitions
+\d+ api_heartbeats
+
+-- Check if partition exists for a date (e.g., today)
+SELECT tablename FROM pg_tables WHERE tablename LIKE 'api_heartbeats_%' AND tablename ~ ('api_heartbeats_' || to_char(CURRENT_DATE, 'YYYY_MM_DD'));
+
+-- View partition ranges
+SELECT * FROM pg_partitioned_table WHERE partrelid = 'api_heartbeats'::regclass;
+```
+
+### Creating Partitions Dynamically
+
+1. **Create the Function Once** (one-time in DB):
+   ```sql
+   CREATE OR REPLACE FUNCTION create_partition_for_date(target_date DATE) RETURNS void AS $$
+   DECLARE
+       partition_name TEXT := 'api_heartbeats_' || to_char(target_date, 'YYYY_MM_DD');
+   BEGIN
+       EXECUTE format(
+           'CREATE TABLE IF NOT EXISTS %I PARTITION OF api_heartbeats FOR VALUES FROM (%L) TO (%L)',
+           partition_name, target_date, target_date + INTERVAL '1 day'
+       );
+   END;
+   $$ LANGUAGE plpgsql;
+   ```
+
+2. **Call the Function** (automated or manual):
+   - Automated: Update the Go agent to execute `SELECT create_partition_for_date(CURRENT_DATE)` on startup.
+   - Manual: `SELECT create_partition_for_date(CURRENT_DATE);` for today, or `SELECT create_partition_for_date(CURRENT_DATE + INTERVAL '1 day');` for tomorrow.
+
+For production, automate with a cron job or app hook. If partitioning causes issues, drop it and use a regular table with indexes.
+
+### Default Handling in Application
+
+- On agent startup: Create partition for today and tomorrow.
+- Before insert: Check/create partition for the `executed_at` date.
+- This ensures the app handles partitions by default without manual intervention.
