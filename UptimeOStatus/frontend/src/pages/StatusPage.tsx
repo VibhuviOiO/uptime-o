@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
@@ -7,6 +7,7 @@ import { useRegions, Region } from "@/hooks/useRegions";
 import { useDatacenters, Datacenter } from "@/hooks/useDatacenters";
 import { useConfig } from "@/hooks/useConfig";
 import { Sparkline } from "@/components/status/Sparkline";
+import SkeletonTiles from "@/components/SkeletonTiles";
 
 const getStatusBadge = (status: string) => {
   const baseClasses = "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border shadow-sm";
@@ -84,14 +85,18 @@ export const StatusPage = () => {
   const [selectedRegion, setSelectedRegion] = useState<number | undefined>();
   const [selectedDatacenter, setSelectedDatacenter] = useState<number | undefined>();
 
-  const { data: statusData, loading: statusLoading, error: statusError } = useStatus(window, selectedRegion, selectedDatacenter);
+  const statusParams = useMemo(() => ({
+    window,
+    regionId: selectedRegion,
+    datacenterId: selectedDatacenter
+  }), [window, selectedRegion, selectedDatacenter]);
+
+  const { data: statusData, loading: statusLoading } = useStatus(statusParams);
   const { data: regions, loading: regionsLoading } = useRegions();
   const { data: datacenters, loading: datacentersLoading } = useDatacenters();
   const { data: config, loading: configLoading } = useConfig();
 
-  if (statusLoading || configLoading) return <div>Loading...</div>;
-  if (statusError) return <div>Error: {statusError}</div>;
-  if (!config) return <div>Loading configuration...</div>;
+  if (configLoading) return <div>Loading configuration...</div>;
 
   return (
     <DashboardLayout>
@@ -181,7 +186,10 @@ export const StatusPage = () => {
         </div>
 
             <div className="grid grid-cols-1 gap-5">
-        {statusData.map((row) => (
+        {statusLoading ? (
+          <SkeletonTiles />
+        ) : (
+          statusData.map((row) => (
           <Card key={`${row.monitorId}-${row.datacenter_id}`} className="group hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-300 border-0 bg-gradient-to-br from-white to-white shadow-lg shadow-slate-100/50">
             <CardContent className="p-6">
               <div className="flex items-start justify-between mb-4">
@@ -231,7 +239,7 @@ export const StatusPage = () => {
               </div>
             </CardContent>
           </Card>
-        ))}
+        )))}
       </div>
         </div>
       </div>
