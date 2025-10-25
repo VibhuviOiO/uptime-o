@@ -72,8 +72,8 @@ jobs:
       - name: Build and push Backend+Frontend image
         uses: docker/build-push-action@v5
         with:
-          context: .
-          file: ./Dockerfile
+          context: uptime-o-status-page
+          file: uptime-o-status-page/Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
           platforms: linux/amd64,linux/arm64
           tags: ${{ steps.meta.outputs.tags }}

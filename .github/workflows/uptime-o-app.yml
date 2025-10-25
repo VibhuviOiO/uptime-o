@@ -1,4 +1,4 @@
-name: Build and Publish Uptime O Status Page Docker Image
+name: Build and Publish Uptime O App Docker Image
 permissions:
   contents: read
   packages: write
@@ -70,3 +70,7 @@ jobs:
           npm run java:docker
         env:
           JIB_IMAGE: ${{ env.REGISTRY }}/${{ steps.lowercase.outputs.org_lower }}/${{ env.IMAGE_NAME }}:latest
+
+      - name: Verify image pushed
+        run: |
+          echo "Image should be available at ${{ env.REGISTRY }}/${{ steps.lowercase.outputs.org_lower }}/${{ env.IMAGE_NAME }}:latest"

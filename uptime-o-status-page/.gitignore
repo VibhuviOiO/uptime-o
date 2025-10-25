@@ -28,10 +28,6 @@ dev.env
 .env.test.local
 .env.production.local
 
-# Docker volumes and data
-docker/tmp/pgdata/
-postgres-data/
-
 # Sensitive infrastructure files
 marathon-state.json
 real_api_calls.txt

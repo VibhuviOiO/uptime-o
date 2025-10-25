@@ -42,9 +42,6 @@ Desktop.ini
 
 # Docker/Postgres data
 tmp/
-tmp/pgdata/
-postgres-data/
-docker/tmp/pgdata/
 
 # Node
 npm-debug.log*
