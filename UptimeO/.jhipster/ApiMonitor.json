@@ -1,0 +1,71 @@
+{
+  "annotations": {
+    "changelogDate": "20251025202837"
+  },
+  "applications": "*",
+  "dto": "mapstruct",
+  "entityTableName": "api_monitors",
+  "fields": [
+    {
+      "fieldName": "name",
+      "fieldType": "String",
+      "fieldValidateRules": ["required", "minlength", "maxlength"],
+      "fieldValidateRulesMaxlength": "100",
+      "fieldValidateRulesMinlength": "1"
+    },
+    {
+      "fieldName": "method",
+      "fieldType": "String",
+      "fieldValidateRules": ["required", "minlength", "maxlength"],
+      "fieldValidateRulesMaxlength": "10",
+      "fieldValidateRulesMinlength": "1"
+    },
+    {
+      "fieldName": "type",
+      "fieldType": "String",
+      "fieldValidateRules": ["required", "minlength", "maxlength"],
+      "fieldValidateRulesMaxlength": "10",
+      "fieldValidateRulesMinlength": "1"
+    },
+    {
+      "fieldName": "url",
+      "fieldType": "TextBlob",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "headers",
+      "fieldType": "TextBlob"
+    },
+    {
+      "fieldName": "body",
+      "fieldType": "TextBlob"
+    }
+  ],
+  "name": "ApiMonitor",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityName": "apiHeartbeat",
+      "otherEntityRelationshipName": "monitor",
+      "relationshipName": "apiHeartbeat",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "datacenterMonitor",
+      "otherEntityRelationshipName": "monitor",
+      "relationshipName": "datacenterMonitor",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "schedule",
+      "otherEntityRelationshipName": "apiMonitor",
+      "relationshipName": "schedule",
+      "relationshipSide": "right",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

@@ -65,3 +65,18 @@ services:
     ports:
       - "8077:8077"
     restart: unless-stopped
+
+  uptimeo-app:
+    image: uptimeo-app:latest  # Build your JHipster app image
+    container_name: uptimeo-app
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/uptimeo
+      SPRING_DATASOURCE_USERNAME: uptimeo
+      SPRING_DATASOURCE_PASSWORD: uptimeo
+      SPRING_PROFILES_ACTIVE: dev
+    ports:
+      - "8080:8080"
+    restart: unless-stopped

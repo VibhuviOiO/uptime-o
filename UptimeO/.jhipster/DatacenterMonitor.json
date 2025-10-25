@@ -1,0 +1,28 @@
+{
+  "annotations": {
+    "changelogDate": "20251025202843"
+  },
+  "applications": "*",
+  "dto": "mapstruct",
+  "entityTableName": "datacenter_monitors",
+  "fields": [],
+  "name": "DatacenterMonitor",
+  "relationships": [
+    {
+      "otherEntityName": "datacenter",
+      "otherEntityRelationshipName": "datacenterMonitor",
+      "relationshipName": "datacenter",
+      "relationshipSide": "right",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityName": "apiMonitor",
+      "otherEntityRelationshipName": "datacenterMonitor",
+      "relationshipName": "monitor",
+      "relationshipSide": "right",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

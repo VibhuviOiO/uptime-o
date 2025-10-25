@@ -1,0 +1,48 @@
+{
+  "annotations": {
+    "changelogDate": "20251025202836"
+  },
+  "applications": "*",
+  "dto": "mapstruct",
+  "entityTableName": "schedules",
+  "fields": [
+    {
+      "fieldName": "name",
+      "fieldType": "String",
+      "fieldValidateRules": ["required", "minlength", "maxlength"],
+      "fieldValidateRulesMaxlength": "50",
+      "fieldValidateRulesMinlength": "1"
+    },
+    {
+      "fieldName": "interval",
+      "fieldType": "Integer",
+      "fieldValidateRules": ["required", "min"],
+      "fieldValidateRulesMin": "1"
+    },
+    {
+      "fieldName": "includeResponseBody",
+      "fieldType": "Boolean"
+    },
+    {
+      "fieldName": "thresholdsWarning",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "thresholdsCritical",
+      "fieldType": "Integer"
+    }
+  ],
+  "name": "Schedule",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityName": "apiMonitor",
+      "otherEntityRelationshipName": "schedule",
+      "relationshipName": "apiMonitor",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceImpl"
+}

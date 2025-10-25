@@ -13,7 +13,6 @@
 # Full reference is available at:
 # http://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html
 # ===================================================================
-
 ---
 # Conditionally disable springdoc on missing api-docs profile
 spring:
@@ -30,18 +29,18 @@ management:
       base-path: /management
       exposure:
         include:
-          - configprops
-          - env
-          - health
-          - info
-          - jhimetrics
-          - jhiopenapigroups
-          - logfile
-          - loggers
-          - prometheus
-          - threaddump
-          - caches
-          - liquibase
+        - configprops
+        - env
+        - health
+        - info
+        - jhimetrics
+        - jhiopenapigroups
+        - logfile
+        - loggers
+        - prometheus
+        - threaddump
+        - caches
+        - liquibase
   endpoint:
     health:
       show-details: when_authorized
@@ -95,7 +94,7 @@ spring:
     name: uptimeO
   docker:
     compose:
-      enabled: true
+      enabled: false
       lifecycle-management: start-only
       file: src/main/docker/services.yml
   profiles:
@@ -105,10 +104,10 @@ spring:
     active: '@spring.profiles.active@'
     group:
       dev:
-        - dev
-        - api-docs
-        # Uncomment to activate TLS for the dev profile
-        #- tls
+      - dev
+      - api-docs
+      # Uncomment to activate TLS for the dev profile
+      #- tls
   jmx:
     enabled: false
   data:
@@ -214,9 +213,9 @@ jhipster:
     license-url:
   security:
     content-security-policy: "default-src 'self'; frame-src 'self' data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://storage.googleapis.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:"
-
-# jhipster-needle-add-application-yaml-document
 ---
+
+
 # ===================================================================
 # Application specific properties
 # Add your own application properties here, see the ApplicationProperties class

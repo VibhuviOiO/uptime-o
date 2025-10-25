@@ -1,0 +1,37 @@
+{
+  "annotations": {
+    "changelogDate": "20251025202840"
+  },
+  "applications": "*",
+  "dto": "mapstruct",
+  "entityTableName": "agents",
+  "fields": [
+    {
+      "fieldName": "name",
+      "fieldType": "String",
+      "fieldValidateRules": ["required", "minlength", "maxlength"],
+      "fieldValidateRulesMaxlength": "50",
+      "fieldValidateRulesMinlength": "1"
+    }
+  ],
+  "name": "Agent",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityName": "apiHeartbeat",
+      "otherEntityRelationshipName": "agent",
+      "relationshipName": "apiHeartbeat",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "datacenter",
+      "otherEntityRelationshipName": "agent",
+      "relationshipName": "datacenter",
+      "relationshipSide": "right",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceImpl"
+}

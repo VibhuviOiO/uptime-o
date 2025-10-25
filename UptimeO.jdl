@@ -1,0 +1,118 @@
+entity Schedule {
+  name String required minlength(1) maxlength(50)
+  interval Integer required min(1)
+  includeResponseBody Boolean
+  thresholdsWarning Integer
+  thresholdsCritical Integer
+}
+
+entity ApiMonitor {
+  name String required minlength(1) maxlength(100)
+  method String required minlength(1) maxlength(10)
+  type String required minlength(1) maxlength(10)
+  url TextBlob required
+  headers TextBlob
+  body TextBlob
+}
+
+entity Region {
+  name String required minlength(1) maxlength(50)
+  regionCode String maxlength(20)
+  groupName String maxlength(20)
+}
+
+entity Datacenter {
+  code String required minlength(1) maxlength(10)
+  name String required minlength(1) maxlength(50)
+}
+
+entity Agent {
+  name String required minlength(1) maxlength(50)
+}
+
+entity ApiHeartbeat {
+  executedAt Instant required
+  success Boolean
+  responseTimeMs Integer
+  responseSizeBytes Integer
+  responseStatusCode Integer
+  responseContentType String maxlength(50)
+  responseServer String maxlength(50)
+  responseCacheStatus String maxlength(50)
+  dnsLookupMs Integer
+  tcpConnectMs Integer
+  tlsHandshakeMs Integer
+  timeToFirstByteMs Integer
+  warningThresholdMs Integer
+  criticalThresholdMs Integer
+  errorType String maxlength(50)
+  errorMessage TextBlob
+  rawRequestHeaders TextBlob
+  rawResponseHeaders TextBlob
+  rawResponseBody TextBlob
+}
+
+entity AuditLog {
+  action String required minlength(1) maxlength(100)
+  entityName String required minlength(1) maxlength(100)
+  entityId Long required
+  oldValue TextBlob
+  newValue TextBlob
+  timestamp Instant required
+  ipAddress String maxlength(45)
+  userAgent TextBlob
+}
+
+entity DatacenterMonitor {
+  // Junction table for many-to-many
+  datacenterId Long required
+  monitorId Long required
+}
+
+relationship OneToMany {
+  Schedule{apiMonitor} to ApiMonitor{schedule}
+}
+
+relationship OneToMany {
+  Region{datacenter} to Datacenter{region}
+}
+
+relationship OneToMany {
+  Datacenter{agent} to Agent{datacenter}
+}
+
+relationship OneToMany {
+  ApiMonitor{apiHeartbeat} to ApiHeartbeat{monitor}
+}
+
+relationship OneToMany {
+  Agent{apiHeartbeat} to ApiHeartbeat{agent}
+}
+
+relationship OneToMany {
+  Datacenter{datacenterMonitor} to DatacenterMonitor{datacenter}
+}
+
+relationship OneToMany {
+  ApiMonitor{datacenterMonitor} to DatacenterMonitor{monitor}
+}
+
+relationship ManyToOne {
+  AuditLog{user} to User with builtInEntity
+}
+
+paginate ApiMonitor, ApiHeartbeat with pagination
+paginate Schedule, Region, Datacenter, Agent with pagination
+paginate AuditLog with pagination
+
+// DTOs for complex entities
+dto ApiMonitor, ApiHeartbeat with mapstruct
+dto AuditLog with mapstruct
+
+// Services
+service ApiMonitor, ApiHeartbeat with serviceClass
+service Schedule, Region, Datacenter, Agent with serviceImpl
+service AuditLog with serviceClass
+
+// Custom repository for ApiHeartbeat if needed
+// repository ApiHeartbeat with custom

@@ -1,0 +1,14 @@
+import { ISchedule } from 'app/shared/model/schedule.model';
+
+export interface IApiMonitor {
+  id?: number;
+  name?: string;
+  method?: string;
+  type?: string;
+  url?: string;
+  headers?: string | null;
+  body?: string | null;
+  schedule?: ISchedule | null;
+}
+
+export const defaultValue: Readonly<IApiMonitor> = {};
