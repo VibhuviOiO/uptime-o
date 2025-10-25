@@ -108,3 +108,4 @@ CREATE INDEX idx_datacenter_monitors_monitor_id
 
 -- ✅ Recency index (query booster)
 CREATE INDEX idx_hb_recent_exec ON api_heartbeats (executed_at DESC);
+CREATE INDEX idx_api_heartbeats_monitor_id_executed_at ON api_heartbeats (monitor_id, executed_at);

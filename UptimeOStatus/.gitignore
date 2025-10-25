@@ -28,16 +28,6 @@ dev.env
 .env.test.local
 .env.production.local
 
-# Infragent - ignore production configs but keep examples
-infragent/configs/monitors.yml
-infragent/configs/monitors-production.yml
-infragent/configs/monitors-*.yml
-infragent/configs/agent.yml
-infragent/configs/agent-*.yml
-!infragent/configs/monitors.example.yml
-!infragent/configs/agent.example.yml
-!infragent/examples/**
-
 # Docker volumes and data
 docker/tmp/pgdata/
 postgres-data/

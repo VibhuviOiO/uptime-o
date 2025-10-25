@@ -4,17 +4,17 @@ services:
     container_name: postgres
     restart: always
     environment:
-      POSTGRES_USER: inframirror
-      POSTGRES_PASSWORD: inframirror
-      POSTGRES_DB: inframirror
+      POSTGRES_USER: uptimeo
+      POSTGRES_PASSWORD: uptimeo
+      POSTGRES_DB: uptimeo
     ports:
       - "5432:5432"
     volumes:
       - ./tmp/pgdata:/var/lib/postgresql/data
-      - ./sql/inframirror.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - ./sql/uptimeo.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
       - ./sql/data.sql:/docker-entrypoint-initdb.d/02-data.sql:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U inframirror -d inframirror"]
+      test: ["CMD-SHELL", "pg_isready -U uptimeo -d uptimeo"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -27,7 +27,7 @@ services:
         condition: service_healthy
     environment:
       DATACENTER_ID: 1
-      DB_CONN_STRING: "postgres://inframirror:inframirror@postgres:5432/inframirror?sslmode=disable"
+      DB_CONN_STRING: "postgres://uptimeo:uptimeo@postgres:5432/uptimeo?sslmode=disable"
     restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "pgrep agent || exit 1"]
@@ -43,10 +43,25 @@ services:
         condition: service_healthy
     environment:
       DATACENTER_ID: 2
-      DB_CONN_STRING: "postgres://inframirror:inframirror@postgres:5432/inframirror?sslmode=disable"
+      DB_CONN_STRING: "postgres://uptimeo:uptimeo@postgres:5432/uptimeo?sslmode=disable"
     restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "pgrep agent || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5
+  uptimeo-status:
+    image: uptimeo-status:latest
+    container_name: uptimeo-status
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB_CONN_STRING: "postgres://uptimeo:uptimeo@postgres:5432/uptimeo?sslmode=disable"
+      VITE_API_BASE_URL: /
+      NAVBAR_TITLE: RichRelevance Status
+      STATUS_PAGE_TITLE: RichRelevance Health Status
+      STATUS_PAGE_SUBTITLE: Real-time monitoring dashboard for your services
+    ports:
+      - "8077:8077"
+    restart: unless-stopped

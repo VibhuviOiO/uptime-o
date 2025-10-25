@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { pool } from '../db.js';
+import pool from '../db.js';
 import { HeartbeatFilters } from '../models/filters.js';
 
 function parseWindow(window: string | undefined): string {

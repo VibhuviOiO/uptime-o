@@ -1,5 +1,4 @@
-
-import { pool } from '../db';
+import pool from '../db.js';
 
 export interface HeartbeatRecord {
   id: number;
