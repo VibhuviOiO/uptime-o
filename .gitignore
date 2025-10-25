@@ -18,9 +18,6 @@ build
 /vendor/
 node_modules/
 
-# Go modules
-go.sum
-
 # IDE/editor files
 *.swp
 *.swo
