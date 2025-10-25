@@ -21,14 +21,12 @@ logs
 tmp/
 
 # Environment files
+dev.env
 .env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
-
-# Legacy agent (contains sensitive RichRelevance configurations)
-infra-mirror-agent/
 
 # Infragent - ignore production configs but keep examples
 infragent/configs/monitors.yml
