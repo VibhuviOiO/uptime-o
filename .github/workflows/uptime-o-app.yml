@@ -57,4 +57,4 @@ jobs:
           cd uptime-o
           GIT_TAG=:${GITHUB_REF#refs/tags/}
           DOCKER_TAG=${GIT_TAG#:refs/heads/main}
-          ./mvnw -ntp jib:build -Djib.to.image=ghcr.io/${{ github.repository_owner }}/uptime-o-app${DOCKER_TAG} -Pprod
+          ./mvnw -DskipTests -ntp jib:build -Djib.to.image=ghcr.io/${{ github.repository_owner }}/uptime-o-app${DOCKER_TAG} -Pprod
