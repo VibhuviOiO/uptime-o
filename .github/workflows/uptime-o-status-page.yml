@@ -1,4 +1,4 @@
-name: Uptime O Status Page CICD
+name: Uptime O Status Page  CI/CD Pipeline
 permissions:
   contents: read
   packages: write
