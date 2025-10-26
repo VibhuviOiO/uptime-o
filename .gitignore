@@ -107,7 +107,7 @@ out/
 *.db
 
 # Logs
-logs
+/logs
 *.log*
 
 # Others

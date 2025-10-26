@@ -13,7 +13,7 @@ import Tracker from './tracker/tracker';
 const AdministrationRoutes = () => (
   <div>
     <ErrorBoundaryRoutes>
-      <Route path="user-management/*" element={<UserManagement />} />
+      <Route path="user-`management/*" element={<UserManagement />} />
       <Route path="tracker" element={<Tracker />} />
       <Route path="health" element={<Health />} />
       <Route path="metrics" element={<Metrics />} />
