@@ -29,8 +29,8 @@ jobs:
           distribution: "temurin"
           java-version: 17
       - name: Build Docker image locally
+        working-directory: uptime-o
         run: |
-          cd uptime-o
           ./mvnw -ntp verify -DskipTests -Pprod jib:dockerBuild -Djib.to.image=uptimeo
 
       - name: Tag Docker image for GHCR
