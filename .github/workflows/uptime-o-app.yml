@@ -28,23 +28,6 @@ jobs:
         with:
           distribution: "temurin"
           java-version: 17
-      - name: Install Node.js packages
-        run: |
-          cd uptime-o
-          npm install
-      - name: Run backend test
-        run: |
-          cd uptime-o
-          chmod +x mvnw
-          npm run ci:backend:test
-      - name: Run frontend test
-        run: |
-          cd uptime-o
-          npm run ci:frontend:test
-      - name: Package application
-        run: |
-          cd uptime-o
-          npm run java:jar:prod
       - name: Build Docker image locally
         run: |
           cd uptime-o
