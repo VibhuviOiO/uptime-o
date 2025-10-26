@@ -1,4 +1,4 @@
-name: Build and Publish Uptime O Status Page Docker Image
+name: Uptime O Status Page CICD
 permissions:
   contents: read
   packages: write

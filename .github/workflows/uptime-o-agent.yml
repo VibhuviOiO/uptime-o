@@ -1,4 +1,4 @@
-name: Build and Publish Uptime O Agent Docker Image
+name: Uptime O Agent CICD
 permissions:
   contents: read
   packages: write
