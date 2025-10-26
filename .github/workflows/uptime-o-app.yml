@@ -31,7 +31,8 @@ jobs:
       - name: Build Docker image locally
         run: |
           cd uptime-o
-          ./mvnw -ntp verify -DskipTests -Pprod jib:dockerBuild
+          ./mvnw -ntp verify -DskipTests -Pprod jib:dockerBuild -Djib.to.image=uptimeo
+
       - name: Tag Docker image for GHCR
         run: |
           docker tag uptimeo ghcr.io/${{ github.repository_owner }}/uptime-o-app:latest
