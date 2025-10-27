@@ -1,0 +1,109 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: uptimeo
+      POSTGRES_PASSWORD: uptimeo
+      POSTGRES_DB: uptimeo
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./tmp/pgdata:/var/lib/postgresql/data
+      - ./sql/uptimeo.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - ./sql/data.sql:/docker-entrypoint-initdb.d/02-data.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U uptimeo -d uptimeo"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  agent-va:
+    image: ghcr.io/vibhuvioio/uptime-o-agent:latest
+    container_name: agent-va
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATACENTER_ID: 1
+      DB_CONN_STRING: "postgres://uptimeo:uptimeo@postgres:5432/uptimeo?sslmode=disable"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pgrep agent || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  agent-ny:
+    image: ghcr.io/vibhuvioio/uptime-o-agent:latest
+    container_name: agent-ny
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATACENTER_ID: 2
+      DB_CONN_STRING: "postgres://uptimeo:uptimeo@postgres:5432/uptimeo?sslmode=disable"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pgrep agent || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  uptimeo-status:
+    image: ghcr.io/vibhuvioio/uptime-o-status-page:latest
+    container_name: uptimeo-status
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB_CONN_STRING: "postgres://uptimeo:uptimeo@postgres:5432/uptimeo?sslmode=disable"
+      VITE_API_BASE_URL: /
+      NAVBAR_TITLE: Uptime Status
+      STATUS_PAGE_TITLE: Uptime Status
+      STATUS_PAGE_SUBTITLE: Real-time monitoring dashboard for your services
+    ports:
+      - "8077:8077"
+    restart: unless-stopped
+
+  uptimeo-app:
+    image: ghcr.io/vibhuvioio/uptime-o-app:latest
+    container_name: uptimeo-app
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/uptimeo
+      SPRING_DATASOURCE_USERNAME: uptimeo
+      SPRING_DATASOURCE_PASSWORD: uptimeo
+      SPRING_PROFILES_ACTIVE: dev
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+
+  partition-init:
+    image: postgres:17
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      POSTGRES_USER: uptimeo
+      POSTGRES_PASSWORD: uptimeo
+      POSTGRES_DB: uptimeo
+    entrypoint: >
+      bash -c "
+        sleep 5 &&
+        psql -h postgres -U uptimeo -d uptimeo -c \"
+        DO \$\$
+        DECLARE
+          partition_name TEXT := 'api_heartbeats_' || to_char(CURRENT_DATE, 'YYYY_MM_DD');
+        BEGIN
+          EXECUTE format(
+            'CREATE TABLE IF NOT EXISTS %I PARTITION OF api_heartbeats FOR VALUES FROM (%L) TO (%L)',
+            partition_name, CURRENT_DATE, CURRENT_DATE + INTERVAL '1 day'
+          );
+        END;
+        \$\$;
+        \"
+      "
+    restart: "no"
