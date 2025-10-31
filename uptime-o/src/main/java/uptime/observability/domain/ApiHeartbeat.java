@@ -72,8 +72,7 @@ public class ApiHeartbeat implements Serializable {
     @Column(name = "error_type", length = 50)
     private String errorType;
 
-    @Lob
-    @Column(name = "error_message",columnDefinition = "text")
+    @Column(name = "error_message", columnDefinition = "text")
     private String errorMessage;
 
     @Column(name = "raw_request_headers", columnDefinition = "jsonb")

@@ -15,12 +15,12 @@ it means there is no partition for today's date in the `api_heartbeats` table.
 ### How to Fix
 
 **Manual SQL (run in psql):**
-For today's date (2025-10-27), use:
+For today's date (2025-10-31), use:
 
 ```sql
-CREATE TABLE IF NOT EXISTS api_heartbeats_2025_10_27
+CREATE TABLE IF NOT EXISTS api_heartbeats_2025_11_01
 PARTITION OF api_heartbeats
-FOR VALUES FROM ('2025-10-27 00:00:00') TO ('2025-10-28 00:00:00');
+FOR VALUES FROM ('2025-11-01 00:00:00') TO ('2025-11-02 00:00:00');
 ```
 
 Replace the date with the current day as needed.

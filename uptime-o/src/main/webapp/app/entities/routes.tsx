@@ -9,6 +9,7 @@ import Region from './region';
 import Datacenter from './datacenter';
 import Agent from './agent';
 import ApiHeartbeat from './api-heartbeat';
+import ApiHeartbeatAggregated from './api-heartbeat/api-heartbeat-aggregated';
 import AuditLog from './audit-log';
 import DatacenterMonitor from './datacenter-monitor';
 /* jhipster-needle-add-route-import - JHipster will add routes here */
@@ -24,6 +25,7 @@ export default () => {
         <Route path="datacenter/*" element={<Datacenter />} />
         <Route path="agent/*" element={<Agent />} />
         <Route path="api-heartbeat/*" element={<ApiHeartbeat />} />
+        <Route path="api-heartbeat-aggregated" element={<ApiHeartbeatAggregated />} />
         <Route path="audit-log/*" element={<AuditLog />} />
         <Route path="datacenter-monitor/*" element={<DatacenterMonitor />} />
         {/* jhipster-needle-add-route-path - JHipster will add routes here */}

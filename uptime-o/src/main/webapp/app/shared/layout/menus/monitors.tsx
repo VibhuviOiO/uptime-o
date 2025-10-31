@@ -7,7 +7,9 @@ export const MonitorsMenu = () => (
     <MenuItem icon="heartbeat" to="/api-heartbeat">
       API Heartbeats
     </MenuItem>
-    {/* jhipster-needle-add-element-to-monitors-menu - JHipster will add entities to the monitors menu here */}
+    <MenuItem icon="heartbeat" to="/api-heartbeat-aggregated">
+      API Monitors (Aggregated)
+    </MenuItem>
   </NavDropdown>
 );
 

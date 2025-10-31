@@ -22,6 +22,7 @@ import tech.jhipster.web.util.ResponseUtil;
 import uptime.observability.repository.ApiHeartbeatRepository;
 import uptime.observability.service.ApiHeartbeatService;
 import uptime.observability.service.dto.ApiHeartbeatDTO;
+import uptime.observability.service.dto.ApiMonitorAggregationDTO;
 import uptime.observability.web.rest.errors.BadRequestAlertException;
 
 /**
@@ -176,5 +177,16 @@ public class ApiHeartbeatResource {
         return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
             .build();
+    }
+
+    /**
+     * {@code GET  /api-heartbeats/aggregated} : get aggregated apiHeartbeats.
+     *
+     * @param range the time range for aggregation.
+     * @return the list of aggregated apiHeartbeats.
+     */
+    @GetMapping("/aggregated")
+    public List<ApiMonitorAggregationDTO> getAggregatedHeartbeats(@RequestParam(defaultValue = "5min") String range) {
+        return apiHeartbeatService.getAggregatedHeartbeats(range);
     }
 }
