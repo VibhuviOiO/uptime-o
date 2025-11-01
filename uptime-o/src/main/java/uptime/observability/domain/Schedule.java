@@ -44,7 +44,7 @@ public class Schedule implements Serializable {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "schedule")
     @JsonIgnoreProperties(value = { "apiHeartbeats", "datacenterMonitors", "schedule" }, allowSetters = true)
-    private Set<ApiMonitor> apiMonitors = new HashSet<>();
+    private Set<HttpMonitor> apiMonitors = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -126,11 +126,11 @@ public class Schedule implements Serializable {
         this.thresholdsCritical = thresholdsCritical;
     }
 
-    public Set<ApiMonitor> getApiMonitors() {
+    public Set<HttpMonitor> getHttpMonitors() {
         return this.apiMonitors;
     }
 
-    public void setApiMonitors(Set<ApiMonitor> apiMonitors) {
+    public void setHttpMonitors(Set<HttpMonitor> apiMonitors) {
         if (this.apiMonitors != null) {
             this.apiMonitors.forEach(i -> i.setSchedule(null));
         }
@@ -140,18 +140,18 @@ public class Schedule implements Serializable {
         this.apiMonitors = apiMonitors;
     }
 
-    public Schedule apiMonitors(Set<ApiMonitor> apiMonitors) {
-        this.setApiMonitors(apiMonitors);
+    public Schedule apiMonitors(Set<HttpMonitor> apiMonitors) {
+        this.setHttpMonitors(apiMonitors);
         return this;
     }
 
-    public Schedule addApiMonitor(ApiMonitor apiMonitor) {
+    public Schedule addHttpMonitor(HttpMonitor apiMonitor) {
         this.apiMonitors.add(apiMonitor);
         apiMonitor.setSchedule(this);
         return this;
     }
 
-    public Schedule removeApiMonitor(ApiMonitor apiMonitor) {
+    public Schedule removeHttpMonitor(HttpMonitor apiMonitor) {
         this.apiMonitors.remove(apiMonitor);
         apiMonitor.setSchedule(null);
         return this;

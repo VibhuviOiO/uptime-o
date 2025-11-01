@@ -6,7 +6,7 @@ entity Schedule (schedules) {
   thresholdsCritical Integer
 }
 
-entity ApiMonitor (api_monitors) {
+entity HttpMonitor (api_monitors) {
   name String required minlength(1) maxlength(100)
   method String required minlength(1) maxlength(10)
   type String required minlength(1) maxlength(10)
@@ -30,7 +30,7 @@ entity Agent (agents) {
   name String required minlength(1) maxlength(50)
 }
 
-entity ApiHeartbeat (api_heartbeats) {
+entity IHttpHeartbeat (api_heartbeats) {
   executedAt Instant required
   success Boolean
   responseTimeMs Integer
@@ -69,7 +69,7 @@ entity DatacenterMonitor (datacenter_monitors) {
 }
 
 relationship OneToMany {
-  Schedule{apiMonitor} to ApiMonitor{schedule}
+  Schedule{apiMonitor} to HttpMonitor{schedule}
 }
 
 relationship OneToMany {
@@ -81,11 +81,11 @@ relationship OneToMany {
 }
 
 relationship OneToMany {
-  ApiMonitor{apiHeartbeat} to ApiHeartbeat{monitor}
+  HttpMonitor{apiHeartbeat} to IHttpHeartbeat{monitor}
 }
 
 relationship OneToMany {
-  Agent{apiHeartbeat} to ApiHeartbeat{agent}
+  Agent{apiHeartbeat} to IHttpHeartbeat{agent}
 }
 
 relationship OneToMany {
@@ -93,23 +93,23 @@ relationship OneToMany {
 }
 
 relationship OneToMany {
-  ApiMonitor{datacenterMonitor(monitorId)} to DatacenterMonitor{monitor(monitorId)}
+  HttpMonitor{datacenterMonitor(monitorId)} to DatacenterMonitor{monitor(monitorId)}
 }
 
 relationship ManyToOne {
   AuditLog{user} to User with builtInEntity
 }
 
-paginate ApiMonitor, ApiHeartbeat with pagination
+paginate HttpMonitor, IHttpHeartbeat with pagination
 paginate Schedule, Region, Datacenter, Agent with pagination
 paginate AuditLog with pagination
 
 dto * with mapstruct
 
 // Services
-service ApiMonitor, ApiHeartbeat with serviceClass
+service HttpMonitor, IHttpHeartbeat with serviceClass
 service Schedule, Region, Datacenter, Agent with serviceImpl
 service AuditLog with serviceClass
 
-// Custom repository for ApiHeartbeat if needed
-// repository ApiHeartbeat with custom
+// Custom repository for IHttpHeartbeat if needed
+// repository IHttpHeartbeat with custom

@@ -13,7 +13,7 @@ public class DatacenterMonitorDTO implements Serializable {
 
     private DatacenterDTO datacenter;
 
-    private ApiMonitorDTO monitor;
+    private HttpMonitorDTO monitor;
 
     public Long getId() {
         return id;
@@ -31,11 +31,11 @@ public class DatacenterMonitorDTO implements Serializable {
         this.datacenter = datacenter;
     }
 
-    public ApiMonitorDTO getMonitor() {
+    public HttpMonitorDTO getMonitor() {
         return monitor;
     }
 
-    public void setMonitor(ApiMonitorDTO monitor) {
+    public void setMonitor(HttpMonitorDTO monitor) {
         this.monitor = monitor;
     }
 

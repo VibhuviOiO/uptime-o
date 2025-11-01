@@ -1,10 +1,10 @@
 package uptime.observability.service.mapper;
 
 import org.mapstruct.*;
-import uptime.observability.domain.ApiMonitor;
+import uptime.observability.domain.HttpMonitor;
 import uptime.observability.domain.Datacenter;
 import uptime.observability.domain.DatacenterMonitor;
-import uptime.observability.service.dto.ApiMonitorDTO;
+import uptime.observability.service.dto.HttpMonitorDTO;
 import uptime.observability.service.dto.DatacenterDTO;
 import uptime.observability.service.dto.DatacenterMonitorDTO;
 
@@ -25,5 +25,5 @@ public interface DatacenterMonitorMapper extends EntityMapper<DatacenterMonitorD
     @Named("apiMonitorId")
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
-    ApiMonitorDTO toDtoApiMonitorId(ApiMonitor apiMonitor);
+    HttpMonitorDTO toDtoHttpMonitorId(HttpMonitor apiMonitor);
 }

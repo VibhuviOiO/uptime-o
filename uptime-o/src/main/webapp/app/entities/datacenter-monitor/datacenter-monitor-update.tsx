@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 
 import { getEntities as getDatacenters } from 'app/entities/datacenter/datacenter.reducer';
-import { getEntities as getApiMonitors } from 'app/entities/api-monitor/api-monitor.reducer';
+import { getEntities as getHttpMonitors } from 'app/entities/http-monitor/http-monitor.reducer';
 import { createEntity, getEntity, reset, updateEntity } from './datacenter-monitor.reducer';
 
 export const DatacenterMonitorUpdate = () => {
@@ -19,7 +19,7 @@ export const DatacenterMonitorUpdate = () => {
   const isNew = id === undefined;
 
   const datacenters = useAppSelector(state => state.datacenter.entities);
-  const apiMonitors = useAppSelector(state => state.apiMonitor.entities);
+  const httpMonitors = useAppSelector(state => state.httpMonitor.entities);
   const datacenterMonitorEntity = useAppSelector(state => state.datacenterMonitor.entity);
   const loading = useAppSelector(state => state.datacenterMonitor.loading);
   const updating = useAppSelector(state => state.datacenterMonitor.updating);
@@ -37,7 +37,7 @@ export const DatacenterMonitorUpdate = () => {
     }
 
     dispatch(getDatacenters({}));
-    dispatch(getApiMonitors({}));
+    dispatch(getHttpMonitors({}));
   }, []);
 
   useEffect(() => {
@@ -55,7 +55,7 @@ export const DatacenterMonitorUpdate = () => {
       ...datacenterMonitorEntity,
       ...values,
       datacenter: datacenters.find(it => it.id.toString() === values.datacenter?.toString()),
-      monitor: apiMonitors.find(it => it.id.toString() === values.monitor?.toString()),
+      monitor: httpMonitors.find(it => it.id.toString() === values.monitor?.toString()),
     };
 
     if (isNew) {
@@ -104,8 +104,8 @@ export const DatacenterMonitorUpdate = () => {
               </ValidatedField>
               <ValidatedField id="datacenter-monitor-monitor" name="monitor" data-cy="monitor" label="Monitor" type="select">
                 <option value="" key="0" />
-                {apiMonitors
-                  ? apiMonitors.map(otherEntity => (
+                {httpMonitors
+                  ? httpMonitors.map(otherEntity => (
                       <option value={otherEntity.id} key={otherEntity.id}>
                         {otherEntity.id}
                       </option>

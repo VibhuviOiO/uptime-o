@@ -4,12 +4,12 @@ import { Route } from 'react-router';
 import ErrorBoundaryRoutes from 'app/shared/error/error-boundary-routes';
 
 import Schedule from './schedule';
-import ApiMonitor from './api-monitor';
+import HttpMonitor from './http-monitor';
 import Region from './region';
 import Datacenter from './datacenter';
 import Agent from './agent';
-import ApiHeartbeat from './api-heartbeat';
-import ApiHeartbeatAggregated from './api-heartbeat/api-heartbeat-aggregated';
+import HttpHeartbeat from './http-heartbeat';
+import HttpHeartbeatAggregated from './http-heartbeat/http-heartbeat-aggregated';
 import AuditLog from './audit-log';
 import DatacenterMonitor from './datacenter-monitor';
 /* jhipster-needle-add-route-import - JHipster will add routes here */
@@ -20,12 +20,12 @@ export default () => {
       <ErrorBoundaryRoutes>
         {/* prettier-ignore */}
         <Route path="schedule/*" element={<Schedule />} />
-        <Route path="http-monitor/*" element={<ApiMonitor />} />
+        <Route path="http-monitor/*" element={<HttpMonitor />} />
         <Route path="region/*" element={<Region />} />
         <Route path="datacenter/*" element={<Datacenter />} />
         <Route path="agent/*" element={<Agent />} />
-        <Route path="http-heartbeats/*" element={<ApiHeartbeat />} />
-        <Route path="api-heartbeat-aggregated" element={<ApiHeartbeatAggregated />} />
+        <Route path="http-heartbeats/*" element={<HttpHeartbeat />} />
+        <Route path="http-heartbeat-aggregated" element={<HttpHeartbeatAggregated />} />
         <Route path="audit-log/*" element={<AuditLog />} />
         <Route path="datacenter-monitor/*" element={<DatacenterMonitor />} />
         {/* jhipster-needle-add-route-path - JHipster will add routes here */}

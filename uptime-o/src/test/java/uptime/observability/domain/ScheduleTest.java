@@ -1,7 +1,7 @@
 package uptime.observability.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static uptime.observability.domain.ApiMonitorTestSamples.*;
+import static uptime.observability.domain.HttpMonitorTestSamples.*;
 import static uptime.observability.domain.ScheduleTestSamples.*;
 
 import java.util.HashSet;
@@ -28,22 +28,22 @@ class ScheduleTest {
     @Test
     void apiMonitorTest() {
         Schedule schedule = getScheduleRandomSampleGenerator();
-        ApiMonitor apiMonitorBack = getApiMonitorRandomSampleGenerator();
+        HttpMonitor apiMonitorBack = getHttpMonitorRandomSampleGenerator();
 
-        schedule.addApiMonitor(apiMonitorBack);
-        assertThat(schedule.getApiMonitors()).containsOnly(apiMonitorBack);
+        schedule.addHttpMonitor(apiMonitorBack);
+        assertThat(schedule.getHttpMonitors()).containsOnly(apiMonitorBack);
         assertThat(apiMonitorBack.getSchedule()).isEqualTo(schedule);
 
-        schedule.removeApiMonitor(apiMonitorBack);
-        assertThat(schedule.getApiMonitors()).doesNotContain(apiMonitorBack);
+        schedule.removeHttpMonitor(apiMonitorBack);
+        assertThat(schedule.getHttpMonitors()).doesNotContain(apiMonitorBack);
         assertThat(apiMonitorBack.getSchedule()).isNull();
 
         schedule.apiMonitors(new HashSet<>(Set.of(apiMonitorBack)));
-        assertThat(schedule.getApiMonitors()).containsOnly(apiMonitorBack);
+        assertThat(schedule.getHttpMonitors()).containsOnly(apiMonitorBack);
         assertThat(apiMonitorBack.getSchedule()).isEqualTo(schedule);
 
-        schedule.setApiMonitors(new HashSet<>());
-        assertThat(schedule.getApiMonitors()).doesNotContain(apiMonitorBack);
+        schedule.setHttpMonitors(new HashSet<>());
+        assertThat(schedule.getHttpMonitors()).doesNotContain(apiMonitorBack);
         assertThat(apiMonitorBack.getSchedule()).isNull();
     }
 }
