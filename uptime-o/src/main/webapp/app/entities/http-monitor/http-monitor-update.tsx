@@ -33,6 +33,8 @@ export const HttpMonitorUpdate = () => {
     if (isNew) {
       dispatch(reset());
     } else {
+      // Reset state first to clear old entity data, then fetch new entity
+      dispatch(reset());
       dispatch(getEntity(id));
     }
 
