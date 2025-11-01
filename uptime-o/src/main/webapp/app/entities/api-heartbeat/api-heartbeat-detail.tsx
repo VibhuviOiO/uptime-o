@@ -113,11 +113,11 @@ export const ApiHeartbeatDetail = () => {
           <dt>Agent</dt>
           <dd>{apiHeartbeatEntity.agent ? apiHeartbeatEntity.agent.id : ''}</dd>
         </dl>
-        <Button tag={Link} to="/api-heartbeat" replace color="info" data-cy="entityDetailsBackButton">
+        <Button tag={Link} to="/http-heartbeats" replace color="info" data-cy="entityDetailsBackButton">
           <FontAwesomeIcon icon="arrow-left" /> <span className="d-none d-md-inline">Back</span>
         </Button>
         &nbsp;
-        <Button tag={Link} to={`/api-heartbeat/${apiHeartbeatEntity.id}/edit`} replace color="primary">
+        <Button tag={Link} to={`/http-heartbeats/${apiHeartbeatEntity.id}/edit`} replace color="primary">
           <FontAwesomeIcon icon="pencil-alt" /> <span className="d-none d-md-inline">Edit</span>
         </Button>
       </Col>

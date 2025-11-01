@@ -4,11 +4,11 @@ import { NavDropdown } from './menu-components';
 
 export const MonitorsMenu = () => (
   <NavDropdown icon="desktop" name="Monitors" id="monitors-menu" data-cy="monitorsMenu">
-    <MenuItem icon="heartbeat" to="/api-heartbeat">
-      API Heartbeats
+    <MenuItem icon="heartbeat" to="/http-heartbeats">
+      HTTP Heartbeats
     </MenuItem>
-    <MenuItem icon="heartbeat" to="/api-heartbeat-aggregated">
-      API Monitors (Aggregated)
+    <MenuItem icon="heartbeat" to="/http-heartbeats-aggregated">
+      HTTP Monitors (Aggregated)
     </MenuItem>
   </NavDropdown>
 );

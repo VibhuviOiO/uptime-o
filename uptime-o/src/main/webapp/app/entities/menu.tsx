@@ -21,8 +21,8 @@ const EntitiesMenu = () => {
       <MenuItem icon="asterisk" to="/agent">
         Agent
       </MenuItem>
-      <MenuItem icon="asterisk" to="/api-heartbeat">
-        Api Heartbeat
+      <MenuItem icon="asterisk" to="/http-heartbeats">
+        HTTP Heartbeats
       </MenuItem>
       <MenuItem icon="asterisk" to="/audit-log">
         Audit Log

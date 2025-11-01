@@ -97,7 +97,7 @@ export const ApiHeartbeat = () => {
           <Button className="me-2" color="info" onClick={handleSyncList} disabled={loading}>
             <FontAwesomeIcon icon="sync" spin={loading} /> Refresh list
           </Button>
-          <Link to="/api-heartbeat/new" className="btn btn-primary jh-create-entity" id="jh-create-entity" data-cy="entityCreateButton">
+          <Link to="/http-heartbeats/new" className="btn btn-primary jh-create-entity" id="jh-create-entity" data-cy="entityCreateButton">
             <FontAwesomeIcon icon="plus" />
             &nbsp; Create a new Api Heartbeat
           </Link>
@@ -181,7 +181,7 @@ export const ApiHeartbeat = () => {
               {apiHeartbeatList.map((apiHeartbeat, i) => (
                 <tr key={`entity-${i}`} data-cy="entityTable">
                   <td>
-                    <Button tag={Link} to={`/api-heartbeat/${apiHeartbeat.id}`} color="link" size="sm">
+                    <Button tag={Link} to={`/http-heartbeats/${apiHeartbeat.id}`} color="link" size="sm">
                       {apiHeartbeat.id}
                     </Button>
                   </td>
@@ -212,12 +212,12 @@ export const ApiHeartbeat = () => {
                   <td>{apiHeartbeat.agent ? <Link to={`/agent/${apiHeartbeat.agent.id}`}>{apiHeartbeat.agent.id}</Link> : ''}</td>
                   <td className="text-end">
                     <div className="btn-group flex-btn-group-container">
-                      <Button tag={Link} to={`/api-heartbeat/${apiHeartbeat.id}`} color="info" size="sm" data-cy="entityDetailsButton">
+                      <Button tag={Link} to={`/http-heartbeats/${apiHeartbeat.id}`} color="info" size="sm" data-cy="entityDetailsButton">
                         <FontAwesomeIcon icon="eye" /> <span className="d-none d-md-inline">View</span>
                       </Button>
                       <Button
                         tag={Link}
-                        to={`/api-heartbeat/${apiHeartbeat.id}/edit?page=${paginationState.activePage}&sort=${paginationState.sort},${paginationState.order}`}
+                        to={`/http-heartbeats/${apiHeartbeat.id}/edit?page=${paginationState.activePage}&sort=${paginationState.sort},${paginationState.order}`}
                         color="primary"
                         size="sm"
                         data-cy="entityEditButton"
@@ -226,7 +226,7 @@ export const ApiHeartbeat = () => {
                       </Button>
                       <Button
                         onClick={() =>
-                          (window.location.href = `/api-heartbeat/${apiHeartbeat.id}/delete?page=${paginationState.activePage}&sort=${paginationState.sort},${paginationState.order}`)
+                          (window.location.href = `/http-heartbeats/${apiHeartbeat.id}/delete?page=${paginationState.activePage}&sort=${paginationState.sort},${paginationState.order}`)
                         }
                         color="danger"
                         size="sm"

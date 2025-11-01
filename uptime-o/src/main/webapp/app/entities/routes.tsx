@@ -24,7 +24,7 @@ export default () => {
         <Route path="region/*" element={<Region />} />
         <Route path="datacenter/*" element={<Datacenter />} />
         <Route path="agent/*" element={<Agent />} />
-        <Route path="api-heartbeat/*" element={<ApiHeartbeat />} />
+        <Route path="http-heartbeats/*" element={<ApiHeartbeat />} />
         <Route path="api-heartbeat-aggregated" element={<ApiHeartbeatAggregated />} />
         <Route path="audit-log/*" element={<AuditLog />} />
         <Route path="datacenter-monitor/*" element={<DatacenterMonitor />} />

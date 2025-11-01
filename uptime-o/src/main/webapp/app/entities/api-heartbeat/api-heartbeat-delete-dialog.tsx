@@ -24,7 +24,7 @@ export const ApiHeartbeatDeleteDialog = () => {
   const updateSuccess = useAppSelector(state => state.apiHeartbeat.updateSuccess);
 
   const handleClose = () => {
-    navigate(`/api-heartbeat${pageLocation.search}`);
+    navigate(`/http-heartbeats${pageLocation.search}`);
   };
 
   useEffect(() => {
