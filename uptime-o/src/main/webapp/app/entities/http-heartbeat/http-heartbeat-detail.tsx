@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { APP_DATE_FORMAT } from 'app/config/constants';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-import { getEntity } from './api-heartbeat.reducer';
+import { getEntity } from './http-heartbeat.reducer';
 
 export const ApiHeartbeatDetail = () => {
   const dispatch = useAppDispatch();

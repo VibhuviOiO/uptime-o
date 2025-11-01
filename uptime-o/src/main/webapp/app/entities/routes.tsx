@@ -8,8 +8,8 @@ import HttpMonitor from './http-monitor';
 import Region from './region';
 import Datacenter from './datacenter';
 import Agent from './agent';
-import ApiHeartbeat from './api-heartbeat';
-import ApiHeartbeatAggregated from './api-heartbeat/api-heartbeat-aggregated';
+import ApiHeartbeat from './http-heartbeat';
+import ApiHeartbeatAggregated from './http-heartbeat/http-heartbeat-aggregated';
 import AuditLog from './audit-log';
 import DatacenterMonitor from './datacenter-monitor';
 /* jhipster-needle-add-route-import - JHipster will add routes here */

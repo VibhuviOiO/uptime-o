@@ -9,7 +9,7 @@ import { useAppDispatch, useAppSelector } from 'app/config/store';
 
 import { getEntities as getHttpMonitors } from 'app/entities/http-monitor/http-monitor.reducer';
 import { getEntities as getAgents } from 'app/entities/agent/agent.reducer';
-import { createEntity, getEntity, reset, updateEntity } from './api-heartbeat.reducer';
+import { createEntity, getEntity, reset, updateEntity } from './http-heartbeat.reducer';
 
 export const ApiHeartbeatUpdate = () => {
   const dispatch = useAppDispatch();

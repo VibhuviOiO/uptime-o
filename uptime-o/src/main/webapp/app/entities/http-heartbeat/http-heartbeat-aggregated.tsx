@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
-import { getAggregatedHeartbeats } from './api-heartbeat-aggregated.reducer';
+import { getAggregatedHeartbeats } from './http-heartbeat-aggregated.reducer';
 
 const timeRanges = [
   { label: '5 min', value: '5min' },

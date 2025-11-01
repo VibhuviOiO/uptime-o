@@ -3,10 +3,10 @@ import { Route } from 'react-router';
 
 import ErrorBoundaryRoutes from 'app/shared/error/error-boundary-routes';
 
-import ApiHeartbeat from './api-heartbeat';
-import ApiHeartbeatDetail from './api-heartbeat-detail';
-import ApiHeartbeatUpdate from './api-heartbeat-update';
-import ApiHeartbeatDeleteDialog from './api-heartbeat-delete-dialog';
+import ApiHeartbeat from './http-heartbeat';
+import ApiHeartbeatDetail from './http-heartbeat-detail';
+import ApiHeartbeatUpdate from './http-heartbeat-update';
+import ApiHeartbeatDeleteDialog from './http-heartbeat-delete-dialog';
 
 const ApiHeartbeatRoutes = () => (
   <ErrorBoundaryRoutes>

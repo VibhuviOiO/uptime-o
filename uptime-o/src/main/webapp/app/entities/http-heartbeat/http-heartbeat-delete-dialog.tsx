@@ -5,7 +5,7 @@ import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { useAppDispatch, useAppSelector } from 'app/config/store';
-import { deleteEntity, getEntity } from './api-heartbeat.reducer';
+import { deleteEntity, getEntity } from './http-heartbeat.reducer';
 
 export const ApiHeartbeatDeleteDialog = () => {
   const dispatch = useAppDispatch();
