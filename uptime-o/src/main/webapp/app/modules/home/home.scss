@@ -1,122 +1,156 @@
 /* ==========================================================================
-Home Page Styles - Modern UI
+Dashboard Home Page Styles
 ========================================================================== */
 
 :root {
   --primary-color: #0066CC;
-  --primary-light: #E6F0FF;
-  --success-color: #10B981;
-  --warning-color: #F59E0B;
-  --error-color: #EF4444;
   --text-primary: #1F2937;
   --text-secondary: #6B7280;
   --text-tertiary: #9CA3AF;
   --bg-light: #F9FAFB;
   --bg-white: #FFFFFF;
   --border-color: #E5E7EB;
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
   --transition: all 0.3s ease;
 }
 
-.home-container {
-  width: 100%;
-  overflow-x: hidden;
-  background: linear-gradient(135deg, #F9FAFB 0%, #F3F4F6 100%);
+.dashboard-home {
+  background: var(--bg-light);
   min-height: 100vh;
+  padding: 2rem;
 }
 
-/* ========================================================================
-   Hero Section
-   ======================================================================== */
-
-.hero {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 4rem;
-  align-items: center;
-  padding: 6rem 2rem;
-  max-width: 1400px;
-  margin: 0 auto;
-  min-height: 80vh;
+/* Header */
+.dashboard-header {
+  margin-bottom: 3rem;
 }
 
-.hero-content {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.hero-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  width: fit-content;
-  padding: 0.5rem 1rem;
-  background: var(--primary-light);
-  color: var(--primary-color);
-  border-radius: 2rem;
-  font-size: 0.875rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.hero-title {
-  font-size: 3.5rem;
-  font-weight: 800;
-  line-height: 1.2;
+.dashboard-header h1 {
+  font-size: 2rem;
+  font-weight: 700;
   color: var(--text-primary);
   margin: 0;
 }
 
-.hero-title .highlight {
-  background: linear-gradient(135deg, var(--primary-color), #0052A3);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+.header-subtitle {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin: 0.5rem 0 0 0;
 }
 
-.hero-subtitle {
-  font-size: 1.25rem;
-  line-height: 1.6;
+/* Grid Layout */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  max-width: 1400px;
+}
+
+/* Cards */
+.dashboard-card {
+  background: var(--bg-white);
+  border: 1px solid var(--border-color);
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  box-shadow: var(--shadow-md);
+  transition: var(--transition);
+  display: flex;
+  flex-direction: column;
+
+  &:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+    border-color: var(--primary-color);
+  }
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+
+  h2 {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+  }
+
+  .card-icon {
+    font-size: 1.5rem;
+  }
+}
+
+.card-body {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.metric-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  margin-bottom: 0.5rem;
+
+  &.status-ok {
+    color: #10B981;
+  }
+
+  &.status-warning {
+    color: #F59E0B;
+  }
+
+  &.status-error {
+    color: #EF4444;
+  }
+}
+
+.metric-label {
+  font-size: 0.875rem;
   color: var(--text-secondary);
   margin: 0;
-  max-width: 500px;
+  margin-bottom: 1rem;
 }
 
-.hero-actions {
-  display: flex;
-  gap: 1rem;
-  margin-top: 1rem;
-  flex-wrap: wrap;
-}
-
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.75rem 1.5rem;
-  border-radius: 0.5rem;
-  font-size: 1rem;
-  font-weight: 600;
+.card-link {
+  display: inline-block;
+  color: var(--primary-color);
   text-decoration: none;
-  border: 2px solid transparent;
-  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 0.5rem 0;
   transition: var(--transition);
-  white-space: nowrap;
-  font-family: inherit;
+
+  &:hover {
+    color: #0052A3;
+  }
 }
 
-.btn-primary {
+/* Card Actions */
+.card-actions {
+  gap: 1rem;
+}
+
+.action-btn {
+  display: inline-block;
   background: var(--primary-color);
   color: white;
-  
+  padding: 0.75rem 1rem;
+  border-radius: 0.375rem;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: var(--transition);
+  cursor: pointer;
+  border: none;
+  text-align: center;
+
   &:hover {
     background: #0052A3;
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-lg);
+    transform: translateY(-1px);
   }
 
   &:active {
@@ -124,424 +158,45 @@ Home Page Styles - Modern UI
   }
 }
 
-.btn-secondary {
-  background: var(--bg-white);
-  color: var(--primary-color);
-  border-color: var(--border-color);
-  
-  &:hover {
-    background: var(--primary-light);
-    border-color: var(--primary-color);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
-  }
-}
-
-.btn-large {
-  padding: 1rem 2rem;
-  font-size: 1.125rem;
-}
-
-.hero-illustration {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.illustration-placeholder {
-  width: 100%;
-  max-width: 400px;
-  aspect-ratio: 1 / 1;
-  background: var(--bg-white);
-  border-radius: 1rem;
-  box-shadow: var(--shadow-lg);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2rem;
-  
-  svg {
-    width: 100%;
-    height: 100%;
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
-  }
-}
-
-/* ========================================================================
-   Features Section
-   ======================================================================== */
-
-.features {
-  padding: 4rem 2rem;
+/* Footer */
+.dashboard-footer {
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-color);
+  text-align: center;
   max-width: 1400px;
-  margin: 0 auto;
-  
-  h2 {
-    text-align: center;
-    font-size: 2.5rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    margin-bottom: 3rem;
-  }
-}
-
-.features-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 2rem;
-}
-
-.feature-card {
-  background: var(--bg-white);
-  padding: 2rem;
-  border-radius: 1rem;
-  box-shadow: var(--shadow-md);
-  transition: var(--transition);
-  border: 1px solid var(--border-color);
-
-  &:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-lg);
-    border-color: var(--primary-color);
-  }
-
-  .feature-icon {
-    font-size: 3rem;
-    line-height: 1;
-    margin-bottom: 1rem;
-  }
-
-  h3 {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    margin: 1rem 0;
-  }
 
   p {
+    font-size: 0.95rem;
     color: var(--text-secondary);
     margin: 0;
-    line-height: 1.6;
   }
-}
 
-/* ========================================================================
-   How It Works Section
-   ======================================================================== */
-
-.how-it-works {
-  padding: 4rem 2rem;
-  max-width: 1400px;
-  margin: 0 auto;
-  background: var(--bg-white);
-
-  h2 {
-    text-align: center;
-    font-size: 2.5rem;
-    font-weight: 700;
+  strong {
     color: var(--text-primary);
-    margin-bottom: 3rem;
   }
 }
 
-.steps {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 2rem;
-}
-
-.step {
-  position: relative;
-  text-align: center;
-  padding: 2rem 1rem;
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 50%;
-    width: 4rem;
-    height: 4rem;
-    background: var(--primary-color);
-    border-radius: 50%;
-    transform: translateX(-50%);
-  }
-
-  &::after {
-    content: '';
-    position: absolute;
-    top: 2rem;
-    left: 50%;
-    width: 100%;
-    height: 2px;
-    background: var(--border-color);
-    transform: translateX(50%);
-  }
-
-  &:last-child::after {
-    display: none;
-  }
-}
-
-.step-number {
-  position: absolute;
-  top: 0;
-  left: 50%;
-  width: 4rem;
-  height: 4rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: white;
-  transform: translateX(-50%);
-  z-index: 1;
-}
-
-.step h3 {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin: 3rem 0 1rem 0;
-}
-
-.step p {
-  color: var(--text-secondary);
-  margin: 0;
-  line-height: 1.6;
-}
-
-/* ========================================================================
-   Status Section
-   ======================================================================== */
-
-.status-section {
-  padding: 4rem 2rem;
-  max-width: 1400px;
-  margin: 0 auto;
-
-  h2 {
-    text-align: center;
-    font-size: 2.5rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    margin-bottom: 3rem;
-  }
-}
-
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1.5rem;
-}
-
-.stat-card {
-  background: var(--bg-white);
-  padding: 1.5rem;
-  border-radius: 1rem;
-  border: 1px solid var(--border-color);
-  text-align: center;
-  box-shadow: var(--shadow-md);
-  transition: var(--transition);
-
-  &:hover {
-    border-color: var(--primary-color);
-    box-shadow: var(--shadow-lg);
-  }
-}
-
-.stat-label {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--text-tertiary);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 0.5rem;
-}
-
-.stat-value {
-  font-size: 2.5rem;
-  font-weight: 700;
-  color: var(--primary-color);
-  margin: 0.5rem 0;
-}
-
-.stat-desc {
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-}
-
-/* ========================================================================
-   CTA Section
-   ======================================================================== */
-
-.cta-section {
-  padding: 4rem 2rem;
-  background: linear-gradient(135deg, var(--primary-color), #0052A3);
-  text-align: center;
-  margin: 2rem 0;
-}
-
-.cta-content {
-  max-width: 600px;
-  margin: 0 auto;
-
-  h2 {
-    font-size: 2rem;
-    font-weight: 700;
-    color: white;
-    margin-bottom: 1rem;
-  }
-
-  p {
-    font-size: 1.125rem;
-    color: rgba(255, 255, 255, 0.9);
-    margin-bottom: 2rem;
-  }
-
-  .btn-primary {
-    background: white;
-    color: var(--primary-color);
-
-    &:hover {
-      background: var(--bg-light);
-      transform: translateY(-2px);
-    }
-  }
-}
-
-/* ========================================================================
-   User Info Section
-   ======================================================================== */
-
-.user-info {
-  padding: 1rem 2rem;
-  text-align: center;
-  background: var(--primary-light);
-  border-top: 1px solid var(--border-color);
-}
-
-.logged-in-message {
-  color: var(--primary-color);
-  font-weight: 600;
-  margin: 0;
-  font-size: 0.95rem;
-}
-
-/* ========================================================================
-   Responsive Design
-   ======================================================================== */
-
-@media (max-width: 1024px) {
-  .hero {
-    grid-template-columns: 1fr;
-    gap: 2rem;
-    padding: 4rem 1rem;
-    min-height: auto;
-  }
-
-  .hero-title {
-    font-size: 2.5rem;
-  }
-
-  .hero-illustration {
-    display: none;
-  }
-}
-
+/* Responsive */
 @media (max-width: 768px) {
-  .hero {
-    padding: 2rem 1rem;
-  }
-
-  .hero-title {
-    font-size: 2rem;
-  }
-
-  .hero-subtitle {
-    font-size: 1rem;
-  }
-
-  .features-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .feature-card {
-    text-align: center;
-  }
-
-  .steps {
-    grid-template-columns: 1fr;
-  }
-
-  .step {
-    padding: 2rem 1rem;
-  }
-
-  .step h3 {
-    margin-top: 4rem;
-  }
-
-  .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .cta-content h2 {
-    font-size: 1.5rem;
-  }
-
-  .btn {
-    padding: 0.625rem 1.25rem;
-    font-size: 0.95rem;
-  }
-
-  .hero-badge {
-    font-size: 0.8rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .hero {
+  .dashboard-home {
     padding: 1rem;
   }
 
-  .hero-title {
+  .dashboard-header h1 {
     font-size: 1.5rem;
   }
 
-  .hero-subtitle {
-    font-size: 0.95rem;
-  }
-
-  .hero-actions {
-    flex-direction: column;
-    width: 100%;
-  }
-
-  .btn {
-    width: 100%;
-  }
-
-  .features h2,
-  .how-it-works h2,
-  .status-section h2 {
-    font-size: 1.75rem;
-  }
-
-  .stats-grid {
+  .dashboard-grid {
     grid-template-columns: 1fr;
   }
 
-  .stat-value {
-    font-size: 2rem;
+  .metric-value {
+    font-size: 1.5rem;
   }
 }
 
-/* ========================================================================
-   Dark Mode Support (Optional)
-   ======================================================================== */
-
+/* Dark Mode */
 @media (prefers-color-scheme: dark) {
   :root {
     --text-primary: #F9FAFB;
@@ -551,18 +206,4 @@ Home Page Styles - Modern UI
     --bg-white: #1F2937;
     --border-color: #374151;
   }
-
-  .home-container {
-    background: linear-gradient(135deg, #111827 0%, #1F2937 100%);
-  }
-
-  .btn-secondary {
-    background: var(--bg-white);
-    color: var(--primary-color);
-
-    &:hover {
-      background: #2D3748;
-    }
-  }
 }
-
