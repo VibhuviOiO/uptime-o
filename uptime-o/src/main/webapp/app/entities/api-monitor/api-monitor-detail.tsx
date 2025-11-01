@@ -21,7 +21,7 @@ export const ApiMonitorDetail = () => {
   return (
     <Row>
       <Col md="8">
-        <h2 data-cy="apiMonitorDetailsHeading">Api Monitor</h2>
+        <h2 data-cy="apiMonitorDetailsHeading">HTTP Monitor</h2>
         <dl className="jh-entity-details">
           <dt>
             <span id="id">ID</span>

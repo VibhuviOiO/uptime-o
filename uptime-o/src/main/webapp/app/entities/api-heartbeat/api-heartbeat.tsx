@@ -92,14 +92,14 @@ export const ApiHeartbeat = () => {
   return (
     <div>
       <h2 id="api-heartbeat-heading" data-cy="ApiHeartbeatHeading">
-        Api Heartbeats
+        HTTP Heartbeats
         <div className="d-flex justify-content-end">
           <Button className="me-2" color="info" onClick={handleSyncList} disabled={loading}>
             <FontAwesomeIcon icon="sync" spin={loading} /> Refresh list
           </Button>
           <Link to="/http-heartbeats/new" className="btn btn-primary jh-create-entity" id="jh-create-entity" data-cy="entityCreateButton">
             <FontAwesomeIcon icon="plus" />
-            &nbsp; Create a new Api Heartbeat
+            &nbsp; Create a new HTTP Heartbeat
           </Link>
         </div>
       </h2>
@@ -241,7 +241,7 @@ export const ApiHeartbeat = () => {
             </tbody>
           </Table>
         ) : (
-          !loading && <div className="alert alert-warning">No Api Heartbeats found</div>
+          !loading && <div className="alert alert-warning">No HTTP Heartbeats found</div>
         )}
       </div>
       {totalItems ? (

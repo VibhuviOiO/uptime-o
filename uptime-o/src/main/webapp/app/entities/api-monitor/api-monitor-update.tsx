@@ -74,7 +74,7 @@ export const ApiMonitorUpdate = () => {
       <Row className="justify-content-center">
         <Col md="8">
           <h2 id="uptimeOApp.apiMonitor.home.createOrEditLabel" data-cy="ApiMonitorCreateUpdateHeading">
-            Create or edit a Api Monitor
+            Create or edit a HTTP Monitor
           </h2>
         </Col>
       </Row>
