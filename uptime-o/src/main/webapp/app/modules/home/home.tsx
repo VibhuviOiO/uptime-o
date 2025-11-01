@@ -1,12 +1,20 @@
 import './home.scss';
 
 import React from 'react';
-import { Link } from 'react-router-dom';
 
 import { useAppSelector } from 'app/config/store';
+import DashboardCard, { ActionCard } from './components/DashboardCard';
+import { useRegionsCount, useDatacentersCount, useAgentsCount, useMonitorsCount, useSystemHealth } from './hooks/useDashboardMetrics';
 
 export const Home = () => {
   const account = useAppSelector(state => state.authentication.account);
+
+  // Lazy load metrics
+  const regionsMetric = useRegionsCount();
+  const datacentersMetric = useDatacentersCount();
+  const agentsMetric = useAgentsCount();
+  const monitorsMetric = useMonitorsCount();
+  const healthMetric = useSystemHealth();
 
   return (
     <div className="dashboard-home">
@@ -21,95 +29,80 @@ export const Home = () => {
       {/* Analytics Grid */}
       <div className="dashboard-grid">
         {/* Regions Card */}
-        <div className="dashboard-card">
-          <div className="card-header">
-            <h2>Regions</h2>
-            <span className="card-icon">🌍</span>
-          </div>
-          <div className="card-body">
-            <div className="metric-value">—</div>
-            <p className="metric-label">Configured globally</p>
-            <Link to="/infrastructure/regions" className="card-link">
-              View Regions →
-            </Link>
-          </div>
-        </div>
+        <DashboardCard
+          title="Regions"
+          icon="🌍"
+          metric={{
+            ...regionsMetric,
+            label: 'Configured globally',
+          }}
+          linkTo="/infrastructure/regions"
+          linkText="View Regions"
+          dataMetric="/api/regions/count"
+        />
 
         {/* Datacenters Card */}
-        <div className="dashboard-card">
-          <div className="card-header">
-            <h2>Datacenters</h2>
-            <span className="card-icon">🏢</span>
-          </div>
-          <div className="card-body">
-            <div className="metric-value">—</div>
-            <p className="metric-label">Deployed instances</p>
-            <Link to="/infrastructure/datacenters" className="card-link">
-              View Datacenters →
-            </Link>
-          </div>
-        </div>
+        <DashboardCard
+          title="Datacenters"
+          icon="🏢"
+          metric={{
+            ...datacentersMetric,
+            label: 'Deployed instances',
+          }}
+          linkTo="/infrastructure/datacenters"
+          linkText="View Datacenters"
+          dataMetric="/api/datacenters/count"
+        />
 
         {/* Agents Card */}
-        <div className="dashboard-card">
-          <div className="card-header">
-            <h2>Agents</h2>
-            <span className="card-icon">🤖</span>
-          </div>
-          <div className="card-body">
-            <div className="metric-value">—</div>
-            <p className="metric-label">Actively running</p>
-            <Link to="/infrastructure/agents" className="card-link">
-              View Agents →
-            </Link>
-          </div>
-        </div>
+        <DashboardCard
+          title="Agents"
+          icon="🤖"
+          metric={{
+            ...agentsMetric,
+            label: 'Actively running',
+          }}
+          linkTo="/infrastructure/agents"
+          linkText="View Agents"
+          dataMetric="/api/agents/count"
+        />
 
         {/* Monitors Card */}
-        <div className="dashboard-card">
-          <div className="card-header">
-            <h2>Monitors</h2>
-            <span className="card-icon">📊</span>
-          </div>
-          <div className="card-body">
-            <div className="metric-value">—</div>
-            <p className="metric-label">API tests configured</p>
-            <Link to="/monitoring/monitors" className="card-link">
-              View Monitors →
-            </Link>
-          </div>
-        </div>
+        <DashboardCard
+          title="Monitors"
+          icon="📊"
+          metric={{
+            ...monitorsMetric,
+            label: 'API tests configured',
+          }}
+          linkTo="/monitoring/monitors"
+          linkText="View Monitors"
+          dataMetric="/api/http-monitors/count"
+        />
 
         {/* Health Status Card */}
-        <div className="dashboard-card">
-          <div className="card-header">
-            <h2>System Health</h2>
-            <span className="card-icon">❤️</span>
-          </div>
-          <div className="card-body">
-            <div className="metric-value status-ok">Healthy</div>
-            <p className="metric-label">All systems operational</p>
-            <Link to="/admin/jhi-health" className="card-link">
-              View Health →
-            </Link>
-          </div>
-        </div>
+        <DashboardCard
+          title="System Health"
+          icon="❤️"
+          metric={{
+            ...healthMetric,
+            label: 'All systems operational',
+          }}
+          linkTo="/admin/jhi-health"
+          linkText="View Health"
+          dataMetric="/management/health"
+          statusClass={typeof healthMetric.value === 'string' && healthMetric.value.includes('Healthy') ? 'status-ok' : 'status-error'}
+        />
 
         {/* Quick Actions Card */}
-        <div className="dashboard-card">
-          <div className="card-header">
-            <h2>Quick Actions</h2>
-            <span className="card-icon">⚡</span>
-          </div>
-          <div className="card-body card-actions">
-            <Link to="/infrastructure/regions" className="action-btn">
-              + New Region
-            </Link>
-            <Link to="/monitoring/monitors" className="action-btn">
-              + New Monitor
-            </Link>
-          </div>
-        </div>
+        <ActionCard
+          title="Quick Actions"
+          icon="⚡"
+          actions={[
+            { label: '+ New Region', to: '/infrastructure/regions' },
+            { label: '+ New Monitor', to: '/monitoring/monitors' },
+          ]}
+        />
       </div>
 
       {/* User Info Footer */}

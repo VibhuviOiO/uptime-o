@@ -150,6 +150,18 @@ public class AgentResource {
     }
 
     /**
+     * {@code GET  /agents/count} : get the count of agents.
+     *
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the count.
+     */
+    @GetMapping("/count")
+    public ResponseEntity<java.util.Map<String, Long>> getAgentCount() {
+        LOG.debug("REST request to get Agent count");
+        long count = agentRepository.count();
+        return ResponseEntity.ok(java.util.Map.of("totalCount", count));
+    }
+
+    /**
      * {@code GET  /agents/:id} : get the "id" agent.
      *
      * @param id the id of the agentDTO to retrieve.

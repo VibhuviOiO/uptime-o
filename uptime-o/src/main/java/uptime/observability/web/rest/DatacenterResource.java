@@ -150,6 +150,18 @@ public class DatacenterResource {
     }
 
     /**
+     * {@code GET  /datacenters/count} : get the count of datacenters.
+     *
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the count.
+     */
+    @GetMapping("/count")
+    public ResponseEntity<java.util.Map<String, Long>> getDatacenterCount() {
+        LOG.debug("REST request to get Datacenter count");
+        long count = datacenterRepository.count();
+        return ResponseEntity.ok(java.util.Map.of("totalCount", count));
+    }
+
+    /**
      * {@code GET  /datacenters/:id} : get the "id" datacenter.
      *
      * @param id the id of the datacenterDTO to retrieve.
