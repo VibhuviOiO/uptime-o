@@ -6,7 +6,7 @@ entity Schedule (schedules) {
   thresholdsCritical Integer
 }
 
-entity ApiMonitor (api_monitors) {
+entity HttpMonitor (api_monitors) {
   name String required minlength(1) maxlength(100)
   method String required minlength(1) maxlength(10)
   type String required minlength(1) maxlength(10)
@@ -69,7 +69,7 @@ entity DatacenterMonitor (datacenter_monitors) {
 }
 
 relationship OneToMany {
-  Schedule{apiMonitor} to ApiMonitor{schedule}
+  Schedule{apiMonitor} to HttpMonitor{schedule}
 }
 
 relationship OneToMany {
@@ -81,7 +81,7 @@ relationship OneToMany {
 }
 
 relationship OneToMany {
-  ApiMonitor{apiHeartbeat} to ApiHeartbeat{monitor}
+  HttpMonitor{apiHeartbeat} to ApiHeartbeat{monitor}
 }
 
 relationship OneToMany {
@@ -93,21 +93,21 @@ relationship OneToMany {
 }
 
 relationship OneToMany {
-  ApiMonitor{datacenterMonitor(monitorId)} to DatacenterMonitor{monitor(monitorId)}
+  HttpMonitor{datacenterMonitor(monitorId)} to DatacenterMonitor{monitor(monitorId)}
 }
 
 relationship ManyToOne {
   AuditLog{user} to User with builtInEntity
 }
 
-paginate ApiMonitor, ApiHeartbeat with pagination
+paginate HttpMonitor, ApiHeartbeat with pagination
 paginate Schedule, Region, Datacenter, Agent with pagination
 paginate AuditLog with pagination
 
 dto * with mapstruct
 
 // Services
-service ApiMonitor, ApiHeartbeat with serviceClass
+service HttpMonitor, ApiHeartbeat with serviceClass
 service Schedule, Region, Datacenter, Agent with serviceImpl
 service AuditLog with serviceClass
 

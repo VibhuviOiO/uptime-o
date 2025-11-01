@@ -5,14 +5,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
 import uptime.observability.web.rest.TestUtil;
 
-class ApiHeartbeatDTOTest {
+class HttpHeartbeatDTOTest {
 
     @Test
     void dtoEqualsVerifier() throws Exception {
-        TestUtil.equalsVerifier(ApiHeartbeatDTO.class);
-        ApiHeartbeatDTO apiHeartbeatDTO1 = new ApiHeartbeatDTO();
+        TestUtil.equalsVerifier(HttpHeartbeatDTO.class);
+        HttpHeartbeatDTO apiHeartbeatDTO1 = new HttpHeartbeatDTO();
         apiHeartbeatDTO1.setId(1L);
-        ApiHeartbeatDTO apiHeartbeatDTO2 = new ApiHeartbeatDTO();
+        HttpHeartbeatDTO apiHeartbeatDTO2 = new HttpHeartbeatDTO();
         assertThat(apiHeartbeatDTO1).isNotEqualTo(apiHeartbeatDTO2);
         apiHeartbeatDTO2.setId(apiHeartbeatDTO1.getId());
         assertThat(apiHeartbeatDTO1).isEqualTo(apiHeartbeatDTO2);

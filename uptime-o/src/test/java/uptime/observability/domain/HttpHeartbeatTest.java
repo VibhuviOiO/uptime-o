@@ -2,19 +2,19 @@ package uptime.observability.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uptime.observability.domain.AgentTestSamples.*;
-import static uptime.observability.domain.ApiHeartbeatTestSamples.*;
-import static uptime.observability.domain.ApiMonitorTestSamples.*;
+import static uptime.observability.domain.HttpHeartbeatTestSamples.*;
+import static uptime.observability.domain.HttpMonitorTestSamples.*;
 
 import org.junit.jupiter.api.Test;
 import uptime.observability.web.rest.TestUtil;
 
-class ApiHeartbeatTest {
+class HttpHeartbeatTest {
 
     @Test
     void equalsVerifier() throws Exception {
-        TestUtil.equalsVerifier(ApiHeartbeat.class);
-        ApiHeartbeat apiHeartbeat1 = getApiHeartbeatSample1();
-        ApiHeartbeat apiHeartbeat2 = new ApiHeartbeat();
+        TestUtil.equalsVerifier(HttpHeartbeat.class);
+        HttpHeartbeat apiHeartbeat1 = getApiHeartbeatSample1();
+        HttpHeartbeat apiHeartbeat2 = new HttpHeartbeat();
         assertThat(apiHeartbeat1).isNotEqualTo(apiHeartbeat2);
 
         apiHeartbeat2.setId(apiHeartbeat1.getId());
@@ -26,8 +26,8 @@ class ApiHeartbeatTest {
 
     @Test
     void monitorTest() {
-        ApiHeartbeat apiHeartbeat = getApiHeartbeatRandomSampleGenerator();
-        ApiMonitor apiMonitorBack = getApiMonitorRandomSampleGenerator();
+        HttpHeartbeat apiHeartbeat = getApiHeartbeatRandomSampleGenerator();
+        HttpMonitor apiMonitorBack = getHttpMonitorRandomSampleGenerator();
 
         apiHeartbeat.setMonitor(apiMonitorBack);
         assertThat(apiHeartbeat.getMonitor()).isEqualTo(apiMonitorBack);
@@ -38,7 +38,7 @@ class ApiHeartbeatTest {
 
     @Test
     void agentTest() {
-        ApiHeartbeat apiHeartbeat = getApiHeartbeatRandomSampleGenerator();
+        HttpHeartbeat apiHeartbeat = getApiHeartbeatRandomSampleGenerator();
         Agent agentBack = getAgentRandomSampleGenerator();
 
         apiHeartbeat.setAgent(agentBack);

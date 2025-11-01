@@ -1,7 +1,7 @@
 package uptime.observability.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static uptime.observability.domain.ApiMonitorTestSamples.*;
+import static uptime.observability.domain.HttpMonitorTestSamples.*;
 import static uptime.observability.domain.DatacenterMonitorTestSamples.*;
 import static uptime.observability.domain.DatacenterTestSamples.*;
 
@@ -39,7 +39,7 @@ class DatacenterMonitorTest {
     @Test
     void monitorTest() {
         DatacenterMonitor datacenterMonitor = getDatacenterMonitorRandomSampleGenerator();
-        ApiMonitor apiMonitorBack = getApiMonitorRandomSampleGenerator();
+        HttpMonitor apiMonitorBack = getHttpMonitorRandomSampleGenerator();
 
         datacenterMonitor.setMonitor(apiMonitorBack);
         assertThat(datacenterMonitor.getMonitor()).isEqualTo(apiMonitorBack);

@@ -7,10 +7,10 @@ import java.time.Instant;
 import java.util.Objects;
 
 /**
- * A DTO for the {@link uptime.observability.domain.ApiHeartbeat} entity.
+ * A DTO for the {@link uptime.observability.domain.HttpHeartbeat} entity.
  */
 @SuppressWarnings("common-java:DuplicatedBlocks")
-public class ApiHeartbeatDTO implements Serializable {
+public class HttpHeartbeatDTO implements Serializable {
 
     private Long id;
 
@@ -57,7 +57,7 @@ public class ApiHeartbeatDTO implements Serializable {
 
     private String rawResponseBody;
 
-    private ApiMonitorDTO monitor;
+    private HttpMonitorDTO monitor;
 
     private AgentDTO agent;
 
@@ -221,11 +221,11 @@ public class ApiHeartbeatDTO implements Serializable {
         this.rawResponseBody = rawResponseBody;
     }
 
-    public ApiMonitorDTO getMonitor() {
+    public HttpMonitorDTO getMonitor() {
         return monitor;
     }
 
-    public void setMonitor(ApiMonitorDTO monitor) {
+    public void setMonitor(HttpMonitorDTO monitor) {
         this.monitor = monitor;
     }
 
@@ -242,11 +242,11 @@ public class ApiHeartbeatDTO implements Serializable {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof ApiHeartbeatDTO)) {
+        if (!(o instanceof HttpHeartbeatDTO)) {
             return false;
         }
 
-        ApiHeartbeatDTO apiHeartbeatDTO = (ApiHeartbeatDTO) o;
+        HttpHeartbeatDTO apiHeartbeatDTO = (HttpHeartbeatDTO) o;
         if (this.id == null) {
             return false;
         }

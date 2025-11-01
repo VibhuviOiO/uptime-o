@@ -30,7 +30,7 @@ public class Agent implements Serializable {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "agent")
     @JsonIgnoreProperties(value = { "monitor", "agent" }, allowSetters = true)
-    private Set<ApiHeartbeat> apiHeartbeats = new HashSet<>();
+    private Set<HttpHeartbeat> apiHeartbeats = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnoreProperties(value = { "agents", "datacenterMonitors", "region" }, allowSetters = true)
@@ -64,11 +64,11 @@ public class Agent implements Serializable {
         this.name = name;
     }
 
-    public Set<ApiHeartbeat> getApiHeartbeats() {
+    public Set<HttpHeartbeat> getApiHeartbeats() {
         return this.apiHeartbeats;
     }
 
-    public void setApiHeartbeats(Set<ApiHeartbeat> apiHeartbeats) {
+    public void setApiHeartbeats(Set<HttpHeartbeat> apiHeartbeats) {
         if (this.apiHeartbeats != null) {
             this.apiHeartbeats.forEach(i -> i.setAgent(null));
         }
@@ -78,18 +78,18 @@ public class Agent implements Serializable {
         this.apiHeartbeats = apiHeartbeats;
     }
 
-    public Agent apiHeartbeats(Set<ApiHeartbeat> apiHeartbeats) {
+    public Agent apiHeartbeats(Set<HttpHeartbeat> apiHeartbeats) {
         this.setApiHeartbeats(apiHeartbeats);
         return this;
     }
 
-    public Agent addApiHeartbeat(ApiHeartbeat apiHeartbeat) {
+    public Agent addApiHeartbeat(HttpHeartbeat apiHeartbeat) {
         this.apiHeartbeats.add(apiHeartbeat);
         apiHeartbeat.setAgent(this);
         return this;
     }
 
-    public Agent removeApiHeartbeat(ApiHeartbeat apiHeartbeat) {
+    public Agent removeApiHeartbeat(HttpHeartbeat apiHeartbeat) {
         this.apiHeartbeats.remove(apiHeartbeat);
         apiHeartbeat.setAgent(null);
         return this;

@@ -43,9 +43,9 @@ public class CacheConfiguration {
             createCache(cm, uptime.observability.domain.Authority.class.getName());
             createCache(cm, uptime.observability.domain.Schedule.class.getName());
             createCache(cm, uptime.observability.domain.Schedule.class.getName() + ".apiMonitors");
-            createCache(cm, uptime.observability.domain.ApiMonitor.class.getName());
-            createCache(cm, uptime.observability.domain.ApiMonitor.class.getName() + ".apiHeartbeats");
-            createCache(cm, uptime.observability.domain.ApiMonitor.class.getName() + ".datacenterMonitors");
+            createCache(cm, uptime.observability.domain.HttpMonitor.class.getName());
+            createCache(cm, uptime.observability.domain.HttpMonitor.class.getName() + ".apiHeartbeats");
+            createCache(cm, uptime.observability.domain.HttpMonitor.class.getName() + ".datacenterMonitors");
             createCache(cm, uptime.observability.domain.Region.class.getName());
             createCache(cm, uptime.observability.domain.Region.class.getName() + ".datacenters");
             createCache(cm, uptime.observability.domain.Datacenter.class.getName());
@@ -53,7 +53,7 @@ public class CacheConfiguration {
             createCache(cm, uptime.observability.domain.Datacenter.class.getName() + ".datacenterMonitors");
             createCache(cm, uptime.observability.domain.Agent.class.getName());
             createCache(cm, uptime.observability.domain.Agent.class.getName() + ".apiHeartbeats");
-            createCache(cm, uptime.observability.domain.ApiHeartbeat.class.getName());
+            createCache(cm, uptime.observability.domain.HttpHeartbeat.class.getName());
             createCache(cm, uptime.observability.domain.AuditLog.class.getName());
             createCache(cm, uptime.observability.domain.DatacenterMonitor.class.getName());
             // jhipster-needle-ehcache-add-entry

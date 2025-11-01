@@ -2,7 +2,7 @@ package uptime.observability.repository;
 
 import org.springframework.data.jpa.repository.*;
 import org.springframework.stereotype.Repository;
-import uptime.observability.domain.ApiHeartbeat;
+import uptime.observability.domain.HttpHeartbeat;
 
 import java.time.Instant;
 import java.util.List;
@@ -12,6 +12,6 @@ import java.util.List;
  */
 @SuppressWarnings("unused")
 @Repository
-public interface ApiHeartbeatRepository extends JpaRepository<ApiHeartbeat, Long> {
-    List<ApiHeartbeat> findByExecutedAtAfter(Instant from);
+public interface HttpHeartbeatRepository extends JpaRepository<HttpHeartbeat, Long> {
+    List<HttpHeartbeat> findByExecutedAtAfter(Instant from);
 }

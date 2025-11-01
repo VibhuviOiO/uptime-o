@@ -2,7 +2,7 @@ package uptime.observability.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uptime.observability.domain.AgentTestSamples.*;
-import static uptime.observability.domain.ApiHeartbeatTestSamples.*;
+import static uptime.observability.domain.HttpHeartbeatTestSamples.*;
 import static uptime.observability.domain.DatacenterTestSamples.*;
 
 import java.util.HashSet;
@@ -29,7 +29,7 @@ class AgentTest {
     @Test
     void apiHeartbeatTest() {
         Agent agent = getAgentRandomSampleGenerator();
-        ApiHeartbeat apiHeartbeatBack = getApiHeartbeatRandomSampleGenerator();
+        HttpHeartbeat apiHeartbeatBack = getApiHeartbeatRandomSampleGenerator();
 
         agent.addApiHeartbeat(apiHeartbeatBack);
         assertThat(agent.getApiHeartbeats()).containsOnly(apiHeartbeatBack);

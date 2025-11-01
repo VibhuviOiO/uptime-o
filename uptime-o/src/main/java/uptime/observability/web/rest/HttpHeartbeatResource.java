@@ -19,31 +19,31 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.PaginationUtil;
 import tech.jhipster.web.util.ResponseUtil;
-import uptime.observability.repository.ApiHeartbeatRepository;
-import uptime.observability.service.ApiHeartbeatService;
-import uptime.observability.service.dto.ApiHeartbeatDTO;
-import uptime.observability.service.dto.ApiMonitorAggregationDTO;
+import uptime.observability.repository.HttpHeartbeatRepository;
+import uptime.observability.service.HttpHeartbeatService;
+import uptime.observability.service.dto.HttpHeartbeatDTO;
+import uptime.observability.service.dto.HttpMonitorAggregationDTO;
 import uptime.observability.web.rest.errors.BadRequestAlertException;
 
 /**
- * REST controller for managing {@link uptime.observability.domain.ApiHeartbeat}.
+ * REST controller for managing {@link uptime.observability.domain.HttpHeartbeat}.
  */
 @RestController
 @RequestMapping("/api/api-heartbeats")
-public class ApiHeartbeatResource {
+public class HttpHeartbeatResource {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ApiHeartbeatResource.class);
+    private static final Logger LOG = LoggerFactory.getLogger(HttpHeartbeatResource.class);
 
     private static final String ENTITY_NAME = "apiHeartbeat";
 
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
 
-    private final ApiHeartbeatService apiHeartbeatService;
+    private final HttpHeartbeatService apiHeartbeatService;
 
-    private final ApiHeartbeatRepository apiHeartbeatRepository;
+    private final HttpHeartbeatRepository apiHeartbeatRepository;
 
-    public ApiHeartbeatResource(ApiHeartbeatService apiHeartbeatService, ApiHeartbeatRepository apiHeartbeatRepository) {
+    public HttpHeartbeatResource(HttpHeartbeatService apiHeartbeatService, HttpHeartbeatRepository apiHeartbeatRepository) {
         this.apiHeartbeatService = apiHeartbeatService;
         this.apiHeartbeatRepository = apiHeartbeatRepository;
     }
@@ -56,7 +56,7 @@ public class ApiHeartbeatResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("")
-    public ResponseEntity<ApiHeartbeatDTO> createApiHeartbeat(@Valid @RequestBody ApiHeartbeatDTO apiHeartbeatDTO)
+    public ResponseEntity<HttpHeartbeatDTO> createApiHeartbeat(@Valid @RequestBody HttpHeartbeatDTO apiHeartbeatDTO)
         throws URISyntaxException {
         LOG.debug("REST request to save ApiHeartbeat : {}", apiHeartbeatDTO);
         if (apiHeartbeatDTO.getId() != null) {
@@ -79,9 +79,9 @@ public class ApiHeartbeatResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/{id}")
-    public ResponseEntity<ApiHeartbeatDTO> updateApiHeartbeat(
+    public ResponseEntity<HttpHeartbeatDTO> updateApiHeartbeat(
         @PathVariable(value = "id", required = false) final Long id,
-        @Valid @RequestBody ApiHeartbeatDTO apiHeartbeatDTO
+        @Valid @RequestBody HttpHeartbeatDTO apiHeartbeatDTO
     ) throws URISyntaxException {
         LOG.debug("REST request to update ApiHeartbeat : {}, {}", id, apiHeartbeatDTO);
         if (apiHeartbeatDTO.getId() == null) {
@@ -113,9 +113,9 @@ public class ApiHeartbeatResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
-    public ResponseEntity<ApiHeartbeatDTO> partialUpdateApiHeartbeat(
+    public ResponseEntity<HttpHeartbeatDTO> partialUpdateApiHeartbeat(
         @PathVariable(value = "id", required = false) final Long id,
-        @NotNull @RequestBody ApiHeartbeatDTO apiHeartbeatDTO
+        @NotNull @RequestBody HttpHeartbeatDTO apiHeartbeatDTO
     ) throws URISyntaxException {
         LOG.debug("REST request to partial update ApiHeartbeat partially : {}, {}", id, apiHeartbeatDTO);
         if (apiHeartbeatDTO.getId() == null) {
@@ -129,7 +129,7 @@ public class ApiHeartbeatResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        Optional<ApiHeartbeatDTO> result = apiHeartbeatService.partialUpdate(apiHeartbeatDTO);
+        Optional<HttpHeartbeatDTO> result = apiHeartbeatService.partialUpdate(apiHeartbeatDTO);
 
         return ResponseUtil.wrapOrNotFound(
             result,
@@ -144,9 +144,9 @@ public class ApiHeartbeatResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of apiHeartbeats in body.
      */
     @GetMapping("")
-    public ResponseEntity<List<ApiHeartbeatDTO>> getAllApiHeartbeats(@org.springdoc.core.annotations.ParameterObject Pageable pageable) {
+    public ResponseEntity<List<HttpHeartbeatDTO>> getAllApiHeartbeats(@org.springdoc.core.annotations.ParameterObject Pageable pageable) {
         LOG.debug("REST request to get a page of ApiHeartbeats");
-        Page<ApiHeartbeatDTO> page = apiHeartbeatService.findAll(pageable);
+        Page<HttpHeartbeatDTO> page = apiHeartbeatService.findAll(pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
@@ -158,9 +158,9 @@ public class ApiHeartbeatResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the apiHeartbeatDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/{id}")
-    public ResponseEntity<ApiHeartbeatDTO> getApiHeartbeat(@PathVariable("id") Long id) {
+    public ResponseEntity<HttpHeartbeatDTO> getApiHeartbeat(@PathVariable("id") Long id) {
         LOG.debug("REST request to get ApiHeartbeat : {}", id);
-        Optional<ApiHeartbeatDTO> apiHeartbeatDTO = apiHeartbeatService.findOne(id);
+        Optional<HttpHeartbeatDTO> apiHeartbeatDTO = apiHeartbeatService.findOne(id);
         return ResponseUtil.wrapOrNotFound(apiHeartbeatDTO);
     }
 
@@ -186,7 +186,7 @@ public class ApiHeartbeatResource {
      * @return the list of aggregated apiHeartbeats.
      */
     @GetMapping("/aggregated")
-    public List<ApiMonitorAggregationDTO> getAggregatedHeartbeats(@RequestParam(defaultValue = "5min") String range) {
+    public List<HttpMonitorAggregationDTO> getAggregatedHeartbeats(@RequestParam(defaultValue = "5min") String range) {
         return apiHeartbeatService.getAggregatedHeartbeats(range);
     }
 }

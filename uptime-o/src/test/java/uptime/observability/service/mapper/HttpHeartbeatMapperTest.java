@@ -1,18 +1,18 @@
 package uptime.observability.service.mapper;
 
-import static uptime.observability.domain.ApiHeartbeatAsserts.*;
-import static uptime.observability.domain.ApiHeartbeatTestSamples.*;
+import static uptime.observability.domain.HttpHeartbeatAsserts.*;
+import static uptime.observability.domain.HttpHeartbeatTestSamples.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class ApiHeartbeatMapperTest {
+class HttpHeartbeatMapperTest {
 
-    private ApiHeartbeatMapper apiHeartbeatMapper;
+    private HttpHeartbeatMapper apiHeartbeatMapper;
 
     @BeforeEach
     void setUp() {
-        apiHeartbeatMapper = new ApiHeartbeatMapperImpl();
+        apiHeartbeatMapper = new HttpHeartbeatMapperImpl();
     }
 
     @Test

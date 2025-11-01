@@ -4,7 +4,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import sinon from 'sinon';
 
 import { EntityState } from 'app/shared/reducers/reducer.utils';
-import { IApiMonitor, defaultValue } from 'app/shared/model/api-monitor.model';
+import { IHttpMonitor, defaultValue } from 'app/shared/model/api-monitor.model';
 import reducer, {
   createEntity,
   deleteEntity,
@@ -23,7 +23,7 @@ describe('Entities reducer tests', () => {
     return Object.keys(element).length === 0;
   }
 
-  const initialState: EntityState<IApiMonitor> = {
+  const initialState: EntityState<IHttpMonitor> = {
     loading: false,
     errorMessage: null,
     entities: [],

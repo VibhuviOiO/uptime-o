@@ -7,25 +7,25 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import uptime.observability.domain.ApiMonitor;
-import uptime.observability.repository.ApiMonitorRepository;
-import uptime.observability.service.dto.ApiMonitorDTO;
-import uptime.observability.service.mapper.ApiMonitorMapper;
+import uptime.observability.domain.HttpMonitor;
+import uptime.observability.repository.HttpMonitorRepository;
+import uptime.observability.service.dto.HttpMonitorDTO;
+import uptime.observability.service.mapper.HttpMonitorMapper;
 
 /**
- * Service Implementation for managing {@link uptime.observability.domain.ApiMonitor}.
+ * Service Implementation for managing {@link uptime.observability.domain.HttpMonitor}.
  */
 @Service
 @Transactional
-public class ApiMonitorService {
+public class HttpMonitorService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ApiMonitorService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(HttpMonitorService.class);
 
-    private final ApiMonitorRepository apiMonitorRepository;
+    private final HttpMonitorRepository apiMonitorRepository;
 
-    private final ApiMonitorMapper apiMonitorMapper;
+    private final HttpMonitorMapper apiMonitorMapper;
 
-    public ApiMonitorService(ApiMonitorRepository apiMonitorRepository, ApiMonitorMapper apiMonitorMapper) {
+    public HttpMonitorService(HttpMonitorRepository apiMonitorRepository, HttpMonitorMapper apiMonitorMapper) {
         this.apiMonitorRepository = apiMonitorRepository;
         this.apiMonitorMapper = apiMonitorMapper;
     }
@@ -36,9 +36,9 @@ public class ApiMonitorService {
      * @param apiMonitorDTO the entity to save.
      * @return the persisted entity.
      */
-    public ApiMonitorDTO save(ApiMonitorDTO apiMonitorDTO) {
-        LOG.debug("Request to save ApiMonitor : {}", apiMonitorDTO);
-        ApiMonitor apiMonitor = apiMonitorMapper.toEntity(apiMonitorDTO);
+    public HttpMonitorDTO save(HttpMonitorDTO apiMonitorDTO) {
+        LOG.debug("Request to save HttpMonitor : {}", apiMonitorDTO);
+        HttpMonitor apiMonitor = apiMonitorMapper.toEntity(apiMonitorDTO);
         apiMonitor = apiMonitorRepository.save(apiMonitor);
         return apiMonitorMapper.toDto(apiMonitor);
     }
@@ -49,9 +49,9 @@ public class ApiMonitorService {
      * @param apiMonitorDTO the entity to save.
      * @return the persisted entity.
      */
-    public ApiMonitorDTO update(ApiMonitorDTO apiMonitorDTO) {
-        LOG.debug("Request to update ApiMonitor : {}", apiMonitorDTO);
-        ApiMonitor apiMonitor = apiMonitorMapper.toEntity(apiMonitorDTO);
+    public HttpMonitorDTO update(HttpMonitorDTO apiMonitorDTO) {
+        LOG.debug("Request to update HttpMonitor : {}", apiMonitorDTO);
+        HttpMonitor apiMonitor = apiMonitorMapper.toEntity(apiMonitorDTO);
         apiMonitor = apiMonitorRepository.save(apiMonitor);
         return apiMonitorMapper.toDto(apiMonitor);
     }
@@ -62,15 +62,15 @@ public class ApiMonitorService {
      * @param apiMonitorDTO the entity to update partially.
      * @return the persisted entity.
      */
-    public Optional<ApiMonitorDTO> partialUpdate(ApiMonitorDTO apiMonitorDTO) {
-        LOG.debug("Request to partially update ApiMonitor : {}", apiMonitorDTO);
+    public Optional<HttpMonitorDTO> partialUpdate(HttpMonitorDTO apiMonitorDTO) {
+        LOG.debug("Request to partially update HttpMonitor : {}", apiMonitorDTO);
 
         return apiMonitorRepository
             .findById(apiMonitorDTO.getId())
-            .map(existingApiMonitor -> {
-                apiMonitorMapper.partialUpdate(existingApiMonitor, apiMonitorDTO);
+            .map(existingHttpMonitor -> {
+                apiMonitorMapper.partialUpdate(existingHttpMonitor, apiMonitorDTO);
 
-                return existingApiMonitor;
+                return existingHttpMonitor;
             })
             .map(apiMonitorRepository::save)
             .map(apiMonitorMapper::toDto);
@@ -83,8 +83,8 @@ public class ApiMonitorService {
      * @return the list of entities.
      */
     @Transactional(readOnly = true)
-    public Page<ApiMonitorDTO> findAll(Pageable pageable) {
-        LOG.debug("Request to get all ApiMonitors");
+    public Page<HttpMonitorDTO> findAll(Pageable pageable) {
+        LOG.debug("Request to get all HttpMonitors");
         return apiMonitorRepository.findAll(pageable).map(apiMonitorMapper::toDto);
     }
 
@@ -95,8 +95,8 @@ public class ApiMonitorService {
      * @return the entity.
      */
     @Transactional(readOnly = true)
-    public Optional<ApiMonitorDTO> findOne(Long id) {
-        LOG.debug("Request to get ApiMonitor : {}", id);
+    public Optional<HttpMonitorDTO> findOne(Long id) {
+        LOG.debug("Request to get HttpMonitor : {}", id);
         return apiMonitorRepository.findById(id).map(apiMonitorMapper::toDto);
     }
 
@@ -106,7 +106,7 @@ public class ApiMonitorService {
      * @param id the id of the entity.
      */
     public void delete(Long id) {
-        LOG.debug("Request to delete ApiMonitor : {}", id);
+        LOG.debug("Request to delete HttpMonitor : {}", id);
         apiMonitorRepository.deleteById(id);
     }
 }

@@ -8,12 +8,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * A ApiMonitor.
+ * A HttpMonitor.
  */
 @Entity
 @Table(name = "api_monitors")
 @SuppressWarnings("common-java:DuplicatedBlocks")
-public class ApiMonitor implements Serializable {
+public class HttpMonitor implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -49,7 +49,7 @@ public class ApiMonitor implements Serializable {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "monitor")
     @JsonIgnoreProperties(value = { "monitor", "agent" }, allowSetters = true)
-    private Set<ApiHeartbeat> apiHeartbeats = new HashSet<>();
+    private Set<HttpHeartbeat> apiHeartbeats = new HashSet<>();
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "monitor")
     @JsonIgnoreProperties(value = { "datacenter", "monitor" }, allowSetters = true)
@@ -65,7 +65,7 @@ public class ApiMonitor implements Serializable {
         return this.id;
     }
 
-    public ApiMonitor id(Long id) {
+    public HttpMonitor id(Long id) {
         this.setId(id);
         return this;
     }
@@ -78,7 +78,7 @@ public class ApiMonitor implements Serializable {
         return this.name;
     }
 
-    public ApiMonitor name(String name) {
+    public HttpMonitor name(String name) {
         this.setName(name);
         return this;
     }
@@ -91,7 +91,7 @@ public class ApiMonitor implements Serializable {
         return this.method;
     }
 
-    public ApiMonitor method(String method) {
+    public HttpMonitor method(String method) {
         this.setMethod(method);
         return this;
     }
@@ -104,7 +104,7 @@ public class ApiMonitor implements Serializable {
         return this.type;
     }
 
-    public ApiMonitor type(String type) {
+    public HttpMonitor type(String type) {
         this.setType(type);
         return this;
     }
@@ -117,7 +117,7 @@ public class ApiMonitor implements Serializable {
         return this.url;
     }
 
-    public ApiMonitor url(String url) {
+    public HttpMonitor url(String url) {
         this.setUrl(url);
         return this;
     }
@@ -130,7 +130,7 @@ public class ApiMonitor implements Serializable {
         return this.headers;
     }
 
-    public ApiMonitor headers(String headers) {
+    public HttpMonitor headers(String headers) {
         this.setHeaders(headers);
         return this;
     }
@@ -143,7 +143,7 @@ public class ApiMonitor implements Serializable {
         return this.body;
     }
 
-    public ApiMonitor body(String body) {
+    public HttpMonitor body(String body) {
         this.setBody(body);
         return this;
     }
@@ -152,11 +152,11 @@ public class ApiMonitor implements Serializable {
         this.body = body;
     }
 
-    public Set<ApiHeartbeat> getApiHeartbeats() {
+    public Set<HttpHeartbeat> getApiHeartbeats() {
         return this.apiHeartbeats;
     }
 
-    public void setApiHeartbeats(Set<ApiHeartbeat> apiHeartbeats) {
+    public void setApiHeartbeats(Set<HttpHeartbeat> apiHeartbeats) {
         if (this.apiHeartbeats != null) {
             this.apiHeartbeats.forEach(i -> i.setMonitor(null));
         }
@@ -166,18 +166,18 @@ public class ApiMonitor implements Serializable {
         this.apiHeartbeats = apiHeartbeats;
     }
 
-    public ApiMonitor apiHeartbeats(Set<ApiHeartbeat> apiHeartbeats) {
+    public HttpMonitor apiHeartbeats(Set<HttpHeartbeat> apiHeartbeats) {
         this.setApiHeartbeats(apiHeartbeats);
         return this;
     }
 
-    public ApiMonitor addApiHeartbeat(ApiHeartbeat apiHeartbeat) {
+    public HttpMonitor addApiHeartbeat(HttpHeartbeat apiHeartbeat) {
         this.apiHeartbeats.add(apiHeartbeat);
         apiHeartbeat.setMonitor(this);
         return this;
     }
 
-    public ApiMonitor removeApiHeartbeat(ApiHeartbeat apiHeartbeat) {
+    public HttpMonitor removeApiHeartbeat(HttpHeartbeat apiHeartbeat) {
         this.apiHeartbeats.remove(apiHeartbeat);
         apiHeartbeat.setMonitor(null);
         return this;
@@ -197,18 +197,18 @@ public class ApiMonitor implements Serializable {
         this.datacenterMonitors = datacenterMonitors;
     }
 
-    public ApiMonitor datacenterMonitors(Set<DatacenterMonitor> datacenterMonitors) {
+    public HttpMonitor datacenterMonitors(Set<DatacenterMonitor> datacenterMonitors) {
         this.setDatacenterMonitors(datacenterMonitors);
         return this;
     }
 
-    public ApiMonitor addDatacenterMonitor(DatacenterMonitor datacenterMonitor) {
+    public HttpMonitor addDatacenterMonitor(DatacenterMonitor datacenterMonitor) {
         this.datacenterMonitors.add(datacenterMonitor);
         datacenterMonitor.setMonitor(this);
         return this;
     }
 
-    public ApiMonitor removeDatacenterMonitor(DatacenterMonitor datacenterMonitor) {
+    public HttpMonitor removeDatacenterMonitor(DatacenterMonitor datacenterMonitor) {
         this.datacenterMonitors.remove(datacenterMonitor);
         datacenterMonitor.setMonitor(null);
         return this;
@@ -222,7 +222,7 @@ public class ApiMonitor implements Serializable {
         this.schedule = schedule;
     }
 
-    public ApiMonitor schedule(Schedule schedule) {
+    public HttpMonitor schedule(Schedule schedule) {
         this.setSchedule(schedule);
         return this;
     }
@@ -234,10 +234,10 @@ public class ApiMonitor implements Serializable {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof ApiMonitor)) {
+        if (!(o instanceof HttpMonitor)) {
             return false;
         }
-        return getId() != null && getId().equals(((ApiMonitor) o).getId());
+        return getId() != null && getId().equals(((HttpMonitor) o).getId());
     }
 
     @Override
@@ -249,7 +249,7 @@ public class ApiMonitor implements Serializable {
     // prettier-ignore
     @Override
     public String toString() {
-        return "ApiMonitor{" +
+        return "HttpMonitor{" +
             "id=" + getId() +
             ", name='" + getName() + "'" +
             ", method='" + getMethod() + "'" +

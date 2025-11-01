@@ -41,7 +41,7 @@
       "fieldType": "TextBlob"
     }
   ],
-  "name": "ApiMonitor",
+  "name": "HttpMonitor",
   "pagination": "pagination",
   "relationships": [
     {

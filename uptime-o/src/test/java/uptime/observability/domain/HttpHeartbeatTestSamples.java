@@ -5,14 +5,14 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
-public class ApiHeartbeatTestSamples {
+public class HttpHeartbeatTestSamples {
 
     private static final Random random = new Random();
     private static final AtomicLong longCount = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
     private static final AtomicInteger intCount = new AtomicInteger(random.nextInt() + (2 * Short.MAX_VALUE));
 
-    public static ApiHeartbeat getApiHeartbeatSample1() {
-        return new ApiHeartbeat()
+    public static HttpHeartbeat getApiHeartbeatSample1() {
+        return new HttpHeartbeat()
             .id(1L)
             .responseTimeMs(1)
             .responseSizeBytes(1)
@@ -29,8 +29,8 @@ public class ApiHeartbeatTestSamples {
             .errorType("errorType1");
     }
 
-    public static ApiHeartbeat getApiHeartbeatSample2() {
-        return new ApiHeartbeat()
+    public static HttpHeartbeat getApiHeartbeatSample2() {
+        return new HttpHeartbeat()
             .id(2L)
             .responseTimeMs(2)
             .responseSizeBytes(2)
@@ -47,8 +47,8 @@ public class ApiHeartbeatTestSamples {
             .errorType("errorType2");
     }
 
-    public static ApiHeartbeat getApiHeartbeatRandomSampleGenerator() {
-        return new ApiHeartbeat()
+    public static HttpHeartbeat getApiHeartbeatRandomSampleGenerator() {
+        return new HttpHeartbeat()
             .id(longCount.incrementAndGet())
             .responseTimeMs(intCount.incrementAndGet())
             .responseSizeBytes(intCount.incrementAndGet())

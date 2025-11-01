@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static uptime.observability.domain.ApiMonitorAsserts.*;
+import static uptime.observability.domain.HttpMonitorAsserts.*;
 import static uptime.observability.web.rest.TestUtil.createUpdateProxyForBean;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -21,18 +21,18 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import uptime.observability.IntegrationTest;
-import uptime.observability.domain.ApiMonitor;
-import uptime.observability.repository.ApiMonitorRepository;
-import uptime.observability.service.dto.ApiMonitorDTO;
-import uptime.observability.service.mapper.ApiMonitorMapper;
+import uptime.observability.domain.HttpMonitor;
+import uptime.observability.repository.HttpMonitorRepository;
+import uptime.observability.service.dto.HttpMonitorDTO;
+import uptime.observability.service.mapper.HttpMonitorMapper;
 
 /**
- * Integration tests for the {@link ApiMonitorResource} REST controller.
+ * Integration tests for the {@link HttpMonitorResource} REST controller.
  */
 @IntegrationTest
 @AutoConfigureMockMvc
 @WithMockUser
-class ApiMonitorResourceIT {
+class HttpMonitorResourceIT {
 
     private static final String DEFAULT_NAME = "AAAAAAAAAA";
     private static final String UPDATED_NAME = "BBBBBBBBBB";
@@ -62,20 +62,20 @@ class ApiMonitorResourceIT {
     private ObjectMapper om;
 
     @Autowired
-    private ApiMonitorRepository apiMonitorRepository;
+    private HttpMonitorRepository apiMonitorRepository;
 
     @Autowired
-    private ApiMonitorMapper apiMonitorMapper;
+    private HttpMonitorMapper apiMonitorMapper;
 
     @Autowired
     private EntityManager em;
 
     @Autowired
-    private MockMvc restApiMonitorMockMvc;
+    private MockMvc restHttpMonitorMockMvc;
 
-    private ApiMonitor apiMonitor;
+    private HttpMonitor apiMonitor;
 
-    private ApiMonitor insertedApiMonitor;
+    private HttpMonitor insertedHttpMonitor;
 
     /**
      * Create an entity for this test.
@@ -83,8 +83,8 @@ class ApiMonitorResourceIT {
      * This is a static method, as tests for other entities might also need it,
      * if they test an entity which requires the current entity.
      */
-    public static ApiMonitor createEntity() {
-        return new ApiMonitor()
+    public static HttpMonitor createEntity() {
+        return new HttpMonitor()
             .name(DEFAULT_NAME)
             .method(DEFAULT_METHOD)
             .type(DEFAULT_TYPE)
@@ -99,8 +99,8 @@ class ApiMonitorResourceIT {
      * This is a static method, as tests for other entities might also need it,
      * if they test an entity which requires the current entity.
      */
-    public static ApiMonitor createUpdatedEntity() {
-        return new ApiMonitor()
+    public static HttpMonitor createUpdatedEntity() {
+        return new HttpMonitor()
             .name(UPDATED_NAME)
             .method(UPDATED_METHOD)
             .type(UPDATED_TYPE)
@@ -116,51 +116,51 @@ class ApiMonitorResourceIT {
 
     @AfterEach
     void cleanup() {
-        if (insertedApiMonitor != null) {
-            apiMonitorRepository.delete(insertedApiMonitor);
-            insertedApiMonitor = null;
+        if (insertedHttpMonitor != null) {
+            apiMonitorRepository.delete(insertedHttpMonitor);
+            insertedHttpMonitor = null;
         }
     }
 
     @Test
     @Transactional
-    void createApiMonitor() throws Exception {
+    void createHttpMonitor() throws Exception {
         long databaseSizeBeforeCreate = getRepositoryCount();
-        // Create the ApiMonitor
-        ApiMonitorDTO apiMonitorDTO = apiMonitorMapper.toDto(apiMonitor);
-        var returnedApiMonitorDTO = om.readValue(
-            restApiMonitorMockMvc
+        // Create the HttpMonitor
+        HttpMonitorDTO apiMonitorDTO = apiMonitorMapper.toDto(apiMonitor);
+        var returnedHttpMonitorDTO = om.readValue(
+            restHttpMonitorMockMvc
                 .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(apiMonitorDTO)))
                 .andExpect(status().isCreated())
                 .andReturn()
                 .getResponse()
                 .getContentAsString(),
-            ApiMonitorDTO.class
+            HttpMonitorDTO.class
         );
 
-        // Validate the ApiMonitor in the database
+        // Validate the HttpMonitor in the database
         assertIncrementedRepositoryCount(databaseSizeBeforeCreate);
-        var returnedApiMonitor = apiMonitorMapper.toEntity(returnedApiMonitorDTO);
-        assertApiMonitorUpdatableFieldsEquals(returnedApiMonitor, getPersistedApiMonitor(returnedApiMonitor));
+        var returnedHttpMonitor = apiMonitorMapper.toEntity(returnedHttpMonitorDTO);
+        assertHttpMonitorUpdatableFieldsEquals(returnedHttpMonitor, getPersistedHttpMonitor(returnedHttpMonitor));
 
-        insertedApiMonitor = returnedApiMonitor;
+        insertedHttpMonitor = returnedHttpMonitor;
     }
 
     @Test
     @Transactional
-    void createApiMonitorWithExistingId() throws Exception {
-        // Create the ApiMonitor with an existing ID
+    void createHttpMonitorWithExistingId() throws Exception {
+        // Create the HttpMonitor with an existing ID
         apiMonitor.setId(1L);
-        ApiMonitorDTO apiMonitorDTO = apiMonitorMapper.toDto(apiMonitor);
+        HttpMonitorDTO apiMonitorDTO = apiMonitorMapper.toDto(apiMonitor);
 
         long databaseSizeBeforeCreate = getRepositoryCount();
 
         // An entity with an existing ID cannot be created, so this API call must fail
-        restApiMonitorMockMvc
+        restHttpMonitorMockMvc
             .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(apiMonitorDTO)))
             .andExpect(status().isBadRequest());
 
-        // Validate the ApiMonitor in the database
+        // Validate the HttpMonitor in the database
         assertSameRepositoryCount(databaseSizeBeforeCreate);
     }
 
@@ -171,10 +171,10 @@ class ApiMonitorResourceIT {
         // set the field null
         apiMonitor.setName(null);
 
-        // Create the ApiMonitor, which fails.
-        ApiMonitorDTO apiMonitorDTO = apiMonitorMapper.toDto(apiMonitor);
+        // Create the HttpMonitor, which fails.
+        HttpMonitorDTO apiMonitorDTO = apiMonitorMapper.toDto(apiMonitor);
 
-        restApiMonitorMockMvc
+        restHttpMonitorMockMvc
             .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(apiMonitorDTO)))
             .andExpect(status().isBadRequest());
 
@@ -188,10 +188,10 @@ class ApiMonitorResourceIT {
         // set the field null
         apiMonitor.setMethod(null);
 
-        // Create the ApiMonitor, which fails.
-        ApiMonitorDTO apiMonitorDTO = apiMonitorMapper.toDto(apiMonitor);
+        // Create the HttpMonitor, which fails.
+        HttpMonitorDTO apiMonitorDTO = apiMonitorMapper.toDto(apiMonitor);
 
-        restApiMonitorMockMvc
+        restHttpMonitorMockMvc
             .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(apiMonitorDTO)))
             .andExpect(status().isBadRequest());
 
@@ -205,10 +205,10 @@ class ApiMonitorResourceIT {
         // set the field null
         apiMonitor.setType(null);
 
-        // Create the ApiMonitor, which fails.
-        ApiMonitorDTO apiMonitorDTO = apiMonitorMapper.toDto(apiMonitor);
+        // Create the HttpMonitor, which fails.
+        HttpMonitorDTO apiMonitorDTO = apiMonitorMapper.toDto(apiMonitor);
 
-        restApiMonitorMockMvc
+        restHttpMonitorMockMvc
             .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(apiMonitorDTO)))
             .andExpect(status().isBadRequest());
 
@@ -217,12 +217,12 @@ class ApiMonitorResourceIT {
 
     @Test
     @Transactional
-    void getAllApiMonitors() throws Exception {
+    void getAllHttpMonitors() throws Exception {
         // Initialize the database
-        insertedApiMonitor = apiMonitorRepository.saveAndFlush(apiMonitor);
+        insertedHttpMonitor = apiMonitorRepository.saveAndFlush(apiMonitor);
 
         // Get all the apiMonitorList
-        restApiMonitorMockMvc
+        restHttpMonitorMockMvc
             .perform(get(ENTITY_API_URL + "?sort=id,desc"))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
@@ -237,12 +237,12 @@ class ApiMonitorResourceIT {
 
     @Test
     @Transactional
-    void getApiMonitor() throws Exception {
+    void getHttpMonitor() throws Exception {
         // Initialize the database
-        insertedApiMonitor = apiMonitorRepository.saveAndFlush(apiMonitor);
+        insertedHttpMonitor = apiMonitorRepository.saveAndFlush(apiMonitor);
 
         // Get the apiMonitor
-        restApiMonitorMockMvc
+        restHttpMonitorMockMvc
             .perform(get(ENTITY_API_URL_ID, apiMonitor.getId()))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
@@ -257,33 +257,33 @@ class ApiMonitorResourceIT {
 
     @Test
     @Transactional
-    void getNonExistingApiMonitor() throws Exception {
+    void getNonExistingHttpMonitor() throws Exception {
         // Get the apiMonitor
-        restApiMonitorMockMvc.perform(get(ENTITY_API_URL_ID, Long.MAX_VALUE)).andExpect(status().isNotFound());
+        restHttpMonitorMockMvc.perform(get(ENTITY_API_URL_ID, Long.MAX_VALUE)).andExpect(status().isNotFound());
     }
 
     @Test
     @Transactional
-    void putExistingApiMonitor() throws Exception {
+    void putExistingHttpMonitor() throws Exception {
         // Initialize the database
-        insertedApiMonitor = apiMonitorRepository.saveAndFlush(apiMonitor);
+        insertedHttpMonitor = apiMonitorRepository.saveAndFlush(apiMonitor);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the apiMonitor
-        ApiMonitor updatedApiMonitor = apiMonitorRepository.findById(apiMonitor.getId()).orElseThrow();
-        // Disconnect from session so that the updates on updatedApiMonitor are not directly saved in db
-        em.detach(updatedApiMonitor);
-        updatedApiMonitor
+        HttpMonitor updatedHttpMonitor = apiMonitorRepository.findById(apiMonitor.getId()).orElseThrow();
+        // Disconnect from session so that the updates on updatedHttpMonitor are not directly saved in db
+        em.detach(updatedHttpMonitor);
+        updatedHttpMonitor
             .name(UPDATED_NAME)
             .method(UPDATED_METHOD)
             .type(UPDATED_TYPE)
             .url(UPDATED_URL)
             .headers(UPDATED_HEADERS)
             .body(UPDATED_BODY);
-        ApiMonitorDTO apiMonitorDTO = apiMonitorMapper.toDto(updatedApiMonitor);
+        HttpMonitorDTO apiMonitorDTO = apiMonitorMapper.toDto(updatedHttpMonitor);
 
-        restApiMonitorMockMvc
+        restHttpMonitorMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, apiMonitorDTO.getId())
                     .contentType(MediaType.APPLICATION_JSON)
@@ -291,22 +291,22 @@ class ApiMonitorResourceIT {
             )
             .andExpect(status().isOk());
 
-        // Validate the ApiMonitor in the database
+        // Validate the HttpMonitor in the database
         assertSameRepositoryCount(databaseSizeBeforeUpdate);
-        assertPersistedApiMonitorToMatchAllProperties(updatedApiMonitor);
+        assertPersistedHttpMonitorToMatchAllProperties(updatedHttpMonitor);
     }
 
     @Test
     @Transactional
-    void putNonExistingApiMonitor() throws Exception {
+    void putNonExistingHttpMonitor() throws Exception {
         long databaseSizeBeforeUpdate = getRepositoryCount();
         apiMonitor.setId(longCount.incrementAndGet());
 
-        // Create the ApiMonitor
-        ApiMonitorDTO apiMonitorDTO = apiMonitorMapper.toDto(apiMonitor);
+        // Create the HttpMonitor
+        HttpMonitorDTO apiMonitorDTO = apiMonitorMapper.toDto(apiMonitor);
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
-        restApiMonitorMockMvc
+        restHttpMonitorMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, apiMonitorDTO.getId())
                     .contentType(MediaType.APPLICATION_JSON)
@@ -314,21 +314,21 @@ class ApiMonitorResourceIT {
             )
             .andExpect(status().isBadRequest());
 
-        // Validate the ApiMonitor in the database
+        // Validate the HttpMonitor in the database
         assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
-    void putWithIdMismatchApiMonitor() throws Exception {
+    void putWithIdMismatchHttpMonitor() throws Exception {
         long databaseSizeBeforeUpdate = getRepositoryCount();
         apiMonitor.setId(longCount.incrementAndGet());
 
-        // Create the ApiMonitor
-        ApiMonitorDTO apiMonitorDTO = apiMonitorMapper.toDto(apiMonitor);
+        // Create the HttpMonitor
+        HttpMonitorDTO apiMonitorDTO = apiMonitorMapper.toDto(apiMonitor);
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
-        restApiMonitorMockMvc
+        restHttpMonitorMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .contentType(MediaType.APPLICATION_JSON)
@@ -336,72 +336,72 @@ class ApiMonitorResourceIT {
             )
             .andExpect(status().isBadRequest());
 
-        // Validate the ApiMonitor in the database
+        // Validate the HttpMonitor in the database
         assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
-    void putWithMissingIdPathParamApiMonitor() throws Exception {
+    void putWithMissingIdPathParamHttpMonitor() throws Exception {
         long databaseSizeBeforeUpdate = getRepositoryCount();
         apiMonitor.setId(longCount.incrementAndGet());
 
-        // Create the ApiMonitor
-        ApiMonitorDTO apiMonitorDTO = apiMonitorMapper.toDto(apiMonitor);
+        // Create the HttpMonitor
+        HttpMonitorDTO apiMonitorDTO = apiMonitorMapper.toDto(apiMonitor);
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
-        restApiMonitorMockMvc
+        restHttpMonitorMockMvc
             .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(apiMonitorDTO)))
             .andExpect(status().isMethodNotAllowed());
 
-        // Validate the ApiMonitor in the database
+        // Validate the HttpMonitor in the database
         assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
-    void partialUpdateApiMonitorWithPatch() throws Exception {
+    void partialUpdateHttpMonitorWithPatch() throws Exception {
         // Initialize the database
-        insertedApiMonitor = apiMonitorRepository.saveAndFlush(apiMonitor);
+        insertedHttpMonitor = apiMonitorRepository.saveAndFlush(apiMonitor);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the apiMonitor using partial update
-        ApiMonitor partialUpdatedApiMonitor = new ApiMonitor();
-        partialUpdatedApiMonitor.setId(apiMonitor.getId());
+        HttpMonitor partialUpdatedHttpMonitor = new HttpMonitor();
+        partialUpdatedHttpMonitor.setId(apiMonitor.getId());
 
-        partialUpdatedApiMonitor.method(UPDATED_METHOD).url(UPDATED_URL).headers(UPDATED_HEADERS);
+        partialUpdatedHttpMonitor.method(UPDATED_METHOD).url(UPDATED_URL).headers(UPDATED_HEADERS);
 
-        restApiMonitorMockMvc
+        restHttpMonitorMockMvc
             .perform(
-                patch(ENTITY_API_URL_ID, partialUpdatedApiMonitor.getId())
+                patch(ENTITY_API_URL_ID, partialUpdatedHttpMonitor.getId())
                     .contentType("application/merge-patch+json")
-                    .content(om.writeValueAsBytes(partialUpdatedApiMonitor))
+                    .content(om.writeValueAsBytes(partialUpdatedHttpMonitor))
             )
             .andExpect(status().isOk());
 
-        // Validate the ApiMonitor in the database
+        // Validate the HttpMonitor in the database
 
         assertSameRepositoryCount(databaseSizeBeforeUpdate);
-        assertApiMonitorUpdatableFieldsEquals(
-            createUpdateProxyForBean(partialUpdatedApiMonitor, apiMonitor),
-            getPersistedApiMonitor(apiMonitor)
+        assertHttpMonitorUpdatableFieldsEquals(
+            createUpdateProxyForBean(partialUpdatedHttpMonitor, apiMonitor),
+            getPersistedHttpMonitor(apiMonitor)
         );
     }
 
     @Test
     @Transactional
-    void fullUpdateApiMonitorWithPatch() throws Exception {
+    void fullUpdateHttpMonitorWithPatch() throws Exception {
         // Initialize the database
-        insertedApiMonitor = apiMonitorRepository.saveAndFlush(apiMonitor);
+        insertedHttpMonitor = apiMonitorRepository.saveAndFlush(apiMonitor);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the apiMonitor using partial update
-        ApiMonitor partialUpdatedApiMonitor = new ApiMonitor();
-        partialUpdatedApiMonitor.setId(apiMonitor.getId());
+        HttpMonitor partialUpdatedHttpMonitor = new HttpMonitor();
+        partialUpdatedHttpMonitor.setId(apiMonitor.getId());
 
-        partialUpdatedApiMonitor
+        partialUpdatedHttpMonitor
             .name(UPDATED_NAME)
             .method(UPDATED_METHOD)
             .type(UPDATED_TYPE)
@@ -409,31 +409,31 @@ class ApiMonitorResourceIT {
             .headers(UPDATED_HEADERS)
             .body(UPDATED_BODY);
 
-        restApiMonitorMockMvc
+        restHttpMonitorMockMvc
             .perform(
-                patch(ENTITY_API_URL_ID, partialUpdatedApiMonitor.getId())
+                patch(ENTITY_API_URL_ID, partialUpdatedHttpMonitor.getId())
                     .contentType("application/merge-patch+json")
-                    .content(om.writeValueAsBytes(partialUpdatedApiMonitor))
+                    .content(om.writeValueAsBytes(partialUpdatedHttpMonitor))
             )
             .andExpect(status().isOk());
 
-        // Validate the ApiMonitor in the database
+        // Validate the HttpMonitor in the database
 
         assertSameRepositoryCount(databaseSizeBeforeUpdate);
-        assertApiMonitorUpdatableFieldsEquals(partialUpdatedApiMonitor, getPersistedApiMonitor(partialUpdatedApiMonitor));
+        assertHttpMonitorUpdatableFieldsEquals(partialUpdatedHttpMonitor, getPersistedHttpMonitor(partialUpdatedHttpMonitor));
     }
 
     @Test
     @Transactional
-    void patchNonExistingApiMonitor() throws Exception {
+    void patchNonExistingHttpMonitor() throws Exception {
         long databaseSizeBeforeUpdate = getRepositoryCount();
         apiMonitor.setId(longCount.incrementAndGet());
 
-        // Create the ApiMonitor
-        ApiMonitorDTO apiMonitorDTO = apiMonitorMapper.toDto(apiMonitor);
+        // Create the HttpMonitor
+        HttpMonitorDTO apiMonitorDTO = apiMonitorMapper.toDto(apiMonitor);
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
-        restApiMonitorMockMvc
+        restHttpMonitorMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, apiMonitorDTO.getId())
                     .contentType("application/merge-patch+json")
@@ -441,21 +441,21 @@ class ApiMonitorResourceIT {
             )
             .andExpect(status().isBadRequest());
 
-        // Validate the ApiMonitor in the database
+        // Validate the HttpMonitor in the database
         assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
-    void patchWithIdMismatchApiMonitor() throws Exception {
+    void patchWithIdMismatchHttpMonitor() throws Exception {
         long databaseSizeBeforeUpdate = getRepositoryCount();
         apiMonitor.setId(longCount.incrementAndGet());
 
-        // Create the ApiMonitor
-        ApiMonitorDTO apiMonitorDTO = apiMonitorMapper.toDto(apiMonitor);
+        // Create the HttpMonitor
+        HttpMonitorDTO apiMonitorDTO = apiMonitorMapper.toDto(apiMonitor);
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
-        restApiMonitorMockMvc
+        restHttpMonitorMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .contentType("application/merge-patch+json")
@@ -463,38 +463,38 @@ class ApiMonitorResourceIT {
             )
             .andExpect(status().isBadRequest());
 
-        // Validate the ApiMonitor in the database
+        // Validate the HttpMonitor in the database
         assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
-    void patchWithMissingIdPathParamApiMonitor() throws Exception {
+    void patchWithMissingIdPathParamHttpMonitor() throws Exception {
         long databaseSizeBeforeUpdate = getRepositoryCount();
         apiMonitor.setId(longCount.incrementAndGet());
 
-        // Create the ApiMonitor
-        ApiMonitorDTO apiMonitorDTO = apiMonitorMapper.toDto(apiMonitor);
+        // Create the HttpMonitor
+        HttpMonitorDTO apiMonitorDTO = apiMonitorMapper.toDto(apiMonitor);
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
-        restApiMonitorMockMvc
+        restHttpMonitorMockMvc
             .perform(patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(om.writeValueAsBytes(apiMonitorDTO)))
             .andExpect(status().isMethodNotAllowed());
 
-        // Validate the ApiMonitor in the database
+        // Validate the HttpMonitor in the database
         assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
-    void deleteApiMonitor() throws Exception {
+    void deleteHttpMonitor() throws Exception {
         // Initialize the database
-        insertedApiMonitor = apiMonitorRepository.saveAndFlush(apiMonitor);
+        insertedHttpMonitor = apiMonitorRepository.saveAndFlush(apiMonitor);
 
         long databaseSizeBeforeDelete = getRepositoryCount();
 
         // Delete the apiMonitor
-        restApiMonitorMockMvc
+        restHttpMonitorMockMvc
             .perform(delete(ENTITY_API_URL_ID, apiMonitor.getId()).accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isNoContent());
 
@@ -518,15 +518,15 @@ class ApiMonitorResourceIT {
         assertThat(countBefore).isEqualTo(getRepositoryCount());
     }
 
-    protected ApiMonitor getPersistedApiMonitor(ApiMonitor apiMonitor) {
+    protected HttpMonitor getPersistedHttpMonitor(HttpMonitor apiMonitor) {
         return apiMonitorRepository.findById(apiMonitor.getId()).orElseThrow();
     }
 
-    protected void assertPersistedApiMonitorToMatchAllProperties(ApiMonitor expectedApiMonitor) {
-        assertApiMonitorAllPropertiesEquals(expectedApiMonitor, getPersistedApiMonitor(expectedApiMonitor));
+    protected void assertPersistedHttpMonitorToMatchAllProperties(HttpMonitor expectedHttpMonitor) {
+        assertHttpMonitorAllPropertiesEquals(expectedHttpMonitor, getPersistedHttpMonitor(expectedHttpMonitor));
     }
 
-    protected void assertPersistedApiMonitorToMatchUpdatableProperties(ApiMonitor expectedApiMonitor) {
-        assertApiMonitorAllUpdatablePropertiesEquals(expectedApiMonitor, getPersistedApiMonitor(expectedApiMonitor));
+    protected void assertPersistedHttpMonitorToMatchUpdatableProperties(HttpMonitor expectedHttpMonitor) {
+        assertHttpMonitorAllUpdatablePropertiesEquals(expectedHttpMonitor, getPersistedHttpMonitor(expectedHttpMonitor));
     }
 }

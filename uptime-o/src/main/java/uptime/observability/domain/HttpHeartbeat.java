@@ -12,7 +12,7 @@ import java.time.Instant;
 @Entity
 @Table(name = "api_heartbeats")
 @SuppressWarnings("common-java:DuplicatedBlocks")
-public class ApiHeartbeat implements Serializable {
+public class HttpHeartbeat implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -86,7 +86,7 @@ public class ApiHeartbeat implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnoreProperties(value = { "apiHeartbeats", "datacenterMonitors", "schedule" }, allowSetters = true)
-    private ApiMonitor monitor;
+    private HttpMonitor monitor;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnoreProperties(value = { "apiHeartbeats", "datacenter" }, allowSetters = true)
@@ -98,7 +98,7 @@ public class ApiHeartbeat implements Serializable {
         return this.id;
     }
 
-    public ApiHeartbeat id(Long id) {
+    public HttpHeartbeat id(Long id) {
         this.setId(id);
         return this;
     }
@@ -111,7 +111,7 @@ public class ApiHeartbeat implements Serializable {
         return this.executedAt;
     }
 
-    public ApiHeartbeat executedAt(Instant executedAt) {
+    public HttpHeartbeat executedAt(Instant executedAt) {
         this.setExecutedAt(executedAt);
         return this;
     }
@@ -124,7 +124,7 @@ public class ApiHeartbeat implements Serializable {
         return this.success;
     }
 
-    public ApiHeartbeat success(Boolean success) {
+    public HttpHeartbeat success(Boolean success) {
         this.setSuccess(success);
         return this;
     }
@@ -137,7 +137,7 @@ public class ApiHeartbeat implements Serializable {
         return this.responseTimeMs;
     }
 
-    public ApiHeartbeat responseTimeMs(Integer responseTimeMs) {
+    public HttpHeartbeat responseTimeMs(Integer responseTimeMs) {
         this.setResponseTimeMs(responseTimeMs);
         return this;
     }
@@ -150,7 +150,7 @@ public class ApiHeartbeat implements Serializable {
         return this.responseSizeBytes;
     }
 
-    public ApiHeartbeat responseSizeBytes(Integer responseSizeBytes) {
+    public HttpHeartbeat responseSizeBytes(Integer responseSizeBytes) {
         this.setResponseSizeBytes(responseSizeBytes);
         return this;
     }
@@ -163,7 +163,7 @@ public class ApiHeartbeat implements Serializable {
         return this.responseStatusCode;
     }
 
-    public ApiHeartbeat responseStatusCode(Integer responseStatusCode) {
+    public HttpHeartbeat responseStatusCode(Integer responseStatusCode) {
         this.setResponseStatusCode(responseStatusCode);
         return this;
     }
@@ -176,7 +176,7 @@ public class ApiHeartbeat implements Serializable {
         return this.responseContentType;
     }
 
-    public ApiHeartbeat responseContentType(String responseContentType) {
+    public HttpHeartbeat responseContentType(String responseContentType) {
         this.setResponseContentType(responseContentType);
         return this;
     }
@@ -189,7 +189,7 @@ public class ApiHeartbeat implements Serializable {
         return this.responseServer;
     }
 
-    public ApiHeartbeat responseServer(String responseServer) {
+    public HttpHeartbeat responseServer(String responseServer) {
         this.setResponseServer(responseServer);
         return this;
     }
@@ -202,7 +202,7 @@ public class ApiHeartbeat implements Serializable {
         return this.responseCacheStatus;
     }
 
-    public ApiHeartbeat responseCacheStatus(String responseCacheStatus) {
+    public HttpHeartbeat responseCacheStatus(String responseCacheStatus) {
         this.setResponseCacheStatus(responseCacheStatus);
         return this;
     }
@@ -215,7 +215,7 @@ public class ApiHeartbeat implements Serializable {
         return this.dnsLookupMs;
     }
 
-    public ApiHeartbeat dnsLookupMs(Integer dnsLookupMs) {
+    public HttpHeartbeat dnsLookupMs(Integer dnsLookupMs) {
         this.setDnsLookupMs(dnsLookupMs);
         return this;
     }
@@ -228,7 +228,7 @@ public class ApiHeartbeat implements Serializable {
         return this.tcpConnectMs;
     }
 
-    public ApiHeartbeat tcpConnectMs(Integer tcpConnectMs) {
+    public HttpHeartbeat tcpConnectMs(Integer tcpConnectMs) {
         this.setTcpConnectMs(tcpConnectMs);
         return this;
     }
@@ -241,7 +241,7 @@ public class ApiHeartbeat implements Serializable {
         return this.tlsHandshakeMs;
     }
 
-    public ApiHeartbeat tlsHandshakeMs(Integer tlsHandshakeMs) {
+    public HttpHeartbeat tlsHandshakeMs(Integer tlsHandshakeMs) {
         this.setTlsHandshakeMs(tlsHandshakeMs);
         return this;
     }
@@ -254,7 +254,7 @@ public class ApiHeartbeat implements Serializable {
         return this.timeToFirstByteMs;
     }
 
-    public ApiHeartbeat timeToFirstByteMs(Integer timeToFirstByteMs) {
+    public HttpHeartbeat timeToFirstByteMs(Integer timeToFirstByteMs) {
         this.setTimeToFirstByteMs(timeToFirstByteMs);
         return this;
     }
@@ -267,7 +267,7 @@ public class ApiHeartbeat implements Serializable {
         return this.warningThresholdMs;
     }
 
-    public ApiHeartbeat warningThresholdMs(Integer warningThresholdMs) {
+    public HttpHeartbeat warningThresholdMs(Integer warningThresholdMs) {
         this.setWarningThresholdMs(warningThresholdMs);
         return this;
     }
@@ -280,7 +280,7 @@ public class ApiHeartbeat implements Serializable {
         return this.criticalThresholdMs;
     }
 
-    public ApiHeartbeat criticalThresholdMs(Integer criticalThresholdMs) {
+    public HttpHeartbeat criticalThresholdMs(Integer criticalThresholdMs) {
         this.setCriticalThresholdMs(criticalThresholdMs);
         return this;
     }
@@ -293,7 +293,7 @@ public class ApiHeartbeat implements Serializable {
         return this.errorType;
     }
 
-    public ApiHeartbeat errorType(String errorType) {
+    public HttpHeartbeat errorType(String errorType) {
         this.setErrorType(errorType);
         return this;
     }
@@ -306,7 +306,7 @@ public class ApiHeartbeat implements Serializable {
         return this.errorMessage;
     }
 
-    public ApiHeartbeat errorMessage(String errorMessage) {
+    public HttpHeartbeat errorMessage(String errorMessage) {
         this.setErrorMessage(errorMessage);
         return this;
     }
@@ -319,7 +319,7 @@ public class ApiHeartbeat implements Serializable {
         return this.rawRequestHeaders;
     }
 
-    public ApiHeartbeat rawRequestHeaders(String rawRequestHeaders) {
+    public HttpHeartbeat rawRequestHeaders(String rawRequestHeaders) {
         this.setRawRequestHeaders(rawRequestHeaders);
         return this;
     }
@@ -332,7 +332,7 @@ public class ApiHeartbeat implements Serializable {
         return this.rawResponseHeaders;
     }
 
-    public ApiHeartbeat rawResponseHeaders(String rawResponseHeaders) {
+    public HttpHeartbeat rawResponseHeaders(String rawResponseHeaders) {
         this.setRawResponseHeaders(rawResponseHeaders);
         return this;
     }
@@ -345,7 +345,7 @@ public class ApiHeartbeat implements Serializable {
         return this.rawResponseBody;
     }
 
-    public ApiHeartbeat rawResponseBody(String rawResponseBody) {
+    public HttpHeartbeat rawResponseBody(String rawResponseBody) {
         this.setRawResponseBody(rawResponseBody);
         return this;
     }
@@ -354,15 +354,15 @@ public class ApiHeartbeat implements Serializable {
         this.rawResponseBody = rawResponseBody;
     }
 
-    public ApiMonitor getMonitor() {
+    public HttpMonitor getMonitor() {
         return this.monitor;
     }
 
-    public void setMonitor(ApiMonitor apiMonitor) {
+    public void setMonitor(HttpMonitor apiMonitor) {
         this.monitor = apiMonitor;
     }
 
-    public ApiHeartbeat monitor(ApiMonitor apiMonitor) {
+    public HttpHeartbeat monitor(HttpMonitor apiMonitor) {
         this.setMonitor(apiMonitor);
         return this;
     }
@@ -375,7 +375,7 @@ public class ApiHeartbeat implements Serializable {
         this.agent = agent;
     }
 
-    public ApiHeartbeat agent(Agent agent) {
+    public HttpHeartbeat agent(Agent agent) {
         this.setAgent(agent);
         return this;
     }
@@ -387,10 +387,10 @@ public class ApiHeartbeat implements Serializable {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof ApiHeartbeat)) {
+        if (!(o instanceof HttpHeartbeat)) {
             return false;
         }
-        return getId() != null && getId().equals(((ApiHeartbeat) o).getId());
+        return getId() != null && getId().equals(((HttpHeartbeat) o).getId());
     }
 
     @Override

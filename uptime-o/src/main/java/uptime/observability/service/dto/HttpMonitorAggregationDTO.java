@@ -2,7 +2,7 @@ package uptime.observability.service.dto;
 
 import java.time.Instant;
 
-public class ApiMonitorAggregationDTO {
+public class HttpMonitorAggregationDTO {
     private Long monitorId;
     private String monitorName;
     private String url;

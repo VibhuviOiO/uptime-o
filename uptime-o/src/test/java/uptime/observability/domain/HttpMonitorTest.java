@@ -1,8 +1,8 @@
 package uptime.observability.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static uptime.observability.domain.ApiHeartbeatTestSamples.*;
-import static uptime.observability.domain.ApiMonitorTestSamples.*;
+import static uptime.observability.domain.HttpHeartbeatTestSamples.*;
+import static uptime.observability.domain.HttpMonitorTestSamples.*;
 import static uptime.observability.domain.DatacenterMonitorTestSamples.*;
 import static uptime.observability.domain.ScheduleTestSamples.*;
 
@@ -11,26 +11,26 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 import uptime.observability.web.rest.TestUtil;
 
-class ApiMonitorTest {
+class HttpMonitorTest {
 
     @Test
     void equalsVerifier() throws Exception {
-        TestUtil.equalsVerifier(ApiMonitor.class);
-        ApiMonitor apiMonitor1 = getApiMonitorSample1();
-        ApiMonitor apiMonitor2 = new ApiMonitor();
+        TestUtil.equalsVerifier(HttpMonitor.class);
+        HttpMonitor apiMonitor1 = getHttpMonitorSample1();
+        HttpMonitor apiMonitor2 = new HttpMonitor();
         assertThat(apiMonitor1).isNotEqualTo(apiMonitor2);
 
         apiMonitor2.setId(apiMonitor1.getId());
         assertThat(apiMonitor1).isEqualTo(apiMonitor2);
 
-        apiMonitor2 = getApiMonitorSample2();
+        apiMonitor2 = getHttpMonitorSample2();
         assertThat(apiMonitor1).isNotEqualTo(apiMonitor2);
     }
 
     @Test
     void apiHeartbeatTest() {
-        ApiMonitor apiMonitor = getApiMonitorRandomSampleGenerator();
-        ApiHeartbeat apiHeartbeatBack = getApiHeartbeatRandomSampleGenerator();
+        HttpMonitor apiMonitor = getHttpMonitorRandomSampleGenerator();
+        HttpHeartbeat apiHeartbeatBack = getApiHeartbeatRandomSampleGenerator();
 
         apiMonitor.addApiHeartbeat(apiHeartbeatBack);
         assertThat(apiMonitor.getApiHeartbeats()).containsOnly(apiHeartbeatBack);
@@ -51,7 +51,7 @@ class ApiMonitorTest {
 
     @Test
     void datacenterMonitorTest() {
-        ApiMonitor apiMonitor = getApiMonitorRandomSampleGenerator();
+        HttpMonitor apiMonitor = getHttpMonitorRandomSampleGenerator();
         DatacenterMonitor datacenterMonitorBack = getDatacenterMonitorRandomSampleGenerator();
 
         apiMonitor.addDatacenterMonitor(datacenterMonitorBack);
@@ -73,7 +73,7 @@ class ApiMonitorTest {
 
     @Test
     void scheduleTest() {
-        ApiMonitor apiMonitor = getApiMonitorRandomSampleGenerator();
+        HttpMonitor apiMonitor = getHttpMonitorRandomSampleGenerator();
         Schedule scheduleBack = getScheduleRandomSampleGenerator();
 
         apiMonitor.setSchedule(scheduleBack);

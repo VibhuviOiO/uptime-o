@@ -29,7 +29,7 @@ public class DatacenterMonitor implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "monitor_id")
     @JsonIgnoreProperties(value = { "apiHeartbeats", "datacenterMonitors", "schedule" }, allowSetters = true)
-    private ApiMonitor monitor;
+    private HttpMonitor monitor;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -59,15 +59,15 @@ public class DatacenterMonitor implements Serializable {
         return this;
     }
 
-    public ApiMonitor getMonitor() {
+    public HttpMonitor getMonitor() {
         return this.monitor;
     }
 
-    public void setMonitor(ApiMonitor apiMonitor) {
+    public void setMonitor(HttpMonitor apiMonitor) {
         this.monitor = apiMonitor;
     }
 
-    public DatacenterMonitor monitor(ApiMonitor apiMonitor) {
+    public DatacenterMonitor monitor(HttpMonitor apiMonitor) {
         this.setMonitor(apiMonitor);
         return this;
     }

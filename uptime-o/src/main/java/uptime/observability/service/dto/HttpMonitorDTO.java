@@ -6,10 +6,10 @@ import java.io.Serializable;
 import java.util.Objects;
 
 /**
- * A DTO for the {@link uptime.observability.domain.ApiMonitor} entity.
+ * A DTO for the {@link uptime.observability.domain.HttpMonitor} entity.
  */
 @SuppressWarnings("common-java:DuplicatedBlocks")
-public class ApiMonitorDTO implements Serializable {
+public class HttpMonitorDTO implements Serializable {
 
     private Long id;
 
@@ -103,11 +103,11 @@ public class ApiMonitorDTO implements Serializable {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof ApiMonitorDTO)) {
+        if (!(o instanceof HttpMonitorDTO)) {
             return false;
         }
 
-        ApiMonitorDTO apiMonitorDTO = (ApiMonitorDTO) o;
+        HttpMonitorDTO apiMonitorDTO = (HttpMonitorDTO) o;
         if (this.id == null) {
             return false;
         }
@@ -122,7 +122,7 @@ public class ApiMonitorDTO implements Serializable {
     // prettier-ignore
     @Override
     public String toString() {
-        return "ApiMonitorDTO{" +
+        return "HttpMonitorDTO{" +
             "id=" + getId() +
             ", name='" + getName() + "'" +
             ", method='" + getMethod() + "'" +

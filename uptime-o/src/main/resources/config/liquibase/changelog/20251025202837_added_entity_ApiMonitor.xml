@@ -7,7 +7,7 @@
                         http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
     <!--
-        Added the entity ApiMonitor.
+        Added the entity HttpMonitor.
     -->
     <changeSet id="20251025202837-1" author="jhipster">
         <createTable tableName="api_monitors">

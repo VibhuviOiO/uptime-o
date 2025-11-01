@@ -19,30 +19,30 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.PaginationUtil;
 import tech.jhipster.web.util.ResponseUtil;
-import uptime.observability.repository.ApiMonitorRepository;
-import uptime.observability.service.ApiMonitorService;
-import uptime.observability.service.dto.ApiMonitorDTO;
+import uptime.observability.repository.HttpMonitorRepository;
+import uptime.observability.service.HttpMonitorService;
+import uptime.observability.service.dto.HttpMonitorDTO;
 import uptime.observability.web.rest.errors.BadRequestAlertException;
 
 /**
- * REST controller for managing {@link uptime.observability.domain.ApiMonitor}.
+ * REST controller for managing {@link uptime.observability.domain.HttpMonitor}.
  */
 @RestController
 @RequestMapping("/api/api-monitors")
-public class ApiMonitorResource {
+public class HttpMonitorResource {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ApiMonitorResource.class);
+    private static final Logger LOG = LoggerFactory.getLogger(HttpMonitorResource.class);
 
     private static final String ENTITY_NAME = "apiMonitor";
 
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
 
-    private final ApiMonitorService apiMonitorService;
+    private final HttpMonitorService apiMonitorService;
 
-    private final ApiMonitorRepository apiMonitorRepository;
+    private final HttpMonitorRepository apiMonitorRepository;
 
-    public ApiMonitorResource(ApiMonitorService apiMonitorService, ApiMonitorRepository apiMonitorRepository) {
+    public HttpMonitorResource(HttpMonitorService apiMonitorService, HttpMonitorRepository apiMonitorRepository) {
         this.apiMonitorService = apiMonitorService;
         this.apiMonitorRepository = apiMonitorRepository;
     }
@@ -55,8 +55,8 @@ public class ApiMonitorResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("")
-    public ResponseEntity<ApiMonitorDTO> createApiMonitor(@Valid @RequestBody ApiMonitorDTO apiMonitorDTO) throws URISyntaxException {
-        LOG.debug("REST request to save ApiMonitor : {}", apiMonitorDTO);
+    public ResponseEntity<HttpMonitorDTO> createHttpMonitor(@Valid @RequestBody HttpMonitorDTO apiMonitorDTO) throws URISyntaxException {
+        LOG.debug("REST request to save HttpMonitor : {}", apiMonitorDTO);
         if (apiMonitorDTO.getId() != null) {
             throw new BadRequestAlertException("A new apiMonitor cannot already have an ID", ENTITY_NAME, "idexists");
         }
@@ -77,11 +77,11 @@ public class ApiMonitorResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/{id}")
-    public ResponseEntity<ApiMonitorDTO> updateApiMonitor(
+    public ResponseEntity<HttpMonitorDTO> updateHttpMonitor(
         @PathVariable(value = "id", required = false) final Long id,
-        @Valid @RequestBody ApiMonitorDTO apiMonitorDTO
+        @Valid @RequestBody HttpMonitorDTO apiMonitorDTO
     ) throws URISyntaxException {
-        LOG.debug("REST request to update ApiMonitor : {}, {}", id, apiMonitorDTO);
+        LOG.debug("REST request to update HttpMonitor : {}, {}", id, apiMonitorDTO);
         if (apiMonitorDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
@@ -111,11 +111,11 @@ public class ApiMonitorResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
-    public ResponseEntity<ApiMonitorDTO> partialUpdateApiMonitor(
+    public ResponseEntity<HttpMonitorDTO> partialUpdateHttpMonitor(
         @PathVariable(value = "id", required = false) final Long id,
-        @NotNull @RequestBody ApiMonitorDTO apiMonitorDTO
+        @NotNull @RequestBody HttpMonitorDTO apiMonitorDTO
     ) throws URISyntaxException {
-        LOG.debug("REST request to partial update ApiMonitor partially : {}, {}", id, apiMonitorDTO);
+        LOG.debug("REST request to partial update HttpMonitor partially : {}, {}", id, apiMonitorDTO);
         if (apiMonitorDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
@@ -127,7 +127,7 @@ public class ApiMonitorResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        Optional<ApiMonitorDTO> result = apiMonitorService.partialUpdate(apiMonitorDTO);
+        Optional<HttpMonitorDTO> result = apiMonitorService.partialUpdate(apiMonitorDTO);
 
         return ResponseUtil.wrapOrNotFound(
             result,
@@ -142,9 +142,9 @@ public class ApiMonitorResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of apiMonitors in body.
      */
     @GetMapping("")
-    public ResponseEntity<List<ApiMonitorDTO>> getAllApiMonitors(@org.springdoc.core.annotations.ParameterObject Pageable pageable) {
-        LOG.debug("REST request to get a page of ApiMonitors");
-        Page<ApiMonitorDTO> page = apiMonitorService.findAll(pageable);
+    public ResponseEntity<List<HttpMonitorDTO>> getAllHttpMonitors(@org.springdoc.core.annotations.ParameterObject Pageable pageable) {
+        LOG.debug("REST request to get a page of HttpMonitors");
+        Page<HttpMonitorDTO> page = apiMonitorService.findAll(pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
@@ -156,9 +156,9 @@ public class ApiMonitorResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the apiMonitorDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/{id}")
-    public ResponseEntity<ApiMonitorDTO> getApiMonitor(@PathVariable("id") Long id) {
-        LOG.debug("REST request to get ApiMonitor : {}", id);
-        Optional<ApiMonitorDTO> apiMonitorDTO = apiMonitorService.findOne(id);
+    public ResponseEntity<HttpMonitorDTO> getHttpMonitor(@PathVariable("id") Long id) {
+        LOG.debug("REST request to get HttpMonitor : {}", id);
+        Optional<HttpMonitorDTO> apiMonitorDTO = apiMonitorService.findOne(id);
         return ResponseUtil.wrapOrNotFound(apiMonitorDTO);
     }
 
@@ -169,8 +169,8 @@ public class ApiMonitorResource {
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteApiMonitor(@PathVariable("id") Long id) {
-        LOG.debug("REST request to delete ApiMonitor : {}", id);
+    public ResponseEntity<Void> deleteHttpMonitor(@PathVariable("id") Long id) {
+        LOG.debug("REST request to delete HttpMonitor : {}", id);
         apiMonitorService.delete(id);
         return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
