@@ -28,7 +28,7 @@ import uptime.observability.web.rest.errors.BadRequestAlertException;
  * REST controller for managing {@link uptime.observability.domain.HttpMonitor}.
  */
 @RestController
-@RequestMapping("/api/api-monitors")
+@RequestMapping("/api/http-monitors")
 public class HttpMonitorResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(HttpMonitorResource.class);
@@ -48,7 +48,7 @@ public class HttpMonitorResource {
     }
 
     /**
-     * {@code POST  /api-monitors} : Create a new apiMonitor.
+     * {@code POST  /http-monitors} : Create a new apiMonitor.
      *
      * @param apiMonitorDTO the apiMonitorDTO to create.
      * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new apiMonitorDTO, or with status {@code 400 (Bad Request)} if the apiMonitor has already an ID.
@@ -61,13 +61,13 @@ public class HttpMonitorResource {
             throw new BadRequestAlertException("A new apiMonitor cannot already have an ID", ENTITY_NAME, "idexists");
         }
         apiMonitorDTO = apiMonitorService.save(apiMonitorDTO);
-        return ResponseEntity.created(new URI("/api/api-monitors/" + apiMonitorDTO.getId()))
+        return ResponseEntity.created(new URI("/api/http-monitors/" + apiMonitorDTO.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, apiMonitorDTO.getId().toString()))
             .body(apiMonitorDTO);
     }
 
     /**
-     * {@code PUT  /api-monitors/:id} : Updates an existing apiMonitor.
+     * {@code PUT  /http-monitors/:id} : Updates an existing apiMonitor.
      *
      * @param id the id of the apiMonitorDTO to save.
      * @param apiMonitorDTO the apiMonitorDTO to update.
@@ -100,7 +100,7 @@ public class HttpMonitorResource {
     }
 
     /**
-     * {@code PATCH  /api-monitors/:id} : Partial updates given fields of an existing apiMonitor, field will ignore if it is null
+     * {@code PATCH  /http-monitors/:id} : Partial updates given fields of an existing apiMonitor, field will ignore if it is null
      *
      * @param id the id of the apiMonitorDTO to save.
      * @param apiMonitorDTO the apiMonitorDTO to update.
@@ -136,7 +136,7 @@ public class HttpMonitorResource {
     }
 
     /**
-     * {@code GET  /api-monitors} : get all the apiMonitors.
+     * {@code GET  /http-monitors} : get all the apiMonitors.
      *
      * @param pageable the pagination information.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of apiMonitors in body.
@@ -150,7 +150,7 @@ public class HttpMonitorResource {
     }
 
     /**
-     * {@code GET  /api-monitors/:id} : get the "id" apiMonitor.
+     * {@code GET  /http-monitors/:id} : get the "id" apiMonitor.
      *
      * @param id the id of the apiMonitorDTO to retrieve.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the apiMonitorDTO, or with status {@code 404 (Not Found)}.
@@ -163,7 +163,7 @@ public class HttpMonitorResource {
     }
 
     /**
-     * {@code DELETE  /api-monitors/:id} : delete the "id" apiMonitor.
+     * {@code DELETE  /http-monitors/:id} : delete the "id" apiMonitor.
      *
      * @param id the id of the apiMonitorDTO to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.

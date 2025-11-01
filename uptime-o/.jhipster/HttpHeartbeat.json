@@ -92,7 +92,7 @@
       "fieldType": "TextBlob"
     }
   ],
-  "name": "ApiHeartbeat",
+  "name": "HttpHeartbeat",
   "pagination": "pagination",
   "relationships": [
     {

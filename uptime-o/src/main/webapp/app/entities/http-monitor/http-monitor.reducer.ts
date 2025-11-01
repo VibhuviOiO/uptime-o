@@ -14,7 +14,7 @@ const initialState: EntityState<IHttpMonitor> = {
   updateSuccess: false,
 };
 
-const apiUrl = 'api/api-monitors';
+const apiUrl = 'api/http-monitors';
 
 // Actions
 

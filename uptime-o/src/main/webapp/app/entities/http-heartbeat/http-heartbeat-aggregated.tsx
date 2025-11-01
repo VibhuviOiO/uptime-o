@@ -12,7 +12,7 @@ const timeRanges = [
   { label: '24 hours', value: '24hour' },
 ];
 
-const ApiHeartbeatAggregated = () => {
+const HttpHeartbeatAggregated = () => {
   const [range, setRange] = useState('5min');
   const dispatch = useAppDispatch();
   const data = useAppSelector(state => state.apiHeartbeatAggregated.data);
@@ -67,4 +67,4 @@ const ApiHeartbeatAggregated = () => {
   );
 };
 
-export default ApiHeartbeatAggregated;
+export default HttpHeartbeatAggregated;

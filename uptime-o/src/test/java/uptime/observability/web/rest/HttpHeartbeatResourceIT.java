@@ -93,7 +93,7 @@ class HttpHeartbeatResourceIT {
     private static final String DEFAULT_RAW_RESPONSE_BODY = "AAAAAAAAAA";
     private static final String UPDATED_RAW_RESPONSE_BODY = "BBBBBBBBBB";
 
-    private static final String ENTITY_API_URL = "/api/api-heartbeats";
+    private static final String ENTITY_API_URL = "/api/http-heartbeats";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
     private static Random random = new Random();
@@ -112,11 +112,11 @@ class HttpHeartbeatResourceIT {
     private EntityManager em;
 
     @Autowired
-    private MockMvc restApiHeartbeatMockMvc;
+    private MockMvc restHttpHeartbeatMockMvc;
 
     private HttpHeartbeat apiHeartbeat;
 
-    private HttpHeartbeat insertedApiHeartbeat;
+    private HttpHeartbeat insertedHttpHeartbeat;
 
     /**
      * Create an entity for this test.
@@ -183,20 +183,20 @@ class HttpHeartbeatResourceIT {
 
     @AfterEach
     void cleanup() {
-        if (insertedApiHeartbeat != null) {
-            apiHeartbeatRepository.delete(insertedApiHeartbeat);
-            insertedApiHeartbeat = null;
+        if (insertedHttpHeartbeat != null) {
+            apiHeartbeatRepository.delete(insertedHttpHeartbeat);
+            insertedHttpHeartbeat = null;
         }
     }
 
     @Test
     @Transactional
-    void createApiHeartbeat() throws Exception {
+    void createHttpHeartbeat() throws Exception {
         long databaseSizeBeforeCreate = getRepositoryCount();
-        // Create the ApiHeartbeat
+        // Create the HttpHeartbeat
         HttpHeartbeatDTO apiHeartbeatDTO = apiHeartbeatMapper.toDto(apiHeartbeat);
-        var returnedApiHeartbeatDTO = om.readValue(
-            restApiHeartbeatMockMvc
+        var returnedHttpHeartbeatDTO = om.readValue(
+            restHttpHeartbeatMockMvc
                 .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(apiHeartbeatDTO)))
                 .andExpect(status().isCreated())
                 .andReturn()
@@ -205,29 +205,29 @@ class HttpHeartbeatResourceIT {
             HttpHeartbeatDTO.class
         );
 
-        // Validate the ApiHeartbeat in the database
+        // Validate the HttpHeartbeat in the database
         assertIncrementedRepositoryCount(databaseSizeBeforeCreate);
-        var returnedApiHeartbeat = apiHeartbeatMapper.toEntity(returnedApiHeartbeatDTO);
-        assertApiHeartbeatUpdatableFieldsEquals(returnedApiHeartbeat, getPersistedApiHeartbeat(returnedApiHeartbeat));
+        var returnedHttpHeartbeat = apiHeartbeatMapper.toEntity(returnedHttpHeartbeatDTO);
+        assertHttpHeartbeatUpdatableFieldsEquals(returnedHttpHeartbeat, getPersistedHttpHeartbeat(returnedHttpHeartbeat));
 
-        insertedApiHeartbeat = returnedApiHeartbeat;
+        insertedHttpHeartbeat = returnedHttpHeartbeat;
     }
 
     @Test
     @Transactional
-    void createApiHeartbeatWithExistingId() throws Exception {
-        // Create the ApiHeartbeat with an existing ID
+    void createHttpHeartbeatWithExistingId() throws Exception {
+        // Create the HttpHeartbeat with an existing ID
         apiHeartbeat.setId(1L);
         HttpHeartbeatDTO apiHeartbeatDTO = apiHeartbeatMapper.toDto(apiHeartbeat);
 
         long databaseSizeBeforeCreate = getRepositoryCount();
 
         // An entity with an existing ID cannot be created, so this API call must fail
-        restApiHeartbeatMockMvc
+        restHttpHeartbeatMockMvc
             .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(apiHeartbeatDTO)))
             .andExpect(status().isBadRequest());
 
-        // Validate the ApiHeartbeat in the database
+        // Validate the HttpHeartbeat in the database
         assertSameRepositoryCount(databaseSizeBeforeCreate);
     }
 
@@ -238,10 +238,10 @@ class HttpHeartbeatResourceIT {
         // set the field null
         apiHeartbeat.setExecutedAt(null);
 
-        // Create the ApiHeartbeat, which fails.
+        // Create the HttpHeartbeat, which fails.
         HttpHeartbeatDTO apiHeartbeatDTO = apiHeartbeatMapper.toDto(apiHeartbeat);
 
-        restApiHeartbeatMockMvc
+        restHttpHeartbeatMockMvc
             .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(apiHeartbeatDTO)))
             .andExpect(status().isBadRequest());
 
@@ -250,12 +250,12 @@ class HttpHeartbeatResourceIT {
 
     @Test
     @Transactional
-    void getAllApiHeartbeats() throws Exception {
+    void getAllHttpHeartbeats() throws Exception {
         // Initialize the database
-        insertedApiHeartbeat = apiHeartbeatRepository.saveAndFlush(apiHeartbeat);
+        insertedHttpHeartbeat = apiHeartbeatRepository.saveAndFlush(apiHeartbeat);
 
         // Get all the apiHeartbeatList
-        restApiHeartbeatMockMvc
+        restHttpHeartbeatMockMvc
             .perform(get(ENTITY_API_URL + "?sort=id,desc"))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
@@ -283,12 +283,12 @@ class HttpHeartbeatResourceIT {
 
     @Test
     @Transactional
-    void getApiHeartbeat() throws Exception {
+    void getHttpHeartbeat() throws Exception {
         // Initialize the database
-        insertedApiHeartbeat = apiHeartbeatRepository.saveAndFlush(apiHeartbeat);
+        insertedHttpHeartbeat = apiHeartbeatRepository.saveAndFlush(apiHeartbeat);
 
         // Get the apiHeartbeat
-        restApiHeartbeatMockMvc
+        restHttpHeartbeatMockMvc
             .perform(get(ENTITY_API_URL_ID, apiHeartbeat.getId()))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
@@ -316,24 +316,24 @@ class HttpHeartbeatResourceIT {
 
     @Test
     @Transactional
-    void getNonExistingApiHeartbeat() throws Exception {
+    void getNonExistingHttpHeartbeat() throws Exception {
         // Get the apiHeartbeat
-        restApiHeartbeatMockMvc.perform(get(ENTITY_API_URL_ID, Long.MAX_VALUE)).andExpect(status().isNotFound());
+        restHttpHeartbeatMockMvc.perform(get(ENTITY_API_URL_ID, Long.MAX_VALUE)).andExpect(status().isNotFound());
     }
 
     @Test
     @Transactional
-    void putExistingApiHeartbeat() throws Exception {
+    void putExistingHttpHeartbeat() throws Exception {
         // Initialize the database
-        insertedApiHeartbeat = apiHeartbeatRepository.saveAndFlush(apiHeartbeat);
+        insertedHttpHeartbeat = apiHeartbeatRepository.saveAndFlush(apiHeartbeat);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the apiHeartbeat
-        HttpHeartbeat updatedApiHeartbeat = apiHeartbeatRepository.findById(apiHeartbeat.getId()).orElseThrow();
-        // Disconnect from session so that the updates on updatedApiHeartbeat are not directly saved in db
-        em.detach(updatedApiHeartbeat);
-        updatedApiHeartbeat
+        HttpHeartbeat updatedHttpHeartbeat = apiHeartbeatRepository.findById(apiHeartbeat.getId()).orElseThrow();
+        // Disconnect from session so that the updates on updatedHttpHeartbeat are not directly saved in db
+        em.detach(updatedHttpHeartbeat);
+        updatedHttpHeartbeat
             .executedAt(UPDATED_EXECUTED_AT)
             .success(UPDATED_SUCCESS)
             .responseTimeMs(UPDATED_RESPONSE_TIME_MS)
@@ -353,9 +353,9 @@ class HttpHeartbeatResourceIT {
             .rawRequestHeaders(UPDATED_RAW_REQUEST_HEADERS)
             .rawResponseHeaders(UPDATED_RAW_RESPONSE_HEADERS)
             .rawResponseBody(UPDATED_RAW_RESPONSE_BODY);
-        HttpHeartbeatDTO apiHeartbeatDTO = apiHeartbeatMapper.toDto(updatedApiHeartbeat);
+        HttpHeartbeatDTO apiHeartbeatDTO = apiHeartbeatMapper.toDto(updatedHttpHeartbeat);
 
-        restApiHeartbeatMockMvc
+        restHttpHeartbeatMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, apiHeartbeatDTO.getId())
                     .contentType(MediaType.APPLICATION_JSON)
@@ -363,22 +363,22 @@ class HttpHeartbeatResourceIT {
             )
             .andExpect(status().isOk());
 
-        // Validate the ApiHeartbeat in the database
+        // Validate the HttpHeartbeat in the database
         assertSameRepositoryCount(databaseSizeBeforeUpdate);
-        assertPersistedApiHeartbeatToMatchAllProperties(updatedApiHeartbeat);
+        assertPersistedHttpHeartbeatToMatchAllProperties(updatedHttpHeartbeat);
     }
 
     @Test
     @Transactional
-    void putNonExistingApiHeartbeat() throws Exception {
+    void putNonExistingHttpHeartbeat() throws Exception {
         long databaseSizeBeforeUpdate = getRepositoryCount();
         apiHeartbeat.setId(longCount.incrementAndGet());
 
-        // Create the ApiHeartbeat
+        // Create the HttpHeartbeat
         HttpHeartbeatDTO apiHeartbeatDTO = apiHeartbeatMapper.toDto(apiHeartbeat);
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
-        restApiHeartbeatMockMvc
+        restHttpHeartbeatMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, apiHeartbeatDTO.getId())
                     .contentType(MediaType.APPLICATION_JSON)
@@ -386,21 +386,21 @@ class HttpHeartbeatResourceIT {
             )
             .andExpect(status().isBadRequest());
 
-        // Validate the ApiHeartbeat in the database
+        // Validate the HttpHeartbeat in the database
         assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
-    void putWithIdMismatchApiHeartbeat() throws Exception {
+    void putWithIdMismatchHttpHeartbeat() throws Exception {
         long databaseSizeBeforeUpdate = getRepositoryCount();
         apiHeartbeat.setId(longCount.incrementAndGet());
 
-        // Create the ApiHeartbeat
+        // Create the HttpHeartbeat
         HttpHeartbeatDTO apiHeartbeatDTO = apiHeartbeatMapper.toDto(apiHeartbeat);
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
-        restApiHeartbeatMockMvc
+        restHttpHeartbeatMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .contentType(MediaType.APPLICATION_JSON)
@@ -408,41 +408,41 @@ class HttpHeartbeatResourceIT {
             )
             .andExpect(status().isBadRequest());
 
-        // Validate the ApiHeartbeat in the database
+        // Validate the HttpHeartbeat in the database
         assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
-    void putWithMissingIdPathParamApiHeartbeat() throws Exception {
+    void putWithMissingIdPathParamHttpHeartbeat() throws Exception {
         long databaseSizeBeforeUpdate = getRepositoryCount();
         apiHeartbeat.setId(longCount.incrementAndGet());
 
-        // Create the ApiHeartbeat
+        // Create the HttpHeartbeat
         HttpHeartbeatDTO apiHeartbeatDTO = apiHeartbeatMapper.toDto(apiHeartbeat);
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
-        restApiHeartbeatMockMvc
+        restHttpHeartbeatMockMvc
             .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(apiHeartbeatDTO)))
             .andExpect(status().isMethodNotAllowed());
 
-        // Validate the ApiHeartbeat in the database
+        // Validate the HttpHeartbeat in the database
         assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
-    void partialUpdateApiHeartbeatWithPatch() throws Exception {
+    void partialUpdateHttpHeartbeatWithPatch() throws Exception {
         // Initialize the database
-        insertedApiHeartbeat = apiHeartbeatRepository.saveAndFlush(apiHeartbeat);
+        insertedHttpHeartbeat = apiHeartbeatRepository.saveAndFlush(apiHeartbeat);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the apiHeartbeat using partial update
-        HttpHeartbeat partialUpdatedApiHeartbeat = new HttpHeartbeat();
-        partialUpdatedApiHeartbeat.setId(apiHeartbeat.getId());
+        HttpHeartbeat partialUpdatedHttpHeartbeat = new HttpHeartbeat();
+        partialUpdatedHttpHeartbeat.setId(apiHeartbeat.getId());
 
-        partialUpdatedApiHeartbeat
+        partialUpdatedHttpHeartbeat
             .executedAt(UPDATED_EXECUTED_AT)
             .success(UPDATED_SUCCESS)
             .responseTimeMs(UPDATED_RESPONSE_TIME_MS)
@@ -456,36 +456,36 @@ class HttpHeartbeatResourceIT {
             .errorType(UPDATED_ERROR_TYPE)
             .rawResponseHeaders(UPDATED_RAW_RESPONSE_HEADERS);
 
-        restApiHeartbeatMockMvc
+        restHttpHeartbeatMockMvc
             .perform(
-                patch(ENTITY_API_URL_ID, partialUpdatedApiHeartbeat.getId())
+                patch(ENTITY_API_URL_ID, partialUpdatedHttpHeartbeat.getId())
                     .contentType("application/merge-patch+json")
-                    .content(om.writeValueAsBytes(partialUpdatedApiHeartbeat))
+                    .content(om.writeValueAsBytes(partialUpdatedHttpHeartbeat))
             )
             .andExpect(status().isOk());
 
-        // Validate the ApiHeartbeat in the database
+        // Validate the HttpHeartbeat in the database
 
         assertSameRepositoryCount(databaseSizeBeforeUpdate);
-        assertApiHeartbeatUpdatableFieldsEquals(
-            createUpdateProxyForBean(partialUpdatedApiHeartbeat, apiHeartbeat),
-            getPersistedApiHeartbeat(apiHeartbeat)
+        assertHttpHeartbeatUpdatableFieldsEquals(
+            createUpdateProxyForBean(partialUpdatedHttpHeartbeat, apiHeartbeat),
+            getPersistedHttpHeartbeat(apiHeartbeat)
         );
     }
 
     @Test
     @Transactional
-    void fullUpdateApiHeartbeatWithPatch() throws Exception {
+    void fullUpdateHttpHeartbeatWithPatch() throws Exception {
         // Initialize the database
-        insertedApiHeartbeat = apiHeartbeatRepository.saveAndFlush(apiHeartbeat);
+        insertedHttpHeartbeat = apiHeartbeatRepository.saveAndFlush(apiHeartbeat);
 
         long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the apiHeartbeat using partial update
-        HttpHeartbeat partialUpdatedApiHeartbeat = new HttpHeartbeat();
-        partialUpdatedApiHeartbeat.setId(apiHeartbeat.getId());
+        HttpHeartbeat partialUpdatedHttpHeartbeat = new HttpHeartbeat();
+        partialUpdatedHttpHeartbeat.setId(apiHeartbeat.getId());
 
-        partialUpdatedApiHeartbeat
+        partialUpdatedHttpHeartbeat
             .executedAt(UPDATED_EXECUTED_AT)
             .success(UPDATED_SUCCESS)
             .responseTimeMs(UPDATED_RESPONSE_TIME_MS)
@@ -506,31 +506,31 @@ class HttpHeartbeatResourceIT {
             .rawResponseHeaders(UPDATED_RAW_RESPONSE_HEADERS)
             .rawResponseBody(UPDATED_RAW_RESPONSE_BODY);
 
-        restApiHeartbeatMockMvc
+        restHttpHeartbeatMockMvc
             .perform(
-                patch(ENTITY_API_URL_ID, partialUpdatedApiHeartbeat.getId())
+                patch(ENTITY_API_URL_ID, partialUpdatedHttpHeartbeat.getId())
                     .contentType("application/merge-patch+json")
-                    .content(om.writeValueAsBytes(partialUpdatedApiHeartbeat))
+                    .content(om.writeValueAsBytes(partialUpdatedHttpHeartbeat))
             )
             .andExpect(status().isOk());
 
-        // Validate the ApiHeartbeat in the database
+        // Validate the HttpHeartbeat in the database
 
         assertSameRepositoryCount(databaseSizeBeforeUpdate);
-        assertApiHeartbeatUpdatableFieldsEquals(partialUpdatedApiHeartbeat, getPersistedApiHeartbeat(partialUpdatedApiHeartbeat));
+        assertHttpHeartbeatUpdatableFieldsEquals(partialUpdatedHttpHeartbeat, getPersistedHttpHeartbeat(partialUpdatedHttpHeartbeat));
     }
 
     @Test
     @Transactional
-    void patchNonExistingApiHeartbeat() throws Exception {
+    void patchNonExistingHttpHeartbeat() throws Exception {
         long databaseSizeBeforeUpdate = getRepositoryCount();
         apiHeartbeat.setId(longCount.incrementAndGet());
 
-        // Create the ApiHeartbeat
+        // Create the HttpHeartbeat
         HttpHeartbeatDTO apiHeartbeatDTO = apiHeartbeatMapper.toDto(apiHeartbeat);
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
-        restApiHeartbeatMockMvc
+        restHttpHeartbeatMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, apiHeartbeatDTO.getId())
                     .contentType("application/merge-patch+json")
@@ -538,21 +538,21 @@ class HttpHeartbeatResourceIT {
             )
             .andExpect(status().isBadRequest());
 
-        // Validate the ApiHeartbeat in the database
+        // Validate the HttpHeartbeat in the database
         assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
-    void patchWithIdMismatchApiHeartbeat() throws Exception {
+    void patchWithIdMismatchHttpHeartbeat() throws Exception {
         long databaseSizeBeforeUpdate = getRepositoryCount();
         apiHeartbeat.setId(longCount.incrementAndGet());
 
-        // Create the ApiHeartbeat
+        // Create the HttpHeartbeat
         HttpHeartbeatDTO apiHeartbeatDTO = apiHeartbeatMapper.toDto(apiHeartbeat);
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
-        restApiHeartbeatMockMvc
+        restHttpHeartbeatMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .contentType("application/merge-patch+json")
@@ -560,38 +560,38 @@ class HttpHeartbeatResourceIT {
             )
             .andExpect(status().isBadRequest());
 
-        // Validate the ApiHeartbeat in the database
+        // Validate the HttpHeartbeat in the database
         assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
-    void patchWithMissingIdPathParamApiHeartbeat() throws Exception {
+    void patchWithMissingIdPathParamHttpHeartbeat() throws Exception {
         long databaseSizeBeforeUpdate = getRepositoryCount();
         apiHeartbeat.setId(longCount.incrementAndGet());
 
-        // Create the ApiHeartbeat
+        // Create the HttpHeartbeat
         HttpHeartbeatDTO apiHeartbeatDTO = apiHeartbeatMapper.toDto(apiHeartbeat);
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
-        restApiHeartbeatMockMvc
+        restHttpHeartbeatMockMvc
             .perform(patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(om.writeValueAsBytes(apiHeartbeatDTO)))
             .andExpect(status().isMethodNotAllowed());
 
-        // Validate the ApiHeartbeat in the database
+        // Validate the HttpHeartbeat in the database
         assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
-    void deleteApiHeartbeat() throws Exception {
+    void deleteHttpHeartbeat() throws Exception {
         // Initialize the database
-        insertedApiHeartbeat = apiHeartbeatRepository.saveAndFlush(apiHeartbeat);
+        insertedHttpHeartbeat = apiHeartbeatRepository.saveAndFlush(apiHeartbeat);
 
         long databaseSizeBeforeDelete = getRepositoryCount();
 
         // Delete the apiHeartbeat
-        restApiHeartbeatMockMvc
+        restHttpHeartbeatMockMvc
             .perform(delete(ENTITY_API_URL_ID, apiHeartbeat.getId()).accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isNoContent());
 
@@ -615,15 +615,15 @@ class HttpHeartbeatResourceIT {
         assertThat(countBefore).isEqualTo(getRepositoryCount());
     }
 
-    protected HttpHeartbeat getPersistedApiHeartbeat(HttpHeartbeat apiHeartbeat) {
+    protected HttpHeartbeat getPersistedHttpHeartbeat(HttpHeartbeat apiHeartbeat) {
         return apiHeartbeatRepository.findById(apiHeartbeat.getId()).orElseThrow();
     }
 
-    protected void assertPersistedApiHeartbeatToMatchAllProperties(HttpHeartbeat expectedApiHeartbeat) {
-        assertApiHeartbeatAllPropertiesEquals(expectedApiHeartbeat, getPersistedApiHeartbeat(expectedApiHeartbeat));
+    protected void assertPersistedHttpHeartbeatToMatchAllProperties(HttpHeartbeat expectedHttpHeartbeat) {
+        assertHttpHeartbeatAllPropertiesEquals(expectedHttpHeartbeat, getPersistedHttpHeartbeat(expectedHttpHeartbeat));
     }
 
-    protected void assertPersistedApiHeartbeatToMatchUpdatableProperties(HttpHeartbeat expectedApiHeartbeat) {
-        assertApiHeartbeatAllUpdatablePropertiesEquals(expectedApiHeartbeat, getPersistedApiHeartbeat(expectedApiHeartbeat));
+    protected void assertPersistedHttpHeartbeatToMatchUpdatableProperties(HttpHeartbeat expectedHttpHeartbeat) {
+        assertHttpHeartbeatAllUpdatablePropertiesEquals(expectedHttpHeartbeat, getPersistedHttpHeartbeat(expectedHttpHeartbeat));
     }
 }

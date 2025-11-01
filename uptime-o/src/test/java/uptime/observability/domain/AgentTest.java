@@ -29,22 +29,22 @@ class AgentTest {
     @Test
     void apiHeartbeatTest() {
         Agent agent = getAgentRandomSampleGenerator();
-        HttpHeartbeat apiHeartbeatBack = getApiHeartbeatRandomSampleGenerator();
+        HttpHeartbeat apiHeartbeatBack = getHttpHeartbeatRandomSampleGenerator();
 
-        agent.addApiHeartbeat(apiHeartbeatBack);
-        assertThat(agent.getApiHeartbeats()).containsOnly(apiHeartbeatBack);
+        agent.addHttpHeartbeat(apiHeartbeatBack);
+        assertThat(agent.getHttpHeartbeats()).containsOnly(apiHeartbeatBack);
         assertThat(apiHeartbeatBack.getAgent()).isEqualTo(agent);
 
-        agent.removeApiHeartbeat(apiHeartbeatBack);
-        assertThat(agent.getApiHeartbeats()).doesNotContain(apiHeartbeatBack);
+        agent.removeHttpHeartbeat(apiHeartbeatBack);
+        assertThat(agent.getHttpHeartbeats()).doesNotContain(apiHeartbeatBack);
         assertThat(apiHeartbeatBack.getAgent()).isNull();
 
         agent.apiHeartbeats(new HashSet<>(Set.of(apiHeartbeatBack)));
-        assertThat(agent.getApiHeartbeats()).containsOnly(apiHeartbeatBack);
+        assertThat(agent.getHttpHeartbeats()).containsOnly(apiHeartbeatBack);
         assertThat(apiHeartbeatBack.getAgent()).isEqualTo(agent);
 
-        agent.setApiHeartbeats(new HashSet<>());
-        assertThat(agent.getApiHeartbeats()).doesNotContain(apiHeartbeatBack);
+        agent.setHttpHeartbeats(new HashSet<>());
+        assertThat(agent.getHttpHeartbeats()).doesNotContain(apiHeartbeatBack);
         assertThat(apiHeartbeatBack.getAgent()).isNull();
     }
 

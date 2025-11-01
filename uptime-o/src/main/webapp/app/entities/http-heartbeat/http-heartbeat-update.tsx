@@ -11,7 +11,7 @@ import { getEntities as getHttpMonitors } from 'app/entities/http-monitor/http-m
 import { getEntities as getAgents } from 'app/entities/agent/agent.reducer';
 import { createEntity, getEntity, reset, updateEntity } from './http-heartbeat.reducer';
 
-export const ApiHeartbeatUpdate = () => {
+export const HttpHeartbeatUpdate = () => {
   const dispatch = useAppDispatch();
 
   const navigate = useNavigate();
@@ -27,7 +27,7 @@ export const ApiHeartbeatUpdate = () => {
   const updateSuccess = useAppSelector(state => state.apiHeartbeat.updateSuccess);
 
   const handleClose = () => {
-    navigate(`/api-heartbeat${location.search}`);
+    navigate(`/http-heartbeat${location.search}`);
   };
 
   useEffect(() => {
@@ -110,7 +110,7 @@ export const ApiHeartbeatUpdate = () => {
     <div>
       <Row className="justify-content-center">
         <Col md="8">
-          <h2 id="uptimeOApp.apiHeartbeat.home.createOrEditLabel" data-cy="ApiHeartbeatCreateUpdateHeading">
+          <h2 id="uptimeOApp.apiHeartbeat.home.createOrEditLabel" data-cy="HttpHeartbeatCreateUpdateHeading">
             Create or edit a Api Heartbeat
           </h2>
         </Col>
@@ -122,11 +122,11 @@ export const ApiHeartbeatUpdate = () => {
           ) : (
             <ValidatedForm defaultValues={defaultValues()} onSubmit={saveEntity}>
               {!isNew ? (
-                <ValidatedField name="id" required readOnly id="api-heartbeat-id" label="ID" validate={{ required: true }} />
+                <ValidatedField name="id" required readOnly id="http-heartbeat-id" label="ID" validate={{ required: true }} />
               ) : null}
               <ValidatedField
                 label="Executed At"
-                id="api-heartbeat-executedAt"
+                id="http-heartbeat-executedAt"
                 name="executedAt"
                 data-cy="executedAt"
                 type="datetime-local"
@@ -135,31 +135,31 @@ export const ApiHeartbeatUpdate = () => {
                   required: { value: true, message: 'This field is required.' },
                 }}
               />
-              <ValidatedField label="Success" id="api-heartbeat-success" name="success" data-cy="success" check type="checkbox" />
+              <ValidatedField label="Success" id="http-heartbeat-success" name="success" data-cy="success" check type="checkbox" />
               <ValidatedField
                 label="Response Time Ms"
-                id="api-heartbeat-responseTimeMs"
+                id="http-heartbeat-responseTimeMs"
                 name="responseTimeMs"
                 data-cy="responseTimeMs"
                 type="text"
               />
               <ValidatedField
                 label="Response Size Bytes"
-                id="api-heartbeat-responseSizeBytes"
+                id="http-heartbeat-responseSizeBytes"
                 name="responseSizeBytes"
                 data-cy="responseSizeBytes"
                 type="text"
               />
               <ValidatedField
                 label="Response Status Code"
-                id="api-heartbeat-responseStatusCode"
+                id="http-heartbeat-responseStatusCode"
                 name="responseStatusCode"
                 data-cy="responseStatusCode"
                 type="text"
               />
               <ValidatedField
                 label="Response Content Type"
-                id="api-heartbeat-responseContentType"
+                id="http-heartbeat-responseContentType"
                 name="responseContentType"
                 data-cy="responseContentType"
                 type="text"
@@ -169,7 +169,7 @@ export const ApiHeartbeatUpdate = () => {
               />
               <ValidatedField
                 label="Response Server"
-                id="api-heartbeat-responseServer"
+                id="http-heartbeat-responseServer"
                 name="responseServer"
                 data-cy="responseServer"
                 type="text"
@@ -179,7 +179,7 @@ export const ApiHeartbeatUpdate = () => {
               />
               <ValidatedField
                 label="Response Cache Status"
-                id="api-heartbeat-responseCacheStatus"
+                id="http-heartbeat-responseCacheStatus"
                 name="responseCacheStatus"
                 data-cy="responseCacheStatus"
                 type="text"
@@ -187,45 +187,45 @@ export const ApiHeartbeatUpdate = () => {
                   maxLength: { value: 50, message: 'This field cannot be longer than 50 characters.' },
                 }}
               />
-              <ValidatedField label="Dns Lookup Ms" id="api-heartbeat-dnsLookupMs" name="dnsLookupMs" data-cy="dnsLookupMs" type="text" />
+              <ValidatedField label="Dns Lookup Ms" id="http-heartbeat-dnsLookupMs" name="dnsLookupMs" data-cy="dnsLookupMs" type="text" />
               <ValidatedField
                 label="Tcp Connect Ms"
-                id="api-heartbeat-tcpConnectMs"
+                id="http-heartbeat-tcpConnectMs"
                 name="tcpConnectMs"
                 data-cy="tcpConnectMs"
                 type="text"
               />
               <ValidatedField
                 label="Tls Handshake Ms"
-                id="api-heartbeat-tlsHandshakeMs"
+                id="http-heartbeat-tlsHandshakeMs"
                 name="tlsHandshakeMs"
                 data-cy="tlsHandshakeMs"
                 type="text"
               />
               <ValidatedField
                 label="Time To First Byte Ms"
-                id="api-heartbeat-timeToFirstByteMs"
+                id="http-heartbeat-timeToFirstByteMs"
                 name="timeToFirstByteMs"
                 data-cy="timeToFirstByteMs"
                 type="text"
               />
               <ValidatedField
                 label="Warning Threshold Ms"
-                id="api-heartbeat-warningThresholdMs"
+                id="http-heartbeat-warningThresholdMs"
                 name="warningThresholdMs"
                 data-cy="warningThresholdMs"
                 type="text"
               />
               <ValidatedField
                 label="Critical Threshold Ms"
-                id="api-heartbeat-criticalThresholdMs"
+                id="http-heartbeat-criticalThresholdMs"
                 name="criticalThresholdMs"
                 data-cy="criticalThresholdMs"
                 type="text"
               />
               <ValidatedField
                 label="Error Type"
-                id="api-heartbeat-errorType"
+                id="http-heartbeat-errorType"
                 name="errorType"
                 data-cy="errorType"
                 type="text"
@@ -235,33 +235,33 @@ export const ApiHeartbeatUpdate = () => {
               />
               <ValidatedField
                 label="Error Message"
-                id="api-heartbeat-errorMessage"
+                id="http-heartbeat-errorMessage"
                 name="errorMessage"
                 data-cy="errorMessage"
                 type="textarea"
               />
               <ValidatedField
                 label="Raw Request Headers"
-                id="api-heartbeat-rawRequestHeaders"
+                id="http-heartbeat-rawRequestHeaders"
                 name="rawRequestHeaders"
                 data-cy="rawRequestHeaders"
                 type="textarea"
               />
               <ValidatedField
                 label="Raw Response Headers"
-                id="api-heartbeat-rawResponseHeaders"
+                id="http-heartbeat-rawResponseHeaders"
                 name="rawResponseHeaders"
                 data-cy="rawResponseHeaders"
                 type="textarea"
               />
               <ValidatedField
                 label="Raw Response Body"
-                id="api-heartbeat-rawResponseBody"
+                id="http-heartbeat-rawResponseBody"
                 name="rawResponseBody"
                 data-cy="rawResponseBody"
                 type="textarea"
               />
-              <ValidatedField id="api-heartbeat-monitor" name="monitor" data-cy="monitor" label="Monitor" type="select">
+              <ValidatedField id="http-heartbeat-monitor" name="monitor" data-cy="monitor" label="Monitor" type="select">
                 <option value="" key="0" />
                 {apiMonitors
                   ? apiMonitors.map(otherEntity => (
@@ -271,7 +271,7 @@ export const ApiHeartbeatUpdate = () => {
                     ))
                   : null}
               </ValidatedField>
-              <ValidatedField id="api-heartbeat-agent" name="agent" data-cy="agent" label="Agent" type="select">
+              <ValidatedField id="http-heartbeat-agent" name="agent" data-cy="agent" label="Agent" type="select">
                 <option value="" key="0" />
                 {agents
                   ? agents.map(otherEntity => (
@@ -281,7 +281,7 @@ export const ApiHeartbeatUpdate = () => {
                     ))
                   : null}
               </ValidatedField>
-              <Button tag={Link} id="cancel-save" data-cy="entityCreateCancelButton" to="/api-heartbeat" replace color="info">
+              <Button tag={Link} id="cancel-save" data-cy="entityCreateCancelButton" to="/http-heartbeat" replace color="info">
                 <FontAwesomeIcon icon="arrow-left" />
                 &nbsp;
                 <span className="d-none d-md-inline">Back</span>
@@ -299,4 +299,4 @@ export const ApiHeartbeatUpdate = () => {
   );
 };
 
-export default ApiHeartbeatUpdate;
+export default HttpHeartbeatUpdate;

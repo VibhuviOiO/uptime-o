@@ -7,7 +7,7 @@
                         http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
     <!--
-        Added the entity ApiHeartbeat.
+        Added the entity HttpHeartbeat.
     -->
     <changeSet id="20251025202841-1" author="jhipster">
         <createTable tableName="api_heartbeats">

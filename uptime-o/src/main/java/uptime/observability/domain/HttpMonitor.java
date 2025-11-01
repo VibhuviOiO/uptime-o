@@ -152,11 +152,11 @@ public class HttpMonitor implements Serializable {
         this.body = body;
     }
 
-    public Set<HttpHeartbeat> getApiHeartbeats() {
+    public Set<HttpHeartbeat> getHttpHeartbeats() {
         return this.apiHeartbeats;
     }
 
-    public void setApiHeartbeats(Set<HttpHeartbeat> apiHeartbeats) {
+    public void setHttpHeartbeats(Set<HttpHeartbeat> apiHeartbeats) {
         if (this.apiHeartbeats != null) {
             this.apiHeartbeats.forEach(i -> i.setMonitor(null));
         }
@@ -167,17 +167,17 @@ public class HttpMonitor implements Serializable {
     }
 
     public HttpMonitor apiHeartbeats(Set<HttpHeartbeat> apiHeartbeats) {
-        this.setApiHeartbeats(apiHeartbeats);
+        this.setHttpHeartbeats(apiHeartbeats);
         return this;
     }
 
-    public HttpMonitor addApiHeartbeat(HttpHeartbeat apiHeartbeat) {
+    public HttpMonitor addHttpHeartbeat(HttpHeartbeat apiHeartbeat) {
         this.apiHeartbeats.add(apiHeartbeat);
         apiHeartbeat.setMonitor(this);
         return this;
     }
 
-    public HttpMonitor removeApiHeartbeat(HttpHeartbeat apiHeartbeat) {
+    public HttpMonitor removeHttpHeartbeat(HttpHeartbeat apiHeartbeat) {
         this.apiHeartbeats.remove(apiHeartbeat);
         apiHeartbeat.setMonitor(null);
         return this;

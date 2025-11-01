@@ -1,4 +1,4 @@
-export interface IApiHeartbeatAggregated {
+export interface IHttpHeartbeatAggregated {
   monitorId: number;
   monitorName: string;
   url: string;

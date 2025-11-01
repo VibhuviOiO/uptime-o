@@ -7,7 +7,7 @@ import java.io.Serializable;
 import java.time.Instant;
 
 /**
- * A ApiHeartbeat.
+ * A HttpHeartbeat.
  */
 @Entity
 @Table(name = "api_heartbeats")
@@ -402,7 +402,7 @@ public class HttpHeartbeat implements Serializable {
     // prettier-ignore
     @Override
     public String toString() {
-        return "ApiHeartbeat{" +
+        return "HttpHeartbeat{" +
             "id=" + getId() +
             ", executedAt='" + getExecutedAt() + "'" +
             ", success='" + getSuccess() + "'" +

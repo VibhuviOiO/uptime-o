@@ -30,7 +30,7 @@ entity Agent (agents) {
   name String required minlength(1) maxlength(50)
 }
 
-entity ApiHeartbeat (api_heartbeats) {
+entity IHttpHeartbeat (api_heartbeats) {
   executedAt Instant required
   success Boolean
   responseTimeMs Integer
@@ -81,11 +81,11 @@ relationship OneToMany {
 }
 
 relationship OneToMany {
-  HttpMonitor{apiHeartbeat} to ApiHeartbeat{monitor}
+  HttpMonitor{apiHeartbeat} to IHttpHeartbeat{monitor}
 }
 
 relationship OneToMany {
-  Agent{apiHeartbeat} to ApiHeartbeat{agent}
+  Agent{apiHeartbeat} to IHttpHeartbeat{agent}
 }
 
 relationship OneToMany {
@@ -100,16 +100,16 @@ relationship ManyToOne {
   AuditLog{user} to User with builtInEntity
 }
 
-paginate HttpMonitor, ApiHeartbeat with pagination
+paginate HttpMonitor, IHttpHeartbeat with pagination
 paginate Schedule, Region, Datacenter, Agent with pagination
 paginate AuditLog with pagination
 
 dto * with mapstruct
 
 // Services
-service HttpMonitor, ApiHeartbeat with serviceClass
+service HttpMonitor, IHttpHeartbeat with serviceClass
 service Schedule, Region, Datacenter, Agent with serviceImpl
 service AuditLog with serviceClass
 
-// Custom repository for ApiHeartbeat if needed
-// repository ApiHeartbeat with custom
+// Custom repository for IHttpHeartbeat if needed
+// repository IHttpHeartbeat with custom

@@ -14,7 +14,7 @@
     "enableHibernateCache": false,
     "enableSwaggerCodegen": true,
     "enableTranslation": false,
-    "entities": ["Schedule", "HttpMonitor", "Region", "Datacenter", "Agent", "ApiHeartbeat", "AuditLog", "DatacenterMonitor"],
+    "entities": ["Schedule", "HttpMonitor", "Region", "Datacenter", "Agent", "HttpHeartbeat", "AuditLog", "DatacenterMonitor"],
     "feignClient": null,
     "jhipsterVersion": "8.11.0",
     "jwtSecretKey": "YzllMGUwNjg0ZjgxMjlhYjZlZjEzYmE3MWRjNDcwYWVlNTBkYTU0NzgxNmU1N2FmZjE4OWViODFhN2ZlY2Q1MjBmOWMxNDNkNDkwNDFhNDkzMTZkYjZiMWNiNTcwNjNmOWU1M2E5ZTA1ZDI4NjI0YzBiNTFiY2YzMDQwZTU2MWQ=",

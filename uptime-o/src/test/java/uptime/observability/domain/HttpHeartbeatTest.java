@@ -13,20 +13,20 @@ class HttpHeartbeatTest {
     @Test
     void equalsVerifier() throws Exception {
         TestUtil.equalsVerifier(HttpHeartbeat.class);
-        HttpHeartbeat apiHeartbeat1 = getApiHeartbeatSample1();
+        HttpHeartbeat apiHeartbeat1 = getHttpHeartbeatSample1();
         HttpHeartbeat apiHeartbeat2 = new HttpHeartbeat();
         assertThat(apiHeartbeat1).isNotEqualTo(apiHeartbeat2);
 
         apiHeartbeat2.setId(apiHeartbeat1.getId());
         assertThat(apiHeartbeat1).isEqualTo(apiHeartbeat2);
 
-        apiHeartbeat2 = getApiHeartbeatSample2();
+        apiHeartbeat2 = getHttpHeartbeatSample2();
         assertThat(apiHeartbeat1).isNotEqualTo(apiHeartbeat2);
     }
 
     @Test
     void monitorTest() {
-        HttpHeartbeat apiHeartbeat = getApiHeartbeatRandomSampleGenerator();
+        HttpHeartbeat apiHeartbeat = getHttpHeartbeatRandomSampleGenerator();
         HttpMonitor apiMonitorBack = getHttpMonitorRandomSampleGenerator();
 
         apiHeartbeat.setMonitor(apiMonitorBack);
@@ -38,7 +38,7 @@ class HttpHeartbeatTest {
 
     @Test
     void agentTest() {
-        HttpHeartbeat apiHeartbeat = getApiHeartbeatRandomSampleGenerator();
+        HttpHeartbeat apiHeartbeat = getHttpHeartbeatRandomSampleGenerator();
         Agent agentBack = getAgentRandomSampleGenerator();
 
         apiHeartbeat.setAgent(agentBack);

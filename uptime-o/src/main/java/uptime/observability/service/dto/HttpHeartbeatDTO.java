@@ -261,7 +261,7 @@ public class HttpHeartbeatDTO implements Serializable {
     // prettier-ignore
     @Override
     public String toString() {
-        return "ApiHeartbeatDTO{" +
+        return "HttpHeartbeatDTO{" +
             "id=" + getId() +
             ", executedAt='" + getExecutedAt() + "'" +
             ", success='" + getSuccess() + "'" +

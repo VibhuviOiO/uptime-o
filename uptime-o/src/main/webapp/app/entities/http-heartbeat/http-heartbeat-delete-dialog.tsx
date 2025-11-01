@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { deleteEntity, getEntity } from './http-heartbeat.reducer';
 
-export const ApiHeartbeatDeleteDialog = () => {
+export const HttpHeartbeatDeleteDialog = () => {
   const dispatch = useAppDispatch();
   const pageLocation = useLocation();
   const navigate = useNavigate();
@@ -60,4 +60,4 @@ export const ApiHeartbeatDeleteDialog = () => {
   );
 };
 
-export default ApiHeartbeatDeleteDialog;
+export default HttpHeartbeatDeleteDialog;

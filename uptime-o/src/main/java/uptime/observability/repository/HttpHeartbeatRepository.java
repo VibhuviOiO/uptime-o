@@ -8,7 +8,7 @@ import java.time.Instant;
 import java.util.List;
 
 /**
- * Spring Data JPA repository for the ApiHeartbeat entity.
+ * Spring Data JPA repository for the HttpHeartbeat entity.
  */
 @SuppressWarnings("unused")
 @Repository

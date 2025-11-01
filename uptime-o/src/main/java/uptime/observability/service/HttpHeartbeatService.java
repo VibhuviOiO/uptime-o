@@ -44,7 +44,7 @@ public class HttpHeartbeatService {
      * @return the persisted entity.
      */
     public HttpHeartbeatDTO save(HttpHeartbeatDTO apiHeartbeatDTO) {
-        LOG.debug("Request to save ApiHeartbeat : {}", apiHeartbeatDTO);
+        LOG.debug("Request to save HttpHeartbeat : {}", apiHeartbeatDTO);
         HttpHeartbeat apiHeartbeat = apiHeartbeatMapper.toEntity(apiHeartbeatDTO);
         apiHeartbeat = apiHeartbeatRepository.save(apiHeartbeat);
         return apiHeartbeatMapper.toDto(apiHeartbeat);
@@ -57,7 +57,7 @@ public class HttpHeartbeatService {
      * @return the persisted entity.
      */
     public HttpHeartbeatDTO update(HttpHeartbeatDTO apiHeartbeatDTO) {
-        LOG.debug("Request to update ApiHeartbeat : {}", apiHeartbeatDTO);
+        LOG.debug("Request to update HttpHeartbeat : {}", apiHeartbeatDTO);
         HttpHeartbeat apiHeartbeat = apiHeartbeatMapper.toEntity(apiHeartbeatDTO);
         apiHeartbeat = apiHeartbeatRepository.save(apiHeartbeat);
         return apiHeartbeatMapper.toDto(apiHeartbeat);
@@ -70,14 +70,14 @@ public class HttpHeartbeatService {
      * @return the persisted entity.
      */
     public Optional<HttpHeartbeatDTO> partialUpdate(HttpHeartbeatDTO apiHeartbeatDTO) {
-        LOG.debug("Request to partially update ApiHeartbeat : {}", apiHeartbeatDTO);
+        LOG.debug("Request to partially update HttpHeartbeat : {}", apiHeartbeatDTO);
 
         return apiHeartbeatRepository
             .findById(apiHeartbeatDTO.getId())
-            .map(existingApiHeartbeat -> {
-                apiHeartbeatMapper.partialUpdate(existingApiHeartbeat, apiHeartbeatDTO);
+            .map(existingHttpHeartbeat -> {
+                apiHeartbeatMapper.partialUpdate(existingHttpHeartbeat, apiHeartbeatDTO);
 
-                return existingApiHeartbeat;
+                return existingHttpHeartbeat;
             })
             .map(apiHeartbeatRepository::save)
             .map(apiHeartbeatMapper::toDto);
@@ -91,7 +91,7 @@ public class HttpHeartbeatService {
      */
     @Transactional(readOnly = true)
     public Page<HttpHeartbeatDTO> findAll(Pageable pageable) {
-        LOG.debug("Request to get all ApiHeartbeats");
+        LOG.debug("Request to get all HttpHeartbeats");
         return apiHeartbeatRepository.findAll(pageable).map(apiHeartbeatMapper::toDto);
     }
 
@@ -103,7 +103,7 @@ public class HttpHeartbeatService {
      */
     @Transactional(readOnly = true)
     public Optional<HttpHeartbeatDTO> findOne(Long id) {
-        LOG.debug("Request to get ApiHeartbeat : {}", id);
+        LOG.debug("Request to get HttpHeartbeat : {}", id);
         return apiHeartbeatRepository.findById(id).map(apiHeartbeatMapper::toDto);
     }
 
@@ -113,7 +113,7 @@ public class HttpHeartbeatService {
      * @param id the id of the entity.
      */
     public void delete(Long id) {
-        LOG.debug("Request to delete ApiHeartbeat : {}", id);
+        LOG.debug("Request to delete HttpHeartbeat : {}", id);
         apiHeartbeatRepository.deleteById(id);
     }
 

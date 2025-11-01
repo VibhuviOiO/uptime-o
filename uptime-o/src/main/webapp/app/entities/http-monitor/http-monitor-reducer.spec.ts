@@ -4,7 +4,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import sinon from 'sinon';
 
 import { EntityState } from 'app/shared/reducers/reducer.utils';
-import { IHttpMonitor, defaultValue } from 'app/shared/model/api-monitor.model';
+import { IHttpMonitor, defaultValue } from 'app/shared/model/http-monitor.model';
 import reducer, {
   createEntity,
   deleteEntity,
@@ -13,7 +13,7 @@ import reducer, {
   partialUpdateEntity,
   reset,
   updateEntity,
-} from './api-monitor.reducer';
+} from './http-monitor.reducer';
 
 describe('Entities reducer tests', () => {
   function isEmpty(element): boolean {

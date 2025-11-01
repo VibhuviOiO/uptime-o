@@ -11,7 +11,7 @@ public class HttpHeartbeatTestSamples {
     private static final AtomicLong longCount = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
     private static final AtomicInteger intCount = new AtomicInteger(random.nextInt() + (2 * Short.MAX_VALUE));
 
-    public static HttpHeartbeat getApiHeartbeatSample1() {
+    public static HttpHeartbeat getHttpHeartbeatSample1() {
         return new HttpHeartbeat()
             .id(1L)
             .responseTimeMs(1)
@@ -29,7 +29,7 @@ public class HttpHeartbeatTestSamples {
             .errorType("errorType1");
     }
 
-    public static HttpHeartbeat getApiHeartbeatSample2() {
+    public static HttpHeartbeat getHttpHeartbeatSample2() {
         return new HttpHeartbeat()
             .id(2L)
             .responseTimeMs(2)
@@ -47,7 +47,7 @@ public class HttpHeartbeatTestSamples {
             .errorType("errorType2");
     }
 
-    public static HttpHeartbeat getApiHeartbeatRandomSampleGenerator() {
+    public static HttpHeartbeat getHttpHeartbeatRandomSampleGenerator() {
         return new HttpHeartbeat()
             .id(longCount.incrementAndGet())
             .responseTimeMs(intCount.incrementAndGet())

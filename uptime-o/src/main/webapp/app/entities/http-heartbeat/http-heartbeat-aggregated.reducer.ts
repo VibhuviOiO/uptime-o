@@ -1,27 +1,27 @@
 import axios from 'axios';
 import { createAsyncThunk, isPending } from '@reduxjs/toolkit';
 import { createSlice } from '@reduxjs/toolkit';
-import { IApiHeartbeatAggregated } from 'app/shared/model/api-heartbeat-aggregated.model';
+import { IHttpHeartbeatAggregated } from 'app/shared/model/http-heartbeat-aggregated.model';
 
 const initialState: {
   loading: boolean;
   errorMessage: string | null;
-  data: IApiHeartbeatAggregated[];
+  data: IHttpHeartbeatAggregated[];
 } = {
   loading: false,
   errorMessage: null,
   data: [],
 };
 
-const apiUrl = 'api/api-heartbeats/aggregated';
+const apiUrl = 'api/http-heartbeats/aggregated';
 
-export const getAggregatedHeartbeats = createAsyncThunk('apiHeartbeatAggregated/fetch_list', async (range: string) => {
+export const getAggregatedHeartbeats = createAsyncThunk('httpHeartbeatAggregated/fetch_list', async (range: string) => {
   const requestUrl = `${apiUrl}?range=${range}`;
-  return axios.get<IApiHeartbeatAggregated[]>(requestUrl);
+  return axios.get<IHttpHeartbeatAggregated[]>(requestUrl);
 });
 
-export const ApiHeartbeatAggregatedSlice = createSlice({
-  name: 'apiHeartbeatAggregated',
+export const HttpHeartbeatAggregatedSlice = createSlice({
+  name: 'httpHeartbeatAggregated',
   initialState,
   reducers: {
     reset(state) {
@@ -43,6 +43,6 @@ export const ApiHeartbeatAggregatedSlice = createSlice({
   },
 });
 
-export const { reset } = ApiHeartbeatAggregatedSlice.actions;
+export const { reset } = HttpHeartbeatAggregatedSlice.actions;
 
-export default ApiHeartbeatAggregatedSlice.reducer;
+export default HttpHeartbeatAggregatedSlice.reducer;

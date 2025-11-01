@@ -9,7 +9,7 @@ import { useAppDispatch, useAppSelector } from 'app/config/store';
 
 import { getEntity } from './http-heartbeat.reducer';
 
-export const ApiHeartbeatDetail = () => {
+export const HttpHeartbeatDetail = () => {
   const dispatch = useAppDispatch();
 
   const { id } = useParams<'id'>();
@@ -125,4 +125,4 @@ export const ApiHeartbeatDetail = () => {
   );
 };
 
-export default ApiHeartbeatDetail;
+export default HttpHeartbeatDetail;

@@ -52,7 +52,7 @@ class HttpMonitorResourceIT {
     private static final String DEFAULT_BODY = "AAAAAAAAAA";
     private static final String UPDATED_BODY = "BBBBBBBBBB";
 
-    private static final String ENTITY_API_URL = "/api/api-monitors";
+    private static final String ENTITY_API_URL = "/api/http-monitors";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
     private static Random random = new Random();

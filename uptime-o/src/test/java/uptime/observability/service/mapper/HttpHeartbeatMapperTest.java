@@ -17,8 +17,8 @@ class HttpHeartbeatMapperTest {
 
     @Test
     void shouldConvertToDtoAndBack() {
-        var expected = getApiHeartbeatSample1();
+        var expected = getHttpHeartbeatSample1();
         var actual = apiHeartbeatMapper.toEntity(apiHeartbeatMapper.toDto(expected));
-        assertApiHeartbeatAllPropertiesEquals(expected, actual);
+        assertHttpHeartbeatAllPropertiesEquals(expected, actual);
     }
 }

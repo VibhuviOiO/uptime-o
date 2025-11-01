@@ -2,7 +2,7 @@ import dayjs from 'dayjs';
 import { IHttpMonitor } from 'app/shared/model/http-monitor.model';
 import { IAgent } from 'app/shared/model/agent.model';
 
-export interface IApiHeartbeat {
+export interface IHttpHeartbeat {
   id?: number;
   executedAt?: dayjs.Dayjs;
   success?: boolean | null;
@@ -27,6 +27,6 @@ export interface IApiHeartbeat {
   agent?: IAgent | null;
 }
 
-export const defaultValue: Readonly<IApiHeartbeat> = {
+export const defaultValue: Readonly<IHttpHeartbeat> = {
   success: false,
 };

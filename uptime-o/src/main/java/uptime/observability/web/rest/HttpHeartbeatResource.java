@@ -29,7 +29,7 @@ import uptime.observability.web.rest.errors.BadRequestAlertException;
  * REST controller for managing {@link uptime.observability.domain.HttpHeartbeat}.
  */
 @RestController
-@RequestMapping("/api/api-heartbeats")
+@RequestMapping("/api/http-heartbeats")
 public class HttpHeartbeatResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(HttpHeartbeatResource.class);
@@ -49,27 +49,27 @@ public class HttpHeartbeatResource {
     }
 
     /**
-     * {@code POST  /api-heartbeats} : Create a new apiHeartbeat.
+     * {@code POST  /http-heartbeats} : Create a new apiHeartbeat.
      *
      * @param apiHeartbeatDTO the apiHeartbeatDTO to create.
      * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new apiHeartbeatDTO, or with status {@code 400 (Bad Request)} if the apiHeartbeat has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("")
-    public ResponseEntity<HttpHeartbeatDTO> createApiHeartbeat(@Valid @RequestBody HttpHeartbeatDTO apiHeartbeatDTO)
+    public ResponseEntity<HttpHeartbeatDTO> createHttpHeartbeat(@Valid @RequestBody HttpHeartbeatDTO apiHeartbeatDTO)
         throws URISyntaxException {
-        LOG.debug("REST request to save ApiHeartbeat : {}", apiHeartbeatDTO);
+        LOG.debug("REST request to save HttpHeartbeat : {}", apiHeartbeatDTO);
         if (apiHeartbeatDTO.getId() != null) {
             throw new BadRequestAlertException("A new apiHeartbeat cannot already have an ID", ENTITY_NAME, "idexists");
         }
         apiHeartbeatDTO = apiHeartbeatService.save(apiHeartbeatDTO);
-        return ResponseEntity.created(new URI("/api/api-heartbeats/" + apiHeartbeatDTO.getId()))
+        return ResponseEntity.created(new URI("/api/http-heartbeats/" + apiHeartbeatDTO.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, apiHeartbeatDTO.getId().toString()))
             .body(apiHeartbeatDTO);
     }
 
     /**
-     * {@code PUT  /api-heartbeats/:id} : Updates an existing apiHeartbeat.
+     * {@code PUT  /http-heartbeats/:id} : Updates an existing apiHeartbeat.
      *
      * @param id the id of the apiHeartbeatDTO to save.
      * @param apiHeartbeatDTO the apiHeartbeatDTO to update.
@@ -79,11 +79,11 @@ public class HttpHeartbeatResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/{id}")
-    public ResponseEntity<HttpHeartbeatDTO> updateApiHeartbeat(
+    public ResponseEntity<HttpHeartbeatDTO> updateHttpHeartbeat(
         @PathVariable(value = "id", required = false) final Long id,
         @Valid @RequestBody HttpHeartbeatDTO apiHeartbeatDTO
     ) throws URISyntaxException {
-        LOG.debug("REST request to update ApiHeartbeat : {}, {}", id, apiHeartbeatDTO);
+        LOG.debug("REST request to update HttpHeartbeat : {}, {}", id, apiHeartbeatDTO);
         if (apiHeartbeatDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
@@ -102,7 +102,7 @@ public class HttpHeartbeatResource {
     }
 
     /**
-     * {@code PATCH  /api-heartbeats/:id} : Partial updates given fields of an existing apiHeartbeat, field will ignore if it is null
+     * {@code PATCH  /http-heartbeats/:id} : Partial updates given fields of an existing apiHeartbeat, field will ignore if it is null
      *
      * @param id the id of the apiHeartbeatDTO to save.
      * @param apiHeartbeatDTO the apiHeartbeatDTO to update.
@@ -113,11 +113,11 @@ public class HttpHeartbeatResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
-    public ResponseEntity<HttpHeartbeatDTO> partialUpdateApiHeartbeat(
+    public ResponseEntity<HttpHeartbeatDTO> partialUpdateHttpHeartbeat(
         @PathVariable(value = "id", required = false) final Long id,
         @NotNull @RequestBody HttpHeartbeatDTO apiHeartbeatDTO
     ) throws URISyntaxException {
-        LOG.debug("REST request to partial update ApiHeartbeat partially : {}, {}", id, apiHeartbeatDTO);
+        LOG.debug("REST request to partial update HttpHeartbeat partially : {}, {}", id, apiHeartbeatDTO);
         if (apiHeartbeatDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
@@ -138,41 +138,41 @@ public class HttpHeartbeatResource {
     }
 
     /**
-     * {@code GET  /api-heartbeats} : get all the apiHeartbeats.
+     * {@code GET  /http-heartbeats} : get all the apiHeartbeats.
      *
      * @param pageable the pagination information.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of apiHeartbeats in body.
      */
     @GetMapping("")
-    public ResponseEntity<List<HttpHeartbeatDTO>> getAllApiHeartbeats(@org.springdoc.core.annotations.ParameterObject Pageable pageable) {
-        LOG.debug("REST request to get a page of ApiHeartbeats");
+    public ResponseEntity<List<HttpHeartbeatDTO>> getAllHttpHeartbeats(@org.springdoc.core.annotations.ParameterObject Pageable pageable) {
+        LOG.debug("REST request to get a page of HttpHeartbeats");
         Page<HttpHeartbeatDTO> page = apiHeartbeatService.findAll(pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
 
     /**
-     * {@code GET  /api-heartbeats/:id} : get the "id" apiHeartbeat.
+     * {@code GET  /http-heartbeats/:id} : get the "id" apiHeartbeat.
      *
      * @param id the id of the apiHeartbeatDTO to retrieve.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the apiHeartbeatDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/{id}")
-    public ResponseEntity<HttpHeartbeatDTO> getApiHeartbeat(@PathVariable("id") Long id) {
-        LOG.debug("REST request to get ApiHeartbeat : {}", id);
+    public ResponseEntity<HttpHeartbeatDTO> getHttpHeartbeat(@PathVariable("id") Long id) {
+        LOG.debug("REST request to get HttpHeartbeat : {}", id);
         Optional<HttpHeartbeatDTO> apiHeartbeatDTO = apiHeartbeatService.findOne(id);
         return ResponseUtil.wrapOrNotFound(apiHeartbeatDTO);
     }
 
     /**
-     * {@code DELETE  /api-heartbeats/:id} : delete the "id" apiHeartbeat.
+     * {@code DELETE  /http-heartbeats/:id} : delete the "id" apiHeartbeat.
      *
      * @param id the id of the apiHeartbeatDTO to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteApiHeartbeat(@PathVariable("id") Long id) {
-        LOG.debug("REST request to delete ApiHeartbeat : {}", id);
+    public ResponseEntity<Void> deleteHttpHeartbeat(@PathVariable("id") Long id) {
+        LOG.debug("REST request to delete HttpHeartbeat : {}", id);
         apiHeartbeatService.delete(id);
         return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
@@ -180,7 +180,7 @@ public class HttpHeartbeatResource {
     }
 
     /**
-     * {@code GET  /api-heartbeats/aggregated} : get aggregated apiHeartbeats.
+     * {@code GET  /http-heartbeats/aggregated} : get aggregated apiHeartbeats.
      *
      * @param range the time range for aggregation.
      * @return the list of aggregated apiHeartbeats.

@@ -64,11 +64,11 @@ public class Agent implements Serializable {
         this.name = name;
     }
 
-    public Set<HttpHeartbeat> getApiHeartbeats() {
+    public Set<HttpHeartbeat> getHttpHeartbeats() {
         return this.apiHeartbeats;
     }
 
-    public void setApiHeartbeats(Set<HttpHeartbeat> apiHeartbeats) {
+    public void setHttpHeartbeats(Set<HttpHeartbeat> apiHeartbeats) {
         if (this.apiHeartbeats != null) {
             this.apiHeartbeats.forEach(i -> i.setAgent(null));
         }
@@ -79,17 +79,17 @@ public class Agent implements Serializable {
     }
 
     public Agent apiHeartbeats(Set<HttpHeartbeat> apiHeartbeats) {
-        this.setApiHeartbeats(apiHeartbeats);
+        this.setHttpHeartbeats(apiHeartbeats);
         return this;
     }
 
-    public Agent addApiHeartbeat(HttpHeartbeat apiHeartbeat) {
+    public Agent addHttpHeartbeat(HttpHeartbeat apiHeartbeat) {
         this.apiHeartbeats.add(apiHeartbeat);
         apiHeartbeat.setAgent(this);
         return this;
     }
 
-    public Agent removeApiHeartbeat(HttpHeartbeat apiHeartbeat) {
+    public Agent removeHttpHeartbeat(HttpHeartbeat apiHeartbeat) {
         this.apiHeartbeats.remove(apiHeartbeat);
         apiHeartbeat.setAgent(null);
         return this;

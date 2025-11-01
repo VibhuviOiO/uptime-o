@@ -4,7 +4,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import sinon from 'sinon';
 
 import { EntityState } from 'app/shared/reducers/reducer.utils';
-import { IApiHeartbeat, defaultValue } from 'app/shared/model/api-heartbeat.model';
+import { IHttpHeartbeat, defaultValue } from 'app/shared/model/http-heartbeat.model';
 import reducer, {
   createEntity,
   deleteEntity,
@@ -13,7 +13,7 @@ import reducer, {
   partialUpdateEntity,
   reset,
   updateEntity,
-} from './api-heartbeat.reducer';
+} from './http-heartbeat.reducer';
 
 describe('Entities reducer tests', () => {
   function isEmpty(element): boolean {
@@ -23,7 +23,7 @@ describe('Entities reducer tests', () => {
     return Object.keys(element).length === 0;
   }
 
-  const initialState: EntityState<IApiHeartbeat> = {
+  const initialState: EntityState<IHttpHeartbeat> = {
     loading: false,
     errorMessage: null,
     entities: [],

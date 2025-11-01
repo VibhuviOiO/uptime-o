@@ -30,22 +30,22 @@ class HttpMonitorTest {
     @Test
     void apiHeartbeatTest() {
         HttpMonitor apiMonitor = getHttpMonitorRandomSampleGenerator();
-        HttpHeartbeat apiHeartbeatBack = getApiHeartbeatRandomSampleGenerator();
+        HttpHeartbeat apiHeartbeatBack = getHttpHeartbeatRandomSampleGenerator();
 
-        apiMonitor.addApiHeartbeat(apiHeartbeatBack);
-        assertThat(apiMonitor.getApiHeartbeats()).containsOnly(apiHeartbeatBack);
+        apiMonitor.addHttpHeartbeat(apiHeartbeatBack);
+        assertThat(apiMonitor.getHttpHeartbeats()).containsOnly(apiHeartbeatBack);
         assertThat(apiHeartbeatBack.getMonitor()).isEqualTo(apiMonitor);
 
-        apiMonitor.removeApiHeartbeat(apiHeartbeatBack);
-        assertThat(apiMonitor.getApiHeartbeats()).doesNotContain(apiHeartbeatBack);
+        apiMonitor.removeHttpHeartbeat(apiHeartbeatBack);
+        assertThat(apiMonitor.getHttpHeartbeats()).doesNotContain(apiHeartbeatBack);
         assertThat(apiHeartbeatBack.getMonitor()).isNull();
 
         apiMonitor.apiHeartbeats(new HashSet<>(Set.of(apiHeartbeatBack)));
-        assertThat(apiMonitor.getApiHeartbeats()).containsOnly(apiHeartbeatBack);
+        assertThat(apiMonitor.getHttpHeartbeats()).containsOnly(apiHeartbeatBack);
         assertThat(apiHeartbeatBack.getMonitor()).isEqualTo(apiMonitor);
 
-        apiMonitor.setApiHeartbeats(new HashSet<>());
-        assertThat(apiMonitor.getApiHeartbeats()).doesNotContain(apiHeartbeatBack);
+        apiMonitor.setHttpHeartbeats(new HashSet<>());
+        assertThat(apiMonitor.getHttpHeartbeats()).doesNotContain(apiHeartbeatBack);
         assertThat(apiHeartbeatBack.getMonitor()).isNull();
     }
 
