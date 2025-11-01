@@ -111,6 +111,30 @@ Welcome to UptimeO documentation! This folder contains comprehensive guides for 
   - Performance issues
   - Logging and debugging
 
+### UI/Frontend Development
+
+- **[UI_DESIGN_SYNTHETIC_TESTING.md](UI_DESIGN_SYNTHETIC_TESTING.md)** - Modern UI design for synthetic API testing
+  - Product architecture and information hierarchy
+  - Infrastructure-first design pattern
+  - Single entity UI pattern (Region as first example)
+  - Component design specifications
+  - React component structure
+  - Redux state management
+  - Modern UX/UI practices
+  - Implementation roadmap
+
+- **[UI_IMPLEMENTATION_GUIDE.md](UI_IMPLEMENTATION_GUIDE.md)** - Step-by-step UI implementation
+  - Prerequisites and backend verification
+  - Type definitions creation
+  - API service layer
+  - Redux state setup
+  - Component implementation
+  - Form handling
+  - Routing configuration
+  - Styling and responsive design
+  - Testing approach
+  - Complete implementation checklist
+
 ## 🚀 Quick Navigation
 
 ### For Different Roles
@@ -155,6 +179,8 @@ Welcome to UptimeO documentation! This folder contains comprehensive guides for 
 | Work with JSON fields | [JSON_FIELDS_GUIDE.md](JSON_FIELDS_GUIDE.md) |
 | Deploy to production | [DEPLOYMENT.md](DEPLOYMENT.md) |
 | Use Docker | [DOCKER.md](DOCKER.md) |
+| Design modern UI | [UI_DESIGN_SYNTHETIC_TESTING.md](UI_DESIGN_SYNTHETIC_TESTING.md) |
+| Build UI components | [UI_IMPLEMENTATION_GUIDE.md](UI_IMPLEMENTATION_GUIDE.md) |
 | Fix an issue | [TROUBLESHOOTING.md](TROUBLESHOOTING.md) |
 
 ## 🔑 Key Concepts
