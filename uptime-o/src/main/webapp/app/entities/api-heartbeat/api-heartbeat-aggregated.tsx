@@ -57,7 +57,7 @@ const ApiHeartbeatAggregated = () => {
               <td>{row.lastCheck}</td>
               <td>{row.lastCheckResponseTime}</td>
               <td>
-                <a href={`/api-monitor/${row.monitorId}`}>Details</a>
+                <a href={`/http-monitor/${row.monitorId}`}>Details</a>
               </td>
             </tr>
           ))}

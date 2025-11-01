@@ -20,7 +20,7 @@ export default () => {
       <ErrorBoundaryRoutes>
         {/* prettier-ignore */}
         <Route path="schedule/*" element={<Schedule />} />
-        <Route path="api-monitor/*" element={<ApiMonitor />} />
+        <Route path="http-monitor/*" element={<ApiMonitor />} />
         <Route path="region/*" element={<Region />} />
         <Route path="datacenter/*" element={<Datacenter />} />
         <Route path="agent/*" element={<Agent />} />

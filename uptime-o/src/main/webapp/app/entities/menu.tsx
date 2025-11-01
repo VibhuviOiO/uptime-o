@@ -9,8 +9,8 @@ const EntitiesMenu = () => {
       <MenuItem icon="asterisk" to="/schedule">
         Schedule
       </MenuItem>
-      <MenuItem icon="asterisk" to="/api-monitor">
-        Api Monitor
+      <MenuItem icon="asterisk" to="/http-monitor">
+        HTTP Monitor
       </MenuItem>
       <MenuItem icon="asterisk" to="/region">
         Region

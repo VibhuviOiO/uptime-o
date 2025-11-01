@@ -24,7 +24,7 @@ export const ApiMonitorUpdate = () => {
   const updateSuccess = useAppSelector(state => state.apiMonitor.updateSuccess);
 
   const handleClose = () => {
-    navigate(`/api-monitor${location.search}`);
+    navigate(`/http-monitor${location.search}`);
   };
 
   useEffect(() => {
@@ -143,7 +143,7 @@ export const ApiMonitorUpdate = () => {
                     ))
                   : null}
               </ValidatedField>
-              <Button tag={Link} id="cancel-save" data-cy="entityCreateCancelButton" to="/api-monitor" replace color="info">
+              <Button tag={Link} id="cancel-save" data-cy="entityCreateCancelButton" to="/http-monitor" replace color="info">
                 <FontAwesomeIcon icon="arrow-left" />
                 &nbsp;
                 <span className="d-none d-md-inline">Back</span>

@@ -24,7 +24,7 @@ export const ApiMonitorDeleteDialog = () => {
   const updateSuccess = useAppSelector(state => state.apiMonitor.updateSuccess);
 
   const handleClose = () => {
-    navigate(`/api-monitor${pageLocation.search}`);
+    navigate(`/http-monitor${pageLocation.search}`);
   };
 
   useEffect(() => {

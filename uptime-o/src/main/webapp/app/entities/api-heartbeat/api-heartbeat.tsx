@@ -207,7 +207,7 @@ export const ApiHeartbeat = () => {
                   <td>{apiHeartbeat.rawResponseHeaders}</td>
                   <td>{apiHeartbeat.rawResponseBody}</td>
                   <td>
-                    {apiHeartbeat.monitor ? <Link to={`/api-monitor/${apiHeartbeat.monitor.id}`}>{apiHeartbeat.monitor.id}</Link> : ''}
+                    {apiHeartbeat.monitor ? <Link to={`/http-monitor/${apiHeartbeat.monitor.id}`}>{apiHeartbeat.monitor.id}</Link> : ''}
                   </td>
                   <td>{apiHeartbeat.agent ? <Link to={`/agent/${apiHeartbeat.agent.id}`}>{apiHeartbeat.agent.id}</Link> : ''}</td>
                   <td className="text-end">

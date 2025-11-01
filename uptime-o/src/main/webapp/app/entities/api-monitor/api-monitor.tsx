@@ -96,7 +96,7 @@ export const ApiMonitor = () => {
           <Button className="me-2" color="info" onClick={handleSyncList} disabled={loading}>
             <FontAwesomeIcon icon="sync" spin={loading} /> Refresh list
           </Button>
-          <Link to="/api-monitor/new" className="btn btn-primary jh-create-entity" id="jh-create-entity" data-cy="entityCreateButton">
+          <Link to="/http-monitor/new" className="btn btn-primary jh-create-entity" id="jh-create-entity" data-cy="entityCreateButton">
             <FontAwesomeIcon icon="plus" />
             &nbsp; Create a new Api Monitor
           </Link>
@@ -138,7 +138,7 @@ export const ApiMonitor = () => {
               {apiMonitorList.map((apiMonitor, i) => (
                 <tr key={`entity-${i}`} data-cy="entityTable">
                   <td>
-                    <Button tag={Link} to={`/api-monitor/${apiMonitor.id}`} color="link" size="sm">
+                    <Button tag={Link} to={`/http-monitor/${apiMonitor.id}`} color="link" size="sm">
                       {apiMonitor.id}
                     </Button>
                   </td>
@@ -151,12 +151,12 @@ export const ApiMonitor = () => {
                   <td>{apiMonitor.schedule ? <Link to={`/schedule/${apiMonitor.schedule.id}`}>{apiMonitor.schedule.id}</Link> : ''}</td>
                   <td className="text-end">
                     <div className="btn-group flex-btn-group-container">
-                      <Button tag={Link} to={`/api-monitor/${apiMonitor.id}`} color="info" size="sm" data-cy="entityDetailsButton">
+                      <Button tag={Link} to={`/http-monitor/${apiMonitor.id}`} color="info" size="sm" data-cy="entityDetailsButton">
                         <FontAwesomeIcon icon="eye" /> <span className="d-none d-md-inline">View</span>
                       </Button>
                       <Button
                         tag={Link}
-                        to={`/api-monitor/${apiMonitor.id}/edit?page=${paginationState.activePage}&sort=${paginationState.sort},${paginationState.order}`}
+                        to={`/http-monitor/${apiMonitor.id}/edit?page=${paginationState.activePage}&sort=${paginationState.sort},${paginationState.order}`}
                         color="primary"
                         size="sm"
                         data-cy="entityEditButton"
@@ -165,7 +165,7 @@ export const ApiMonitor = () => {
                       </Button>
                       <Button
                         onClick={() =>
-                          (window.location.href = `/api-monitor/${apiMonitor.id}/delete?page=${paginationState.activePage}&sort=${paginationState.sort},${paginationState.order}`)
+                          (window.location.href = `/http-monitor/${apiMonitor.id}/delete?page=${paginationState.activePage}&sort=${paginationState.sort},${paginationState.order}`)
                         }
                         color="danger"
                         size="sm"

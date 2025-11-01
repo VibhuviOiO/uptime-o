@@ -115,7 +115,7 @@ export const DatacenterMonitor = () => {
                   </td>
                   <td>
                     {datacenterMonitor.monitor ? (
-                      <Link to={`/api-monitor/${datacenterMonitor.monitor.id}`}>{datacenterMonitor.monitor.id}</Link>
+                      <Link to={`/http-monitor/${datacenterMonitor.monitor.id}`}>{datacenterMonitor.monitor.id}</Link>
                     ) : (
                       ''
                     )}

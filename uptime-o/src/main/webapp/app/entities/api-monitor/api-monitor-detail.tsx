@@ -54,11 +54,11 @@ export const ApiMonitorDetail = () => {
           <dt>Schedule</dt>
           <dd>{apiMonitorEntity.schedule ? apiMonitorEntity.schedule.id : ''}</dd>
         </dl>
-        <Button tag={Link} to="/api-monitor" replace color="info" data-cy="entityDetailsBackButton">
+        <Button tag={Link} to="/http-monitor" replace color="info" data-cy="entityDetailsBackButton">
           <FontAwesomeIcon icon="arrow-left" /> <span className="d-none d-md-inline">Back</span>
         </Button>
         &nbsp;
-        <Button tag={Link} to={`/api-monitor/${apiMonitorEntity.id}/edit`} replace color="primary">
+        <Button tag={Link} to={`/http-monitor/${apiMonitorEntity.id}/edit`} replace color="primary">
           <FontAwesomeIcon icon="pencil-alt" /> <span className="d-none d-md-inline">Edit</span>
         </Button>
       </Col>
