@@ -2,9 +2,9 @@ import axios from 'axios';
 import { createAsyncThunk, isFulfilled, isPending } from '@reduxjs/toolkit';
 import { cleanEntity } from 'app/shared/util/entity-utils';
 import { EntityState, IQueryParams, createEntitySlice, serializeAxiosError } from 'app/shared/reducers/reducer.utils';
-import { IApiMonitor, defaultValue } from 'app/shared/model/api-monitor.model';
+import { IHttpMonitor, defaultValue } from 'app/shared/model/http-monitor.model';
 
-const initialState: EntityState<IApiMonitor> = {
+const initialState: EntityState<IHttpMonitor> = {
   loading: false,
   errorMessage: null,
   entities: [],
@@ -19,27 +19,27 @@ const apiUrl = 'api/api-monitors';
 // Actions
 
 export const getEntities = createAsyncThunk(
-  'apiMonitor/fetch_entity_list',
+  'httpMonitor/fetch_entity_list',
   async ({ page, size, sort }: IQueryParams) => {
     const requestUrl = `${apiUrl}?${sort ? `page=${page}&size=${size}&sort=${sort}&` : ''}cacheBuster=${new Date().getTime()}`;
-    return axios.get<IApiMonitor[]>(requestUrl);
+    return axios.get<IHttpMonitor[]>(requestUrl);
   },
   { serializeError: serializeAxiosError },
 );
 
 export const getEntity = createAsyncThunk(
-  'apiMonitor/fetch_entity',
+  'httpMonitor/fetch_entity',
   async (id: string | number) => {
     const requestUrl = `${apiUrl}/${id}`;
-    return axios.get<IApiMonitor>(requestUrl);
+    return axios.get<IHttpMonitor>(requestUrl);
   },
   { serializeError: serializeAxiosError },
 );
 
 export const createEntity = createAsyncThunk(
-  'apiMonitor/create_entity',
-  async (entity: IApiMonitor, thunkAPI) => {
-    const result = await axios.post<IApiMonitor>(apiUrl, cleanEntity(entity));
+  'httpMonitor/create_entity',
+  async (entity: IHttpMonitor, thunkAPI) => {
+    const result = await axios.post<IHttpMonitor>(apiUrl, cleanEntity(entity));
     thunkAPI.dispatch(getEntities({}));
     return result;
   },
@@ -47,9 +47,9 @@ export const createEntity = createAsyncThunk(
 );
 
 export const updateEntity = createAsyncThunk(
-  'apiMonitor/update_entity',
-  async (entity: IApiMonitor, thunkAPI) => {
-    const result = await axios.put<IApiMonitor>(`${apiUrl}/${entity.id}`, cleanEntity(entity));
+  'httpMonitor/update_entity',
+  async (entity: IHttpMonitor, thunkAPI) => {
+    const result = await axios.put<IHttpMonitor>(`${apiUrl}/${entity.id}`, cleanEntity(entity));
     thunkAPI.dispatch(getEntities({}));
     return result;
   },
@@ -57,9 +57,9 @@ export const updateEntity = createAsyncThunk(
 );
 
 export const partialUpdateEntity = createAsyncThunk(
-  'apiMonitor/partial_update_entity',
-  async (entity: IApiMonitor, thunkAPI) => {
-    const result = await axios.patch<IApiMonitor>(`${apiUrl}/${entity.id}`, cleanEntity(entity));
+  'httpMonitor/partial_update_entity',
+  async (entity: IHttpMonitor, thunkAPI) => {
+    const result = await axios.patch<IHttpMonitor>(`${apiUrl}/${entity.id}`, cleanEntity(entity));
     thunkAPI.dispatch(getEntities({}));
     return result;
   },
@@ -67,10 +67,10 @@ export const partialUpdateEntity = createAsyncThunk(
 );
 
 export const deleteEntity = createAsyncThunk(
-  'apiMonitor/delete_entity',
+  'httpMonitor/delete_entity',
   async (id: string | number, thunkAPI) => {
     const requestUrl = `${apiUrl}/${id}`;
-    const result = await axios.delete<IApiMonitor>(requestUrl);
+    const result = await axios.delete<IHttpMonitor>(requestUrl);
     thunkAPI.dispatch(getEntities({}));
     return result;
   },
@@ -79,8 +79,8 @@ export const deleteEntity = createAsyncThunk(
 
 // slice
 
-export const ApiMonitorSlice = createEntitySlice({
-  name: 'apiMonitor',
+export const HttpMonitorSlice = createEntitySlice({
+  name: 'httpMonitor',
   initialState,
   extraReducers(builder) {
     builder
@@ -122,7 +122,7 @@ export const ApiMonitorSlice = createEntitySlice({
   },
 });
 
-export const { reset } = ApiMonitorSlice.actions;
+export const { reset } = HttpMonitorSlice.actions;
 
 // Reducer
-export default ApiMonitorSlice.reducer;
+export default HttpMonitorSlice.reducer;

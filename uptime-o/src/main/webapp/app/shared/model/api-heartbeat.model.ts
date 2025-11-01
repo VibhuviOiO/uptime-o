@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { IApiMonitor } from 'app/shared/model/api-monitor.model';
+import { IHttpMonitor } from 'app/shared/model/http-monitor.model';
 import { IAgent } from 'app/shared/model/agent.model';
 
 export interface IApiHeartbeat {
@@ -23,7 +23,7 @@ export interface IApiHeartbeat {
   rawRequestHeaders?: string | null;
   rawResponseHeaders?: string | null;
   rawResponseBody?: string | null;
-  monitor?: IApiMonitor | null;
+  monitor?: IHttpMonitor | null;
   agent?: IAgent | null;
 }
 

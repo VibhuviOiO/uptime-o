@@ -5,9 +5,9 @@ import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { useAppDispatch, useAppSelector } from 'app/config/store';
-import { deleteEntity, getEntity } from './api-monitor.reducer';
+import { deleteEntity, getEntity } from './http-monitor.reducer';
 
-export const ApiMonitorDeleteDialog = () => {
+export const HttpMonitorDeleteDialog = () => {
   const dispatch = useAppDispatch();
   const pageLocation = useLocation();
   const navigate = useNavigate();
@@ -20,8 +20,8 @@ export const ApiMonitorDeleteDialog = () => {
     setLoadModal(true);
   }, []);
 
-  const apiMonitorEntity = useAppSelector(state => state.apiMonitor.entity);
-  const updateSuccess = useAppSelector(state => state.apiMonitor.updateSuccess);
+  const apiMonitorEntity = useAppSelector(state => state.httpMonitor.entity);
+  const updateSuccess = useAppSelector(state => state.httpMonitor.updateSuccess);
 
   const handleClose = () => {
     navigate(`/http-monitor${pageLocation.search}`);
@@ -40,16 +40,16 @@ export const ApiMonitorDeleteDialog = () => {
 
   return (
     <Modal isOpen toggle={handleClose}>
-      <ModalHeader toggle={handleClose} data-cy="apiMonitorDeleteDialogHeading">
+      <ModalHeader toggle={handleClose} data-cy="httpMonitorDeleteDialogHeading">
         Confirm delete operation
       </ModalHeader>
-      <ModalBody id="uptimeOApp.apiMonitor.delete.question">Are you sure you want to delete Api Monitor {apiMonitorEntity.id}?</ModalBody>
+      <ModalBody id="uptimeOApp.apiMonitor.delete.question">Are you sure you want to delete HTTP Monitor {apiMonitorEntity.id}?</ModalBody>
       <ModalFooter>
         <Button color="secondary" onClick={handleClose}>
           <FontAwesomeIcon icon="ban" />
           &nbsp; Cancel
         </Button>
-        <Button id="jhi-confirm-delete-apiMonitor" data-cy="entityConfirmDeleteButton" color="danger" onClick={confirmDelete}>
+        <Button id="jhi-confirm-delete-httpMonitor" data-cy="entityConfirmDeleteButton" color="danger" onClick={confirmDelete}>
           <FontAwesomeIcon icon="trash" />
           &nbsp; Delete
         </Button>
@@ -58,4 +58,4 @@ export const ApiMonitorDeleteDialog = () => {
   );
 };
 
-export default ApiMonitorDeleteDialog;
+export default HttpMonitorDeleteDialog;

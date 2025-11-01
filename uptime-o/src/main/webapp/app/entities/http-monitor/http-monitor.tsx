@@ -8,9 +8,9 @@ import { ASC, DESC, ITEMS_PER_PAGE, SORT } from 'app/shared/util/pagination.cons
 import { overridePaginationStateWithQueryParams } from 'app/shared/util/entity-utils';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-import { getEntities } from './api-monitor.reducer';
+import { getEntities } from './http-monitor.reducer';
 
-export const ApiMonitor = () => {
+export const HttpMonitor = () => {
   const dispatch = useAppDispatch();
 
   const pageLocation = useLocation();
@@ -20,9 +20,9 @@ export const ApiMonitor = () => {
     overridePaginationStateWithQueryParams(getPaginationState(pageLocation, ITEMS_PER_PAGE, 'id'), pageLocation.search),
   );
 
-  const apiMonitorList = useAppSelector(state => state.apiMonitor.entities);
-  const loading = useAppSelector(state => state.apiMonitor.loading);
-  const totalItems = useAppSelector(state => state.apiMonitor.totalItems);
+  const httpMonitorList = useAppSelector(state => state.httpMonitor.entities);
+  const loading = useAppSelector(state => state.httpMonitor.loading);
+  const totalItems = useAppSelector(state => state.httpMonitor.totalItems);
 
   const getAllEntities = () => {
     dispatch(
@@ -90,7 +90,7 @@ export const ApiMonitor = () => {
 
   return (
     <div>
-      <h2 id="api-monitor-heading" data-cy="ApiMonitorHeading">
+      <h2 id="http-monitor-heading" data-cy="HttpMonitorHeading">
         HTTP Monitors
         <div className="d-flex justify-content-end">
           <Button className="me-2" color="info" onClick={handleSyncList} disabled={loading}>
@@ -103,7 +103,7 @@ export const ApiMonitor = () => {
         </div>
       </h2>
       <div className="table-responsive">
-        {apiMonitorList && apiMonitorList.length > 0 ? (
+        {httpMonitorList && httpMonitorList.length > 0 ? (
           <Table responsive>
             <thead>
               <tr>
@@ -135,28 +135,28 @@ export const ApiMonitor = () => {
               </tr>
             </thead>
             <tbody>
-              {apiMonitorList.map((apiMonitor, i) => (
+              {httpMonitorList.map((httpMonitor, i) => (
                 <tr key={`entity-${i}`} data-cy="entityTable">
                   <td>
-                    <Button tag={Link} to={`/http-monitor/${apiMonitor.id}`} color="link" size="sm">
-                      {apiMonitor.id}
+                    <Button tag={Link} to={`/http-monitor/${httpMonitor.id}`} color="link" size="sm">
+                      {httpMonitor.id}
                     </Button>
                   </td>
-                  <td>{apiMonitor.name}</td>
-                  <td>{apiMonitor.method}</td>
-                  <td>{apiMonitor.type}</td>
-                  <td>{apiMonitor.url}</td>
-                  <td>{apiMonitor.headers}</td>
-                  <td>{apiMonitor.body}</td>
-                  <td>{apiMonitor.schedule ? <Link to={`/schedule/${apiMonitor.schedule.id}`}>{apiMonitor.schedule.id}</Link> : ''}</td>
+                  <td>{httpMonitor.name}</td>
+                  <td>{httpMonitor.method}</td>
+                  <td>{httpMonitor.type}</td>
+                  <td>{httpMonitor.url}</td>
+                  <td>{httpMonitor.headers}</td>
+                  <td>{httpMonitor.body}</td>
+                  <td>{httpMonitor.schedule ? <Link to={`/schedule/${httpMonitor.schedule.id}`}>{httpMonitor.schedule.id}</Link> : ''}</td>
                   <td className="text-end">
                     <div className="btn-group flex-btn-group-container">
-                      <Button tag={Link} to={`/http-monitor/${apiMonitor.id}`} color="info" size="sm" data-cy="entityDetailsButton">
+                      <Button tag={Link} to={`/http-monitor/${httpMonitor.id}`} color="info" size="sm" data-cy="entityDetailsButton">
                         <FontAwesomeIcon icon="eye" /> <span className="d-none d-md-inline">View</span>
                       </Button>
                       <Button
                         tag={Link}
-                        to={`/http-monitor/${apiMonitor.id}/edit?page=${paginationState.activePage}&sort=${paginationState.sort},${paginationState.order}`}
+                        to={`/http-monitor/${httpMonitor.id}/edit?page=${paginationState.activePage}&sort=${paginationState.sort},${paginationState.order}`}
                         color="primary"
                         size="sm"
                         data-cy="entityEditButton"
@@ -165,7 +165,7 @@ export const ApiMonitor = () => {
                       </Button>
                       <Button
                         onClick={() =>
-                          (window.location.href = `/http-monitor/${apiMonitor.id}/delete?page=${paginationState.activePage}&sort=${paginationState.sort},${paginationState.order}`)
+                          (window.location.href = `/http-monitor/${httpMonitor.id}/delete?page=${paginationState.activePage}&sort=${paginationState.sort},${paginationState.order}`)
                         }
                         color="danger"
                         size="sm"
@@ -184,7 +184,7 @@ export const ApiMonitor = () => {
         )}
       </div>
       {totalItems ? (
-        <div className={apiMonitorList && apiMonitorList.length > 0 ? '' : 'd-none'}>
+        <div className={httpMonitorList && httpMonitorList.length > 0 ? '' : 'd-none'}>
           <div className="justify-content-center d-flex">
             <JhiItemCount page={paginationState.activePage} total={totalItems} itemsPerPage={paginationState.itemsPerPage} />
           </div>
@@ -205,4 +205,4 @@ export const ApiMonitor = () => {
   );
 };
 
-export default ApiMonitor;
+export default HttpMonitor;

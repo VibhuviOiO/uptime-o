@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { convertDateTimeFromServer, convertDateTimeToServer, displayDefaultDateTime } from 'app/shared/util/date-utils';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-import { getEntities as getApiMonitors } from 'app/entities/api-monitor/api-monitor.reducer';
+import { getEntities as getHttpMonitors } from 'app/entities/http-monitor/http-monitor.reducer';
 import { getEntities as getAgents } from 'app/entities/agent/agent.reducer';
 import { createEntity, getEntity, reset, updateEntity } from './api-heartbeat.reducer';
 
@@ -19,7 +19,7 @@ export const ApiHeartbeatUpdate = () => {
   const { id } = useParams<'id'>();
   const isNew = id === undefined;
 
-  const apiMonitors = useAppSelector(state => state.apiMonitor.entities);
+  const apiMonitors = useAppSelector(state => state.httpMonitor.entities);
   const agents = useAppSelector(state => state.agent.entities);
   const apiHeartbeatEntity = useAppSelector(state => state.apiHeartbeat.entity);
   const loading = useAppSelector(state => state.apiHeartbeat.loading);
@@ -37,7 +37,7 @@ export const ApiHeartbeatUpdate = () => {
       dispatch(getEntity(id));
     }
 
-    dispatch(getApiMonitors({}));
+    dispatch(getHttpMonitors({}));
     dispatch(getAgents({}));
   }, []);
 

@@ -1,5 +1,5 @@
 import schedule from 'app/entities/schedule/schedule.reducer';
-import apiMonitor from 'app/entities/api-monitor/api-monitor.reducer';
+import httpMonitor from 'app/entities/http-monitor/http-monitor.reducer';
 import region from 'app/entities/region/region.reducer';
 import datacenter from 'app/entities/datacenter/datacenter.reducer';
 import agent from 'app/entities/agent/agent.reducer';
@@ -11,7 +11,7 @@ import datacenterMonitor from 'app/entities/datacenter-monitor/datacenter-monito
 
 const entitiesReducers = {
   schedule,
-  apiMonitor,
+  httpMonitor,
   region,
   datacenter,
   agent,

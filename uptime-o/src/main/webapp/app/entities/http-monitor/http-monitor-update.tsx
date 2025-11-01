@@ -7,9 +7,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 
 import { getEntities as getSchedules } from 'app/entities/schedule/schedule.reducer';
-import { createEntity, getEntity, reset, updateEntity } from './api-monitor.reducer';
+import { createEntity, getEntity, reset, updateEntity } from './http-monitor.reducer';
 
-export const ApiMonitorUpdate = () => {
+export const HttpMonitorUpdate = () => {
   const dispatch = useAppDispatch();
 
   const navigate = useNavigate();
@@ -18,10 +18,10 @@ export const ApiMonitorUpdate = () => {
   const isNew = id === undefined;
 
   const schedules = useAppSelector(state => state.schedule.entities);
-  const apiMonitorEntity = useAppSelector(state => state.apiMonitor.entity);
-  const loading = useAppSelector(state => state.apiMonitor.loading);
-  const updating = useAppSelector(state => state.apiMonitor.updating);
-  const updateSuccess = useAppSelector(state => state.apiMonitor.updateSuccess);
+  const httpMonitorEntity = useAppSelector(state => state.httpMonitor.entity);
+  const loading = useAppSelector(state => state.httpMonitor.loading);
+  const updating = useAppSelector(state => state.httpMonitor.updating);
+  const updateSuccess = useAppSelector(state => state.httpMonitor.updateSuccess);
 
   const handleClose = () => {
     navigate(`/http-monitor${location.search}`);
@@ -49,7 +49,7 @@ export const ApiMonitorUpdate = () => {
     }
 
     const entity = {
-      ...apiMonitorEntity,
+      ...httpMonitorEntity,
       ...values,
       schedule: schedules.find(it => it.id.toString() === values.schedule?.toString()),
     };
@@ -65,15 +65,15 @@ export const ApiMonitorUpdate = () => {
     isNew
       ? {}
       : {
-          ...apiMonitorEntity,
-          schedule: apiMonitorEntity?.schedule?.id,
+          ...httpMonitorEntity,
+          schedule: httpMonitorEntity?.schedule?.id,
         };
 
   return (
     <div>
       <Row className="justify-content-center">
         <Col md="8">
-          <h2 id="uptimeOApp.apiMonitor.home.createOrEditLabel" data-cy="ApiMonitorCreateUpdateHeading">
+          <h2 id="uptimeOApp.apiMonitor.home.createOrEditLabel" data-cy="HttpMonitorCreateUpdateHeading">
             Create or edit a HTTP Monitor
           </h2>
         </Col>
@@ -84,10 +84,10 @@ export const ApiMonitorUpdate = () => {
             <p>Loading...</p>
           ) : (
             <ValidatedForm defaultValues={defaultValues()} onSubmit={saveEntity}>
-              {!isNew ? <ValidatedField name="id" required readOnly id="api-monitor-id" label="ID" validate={{ required: true }} /> : null}
+              {!isNew ? <ValidatedField name="id" required readOnly id="http-monitor-id" label="ID" validate={{ required: true }} /> : null}
               <ValidatedField
                 label="Name"
-                id="api-monitor-name"
+                id="http-monitor-name"
                 name="name"
                 data-cy="name"
                 type="text"
@@ -99,7 +99,7 @@ export const ApiMonitorUpdate = () => {
               />
               <ValidatedField
                 label="Method"
-                id="api-monitor-method"
+                id="http-monitor-method"
                 name="method"
                 data-cy="method"
                 type="text"
@@ -111,7 +111,7 @@ export const ApiMonitorUpdate = () => {
               />
               <ValidatedField
                 label="Type"
-                id="api-monitor-type"
+                id="http-monitor-type"
                 name="type"
                 data-cy="type"
                 type="text"
@@ -123,7 +123,7 @@ export const ApiMonitorUpdate = () => {
               />
               <ValidatedField
                 label="Url"
-                id="api-monitor-url"
+                id="http-monitor-url"
                 name="url"
                 data-cy="url"
                 type="textarea"
@@ -131,9 +131,9 @@ export const ApiMonitorUpdate = () => {
                   required: { value: true, message: 'This field is required.' },
                 }}
               />
-              <ValidatedField label="Headers" id="api-monitor-headers" name="headers" data-cy="headers" type="textarea" />
-              <ValidatedField label="Body" id="api-monitor-body" name="body" data-cy="body" type="textarea" />
-              <ValidatedField id="api-monitor-schedule" name="schedule" data-cy="schedule" label="Schedule" type="select">
+              <ValidatedField label="Headers" id="http-monitor-headers" name="headers" data-cy="headers" type="textarea" />
+              <ValidatedField label="Body" id="http-monitor-body" name="body" data-cy="body" type="textarea" />
+              <ValidatedField id="http-monitor-schedule" name="schedule" data-cy="schedule" label="Schedule" type="select">
                 <option value="" key="0" />
                 {schedules
                   ? schedules.map(otherEntity => (
@@ -161,4 +161,4 @@ export const ApiMonitorUpdate = () => {
   );
 };
 
-export default ApiMonitorUpdate;
+export default HttpMonitorUpdate;

@@ -6,9 +6,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-import { getEntity } from './api-monitor.reducer';
+import { getEntity } from './http-monitor.reducer';
 
-export const ApiMonitorDetail = () => {
+export const HttpMonitorDetail = () => {
   const dispatch = useAppDispatch();
 
   const { id } = useParams<'id'>();
@@ -17,7 +17,7 @@ export const ApiMonitorDetail = () => {
     dispatch(getEntity(id));
   }, []);
 
-  const apiMonitorEntity = useAppSelector(state => state.apiMonitor.entity);
+  const httpMonitorEntity = useAppSelector(state => state.httpMonitor.entity);
   return (
     <Row>
       <Col md="8">
@@ -26,39 +26,39 @@ export const ApiMonitorDetail = () => {
           <dt>
             <span id="id">ID</span>
           </dt>
-          <dd>{apiMonitorEntity.id}</dd>
+          <dd>{httpMonitorEntity.id}</dd>
           <dt>
             <span id="name">Name</span>
           </dt>
-          <dd>{apiMonitorEntity.name}</dd>
+          <dd>{httpMonitorEntity.name}</dd>
           <dt>
             <span id="method">Method</span>
           </dt>
-          <dd>{apiMonitorEntity.method}</dd>
+          <dd>{httpMonitorEntity.method}</dd>
           <dt>
             <span id="type">Type</span>
           </dt>
-          <dd>{apiMonitorEntity.type}</dd>
+          <dd>{httpMonitorEntity.type}</dd>
           <dt>
             <span id="url">Url</span>
           </dt>
-          <dd>{apiMonitorEntity.url}</dd>
+          <dd>{httpMonitorEntity.url}</dd>
           <dt>
             <span id="headers">Headers</span>
           </dt>
-          <dd>{apiMonitorEntity.headers}</dd>
+          <dd>{httpMonitorEntity.headers}</dd>
           <dt>
             <span id="body">Body</span>
           </dt>
-          <dd>{apiMonitorEntity.body}</dd>
+          <dd>{httpMonitorEntity.body}</dd>
           <dt>Schedule</dt>
-          <dd>{apiMonitorEntity.schedule ? apiMonitorEntity.schedule.id : ''}</dd>
+          <dd>{httpMonitorEntity.schedule ? httpMonitorEntity.schedule.id : ''}</dd>
         </dl>
         <Button tag={Link} to="/http-monitor" replace color="info" data-cy="entityDetailsBackButton">
           <FontAwesomeIcon icon="arrow-left" /> <span className="d-none d-md-inline">Back</span>
         </Button>
         &nbsp;
-        <Button tag={Link} to={`/http-monitor/${apiMonitorEntity.id}/edit`} replace color="primary">
+        <Button tag={Link} to={`/http-monitor/${httpMonitorEntity.id}/edit`} replace color="primary">
           <FontAwesomeIcon icon="pencil-alt" /> <span className="d-none d-md-inline">Edit</span>
         </Button>
       </Col>
@@ -66,4 +66,4 @@ export const ApiMonitorDetail = () => {
   );
 };
 
-export default ApiMonitorDetail;
+export default HttpMonitorDetail;

@@ -4,7 +4,7 @@ import { Route } from 'react-router';
 import ErrorBoundaryRoutes from 'app/shared/error/error-boundary-routes';
 
 import Schedule from './schedule';
-import ApiMonitor from './api-monitor';
+import HttpMonitor from './http-monitor';
 import Region from './region';
 import Datacenter from './datacenter';
 import Agent from './agent';
@@ -20,7 +20,7 @@ export default () => {
       <ErrorBoundaryRoutes>
         {/* prettier-ignore */}
         <Route path="schedule/*" element={<Schedule />} />
-        <Route path="http-monitor/*" element={<ApiMonitor />} />
+        <Route path="http-monitor/*" element={<HttpMonitor />} />
         <Route path="region/*" element={<Region />} />
         <Route path="datacenter/*" element={<Datacenter />} />
         <Route path="agent/*" element={<Agent />} />
