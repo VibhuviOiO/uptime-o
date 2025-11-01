@@ -6,8 +6,8 @@ export interface IHttpMonitor {
   method?: string;
   type?: string;
   url?: string;
-  headers?: string | null;
-  body?: string | null;
+  headers?: any;
+  body?: any;
   schedule?: ISchedule | null;
 }
 

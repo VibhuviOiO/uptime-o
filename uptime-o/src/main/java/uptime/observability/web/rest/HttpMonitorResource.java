@@ -33,7 +33,7 @@ public class HttpMonitorResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(HttpMonitorResource.class);
 
-    private static final String ENTITY_NAME = "apiMonitor";
+    private static final String ENTITY_NAME = "httpMonitor";
 
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
@@ -48,17 +48,17 @@ public class HttpMonitorResource {
     }
 
     /**
-     * {@code POST  /http-monitors} : Create a new apiMonitor.
+     * {@code POST  /http-monitors} : Create a new httpMonitor.
      *
      * @param apiMonitorDTO the apiMonitorDTO to create.
-     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new apiMonitorDTO, or with status {@code 400 (Bad Request)} if the apiMonitor has already an ID.
+     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new apiMonitorDTO, or with status {@code 400 (Bad Request)} if the httpMonitor has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("")
     public ResponseEntity<HttpMonitorDTO> createHttpMonitor(@Valid @RequestBody HttpMonitorDTO apiMonitorDTO) throws URISyntaxException {
         LOG.debug("REST request to save HttpMonitor : {}", apiMonitorDTO);
         if (apiMonitorDTO.getId() != null) {
-            throw new BadRequestAlertException("A new apiMonitor cannot already have an ID", ENTITY_NAME, "idexists");
+            throw new BadRequestAlertException("A new httpMonitor cannot already have an ID", ENTITY_NAME, "idexists");
         }
         apiMonitorDTO = apiMonitorService.save(apiMonitorDTO);
         return ResponseEntity.created(new URI("/api/http-monitors/" + apiMonitorDTO.getId()))
@@ -67,7 +67,7 @@ public class HttpMonitorResource {
     }
 
     /**
-     * {@code PUT  /http-monitors/:id} : Updates an existing apiMonitor.
+     * {@code PUT  /http-monitors/:id} : Updates an existing httpMonitor.
      *
      * @param id the id of the apiMonitorDTO to save.
      * @param apiMonitorDTO the apiMonitorDTO to update.
@@ -100,7 +100,7 @@ public class HttpMonitorResource {
     }
 
     /**
-     * {@code PATCH  /http-monitors/:id} : Partial updates given fields of an existing apiMonitor, field will ignore if it is null
+     * {@code PATCH  /http-monitors/:id} : Partial updates given fields of an existing httpMonitor, field will ignore if it is null
      *
      * @param id the id of the apiMonitorDTO to save.
      * @param apiMonitorDTO the apiMonitorDTO to update.
@@ -136,10 +136,10 @@ public class HttpMonitorResource {
     }
 
     /**
-     * {@code GET  /http-monitors} : get all the apiMonitors.
+     * {@code GET  /http-monitors} : get all the httpMonitors.
      *
      * @param pageable the pagination information.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of apiMonitors in body.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of httpMonitors in body.
      */
     @GetMapping("")
     public ResponseEntity<List<HttpMonitorDTO>> getAllHttpMonitors(@org.springdoc.core.annotations.ParameterObject Pageable pageable) {
@@ -150,7 +150,7 @@ public class HttpMonitorResource {
     }
 
     /**
-     * {@code GET  /http-monitors/:id} : get the "id" apiMonitor.
+     * {@code GET  /http-monitors/:id} : get the "id" httpMonitor.
      *
      * @param id the id of the apiMonitorDTO to retrieve.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the apiMonitorDTO, or with status {@code 404 (Not Found)}.
@@ -163,7 +163,7 @@ public class HttpMonitorResource {
     }
 
     /**
-     * {@code DELETE  /http-monitors/:id} : delete the "id" apiMonitor.
+     * {@code DELETE  /http-monitors/:id} : delete the "id" httpMonitor.
      *
      * @param id the id of the apiMonitorDTO to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.

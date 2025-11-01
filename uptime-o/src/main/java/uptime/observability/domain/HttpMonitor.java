@@ -1,11 +1,13 @@
 package uptime.observability.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
+import org.hibernate.annotations.Type;
 
 /**
  * A HttpMonitor.
@@ -42,10 +44,12 @@ public class HttpMonitor implements Serializable {
     private String url;
 
     @Column(name = "headers", columnDefinition = "jsonb")
-    private String headers;
+    @Type(JsonNodeType.class)
+    private JsonNode headers;
 
     @Column(name = "body", columnDefinition = "jsonb")
-    private String body;
+    @Type(JsonNodeType.class)
+    private JsonNode body;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "monitor")
     @JsonIgnoreProperties(value = { "monitor", "agent" }, allowSetters = true)
@@ -126,29 +130,29 @@ public class HttpMonitor implements Serializable {
         this.url = url;
     }
 
-    public String getHeaders() {
+    public JsonNode getHeaders() {
         return this.headers;
     }
 
-    public HttpMonitor headers(String headers) {
+    public HttpMonitor headers(JsonNode headers) {
         this.setHeaders(headers);
         return this;
     }
 
-    public void setHeaders(String headers) {
+    public void setHeaders(JsonNode headers) {
         this.headers = headers;
     }
 
-    public String getBody() {
+    public JsonNode getBody() {
         return this.body;
     }
 
-    public HttpMonitor body(String body) {
+    public HttpMonitor body(JsonNode body) {
         this.setBody(body);
         return this;
     }
 
-    public void setBody(String body) {
+    public void setBody(JsonNode body) {
         this.body = body;
     }
 

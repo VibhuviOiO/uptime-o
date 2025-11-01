@@ -1,8 +1,10 @@
 package uptime.observability.service.dto;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.persistence.Lob;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -28,9 +30,9 @@ public class HttpMonitorDTO implements Serializable {
     @Lob
     private String url;
 
-    private String headers;
+    private JsonNode headers;
 
-    private String body;
+    private JsonNode body;
 
     private ScheduleDTO schedule;
 
@@ -74,19 +76,19 @@ public class HttpMonitorDTO implements Serializable {
         this.url = url;
     }
 
-    public String getHeaders() {
+    public JsonNode getHeaders() {
         return headers;
     }
 
-    public void setHeaders(String headers) {
+    public void setHeaders(JsonNode headers) {
         this.headers = headers;
     }
 
-    public String getBody() {
+    public JsonNode getBody() {
         return body;
     }
 
-    public void setBody(String body) {
+    public void setBody(JsonNode body) {
         this.body = body;
     }
 

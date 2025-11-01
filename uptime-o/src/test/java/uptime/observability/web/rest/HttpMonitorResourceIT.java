@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static uptime.observability.domain.HttpMonitorAsserts.*;
 import static uptime.observability.web.rest.TestUtil.createUpdateProxyForBean;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
 import java.util.Random;
@@ -46,11 +47,23 @@ class HttpMonitorResourceIT {
     private static final String DEFAULT_URL = "AAAAAAAAAA";
     private static final String UPDATED_URL = "BBBBBBBBBB";
 
-    private static final String DEFAULT_HEADERS = "AAAAAAAAAA";
-    private static final String UPDATED_HEADERS = "BBBBBBBBBB";
+    private static final JsonNode DEFAULT_HEADERS;
+    private static final JsonNode UPDATED_HEADERS;
 
-    private static final String DEFAULT_BODY = "AAAAAAAAAA";
-    private static final String UPDATED_BODY = "BBBBBBBBBB";
+    private static final JsonNode DEFAULT_BODY;
+    private static final JsonNode UPDATED_BODY;
+
+    static {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            DEFAULT_HEADERS = mapper.readTree("\"AAAAAAAAAA\"");
+            UPDATED_HEADERS = mapper.readTree("\"BBBBBBBBBB\"");
+            DEFAULT_BODY = mapper.readTree("\"AAAAAAAAAA\"");
+            UPDATED_BODY = mapper.readTree("\"BBBBBBBBBB\"");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     private static final String ENTITY_API_URL = "/api/http-monitors";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";

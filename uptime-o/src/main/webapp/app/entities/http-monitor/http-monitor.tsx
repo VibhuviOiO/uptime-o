@@ -146,8 +146,12 @@ export const HttpMonitor = () => {
                   <td>{httpMonitor.method}</td>
                   <td>{httpMonitor.type}</td>
                   <td>{httpMonitor.url}</td>
-                  <td>{httpMonitor.headers}</td>
-                  <td>{httpMonitor.body}</td>
+                  <td>
+                    <code style={{ fontSize: '0.8em' }}>{httpMonitor.headers ? JSON.stringify(httpMonitor.headers, null, 2) : 'null'}</code>
+                  </td>
+                  <td>
+                    <code style={{ fontSize: '0.8em' }}>{httpMonitor.body ? JSON.stringify(httpMonitor.body, null, 2) : 'null'}</code>
+                  </td>
                   <td>{httpMonitor.schedule ? <Link to={`/schedule/${httpMonitor.schedule.id}`}>{httpMonitor.schedule.id}</Link> : ''}</td>
                   <td className="text-end">
                     <div className="btn-group flex-btn-group-container">
