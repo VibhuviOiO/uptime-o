@@ -1,0 +1,332 @@
+@import 'app/app.scss';
+
+// KPI Card Component Styles
+.kpi-card {
+  background: $white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-left: 4px solid;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+
+  &:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    transform: translateY(-2px);
+  }
+
+  // Status-based styling
+  &--healthy {
+    border-left-color: #10b981;
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.04) 0%, transparent 100%);
+  }
+
+  &--degraded {
+    border-left-color: #f59e0b;
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.04) 0%, transparent 100%);
+  }
+
+  &--failed {
+    border-left-color: #ef4444;
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.04) 0%, transparent 100%);
+  }
+
+  &--skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+  }
+
+  // Header section
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+  }
+
+  &__label {
+    margin: 0;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  &__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    background: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
+    font-size: 1rem;
+  }
+
+  // Body section
+  &__body {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__value {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1f2937;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+  }
+
+  &__unit {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #9ca3af;
+  }
+
+  &__trend {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+
+    svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    &--up {
+      color: #10b981;
+    }
+
+    &--down {
+      color: #ef4444;
+    }
+  }
+
+  // Status indicator
+  &__status-indicator {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 0 30px 30px 0;
+    opacity: 0.3;
+
+    &--healthy {
+      border-color: transparent #10b981 transparent transparent;
+    }
+
+    &--degraded {
+      border-color: transparent #f59e0b transparent transparent;
+    }
+
+    &--failed {
+      border-color: transparent #ef4444 transparent transparent;
+    }
+  }
+
+  // Skeleton loader
+  &__skeleton-line {
+    height: 12px;
+    border-radius: 4px;
+    background: #e5e7eb;
+    margin-bottom: 0.75rem;
+
+    &:last-child {
+      margin-bottom: 0;
+      width: 60%;
+    }
+  }
+}
+
+// Dashboard KPIs Container
+.dashboard-kpis {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 2rem;
+  background: #f9fafb;
+  border-radius: 12px;
+  min-height: 400px;
+
+  &--loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: $white;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  }
+
+  &--error {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+  }
+
+  &__skeleton-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    width: 100%;
+  }
+
+  &__error-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    text-align: center;
+    color: #dc2626;
+
+    h3 {
+      font-size: 1.125rem;
+      font-weight: 600;
+      margin: 0;
+      color: #991b1b;
+    }
+
+    p {
+      margin: 0;
+      font-size: 0.875rem;
+      color: #7f1d1d;
+    }
+
+    svg {
+      color: #dc2626;
+    }
+  }
+
+  // Grid layout for KPI cards
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+
+    @media (max-width: 1024px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (max-width: 1440px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  // Status summary section
+  &__summary {
+    display: flex;
+    gap: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e5e7eb;
+    flex-wrap: wrap;
+
+    @media (max-width: 768px) {
+      gap: 1rem;
+    }
+  }
+
+  &__status-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+
+    &--healthy {
+      background: rgba(16, 185, 129, 0.1);
+      color: #047857;
+    }
+
+    &--degraded {
+      background: rgba(245, 158, 11, 0.1);
+      color: #92400e;
+    }
+
+    &--failed {
+      background: rgba(239, 68, 68, 0.1);
+      color: #991b1b;
+    }
+  }
+
+  &__status-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+
+    .dashboard-kpis__status-badge--healthy & {
+      background: #10b981;
+    }
+
+    .dashboard-kpis__status-badge--degraded & {
+      background: #f59e0b;
+    }
+
+    .dashboard-kpis__status-badge--failed & {
+      background: #ef4444;
+    }
+  }
+
+  &__status-text {
+    font-weight: 600;
+  }
+}
+
+// Animation for skeleton loading
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 640px) {
+  .dashboard-kpis {
+    padding: 1rem;
+    gap: 1.5rem;
+
+    &__grid {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+
+    &__summary {
+      flex-direction: column;
+    }
+  }
+
+  .kpi-card {
+    padding: 1rem;
+
+    &__value {
+      font-size: 1.5rem;
+    }
+
+    &__label {
+      font-size: 0.75rem;
+    }
+  }
+}

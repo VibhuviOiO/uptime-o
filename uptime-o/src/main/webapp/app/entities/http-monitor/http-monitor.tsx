@@ -9,12 +9,16 @@ import { overridePaginationStateWithQueryParams } from 'app/shared/util/entity-u
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 
 import { getEntities } from './http-monitor.reducer';
+import DatacenterMonitorAssign from './datacenter-monitor-assign';
 
 export const HttpMonitor = () => {
   const dispatch = useAppDispatch();
 
   const pageLocation = useLocation();
   const navigate = useNavigate();
+
+  const [assignModalOpen, setAssignModalOpen] = useState(false);
+  const [selectedMonitor, setSelectedMonitor] = useState<any>(null);
 
   const [paginationState, setPaginationState] = useState(
     overridePaginationStateWithQueryParams(getPaginationState(pageLocation, ITEMS_PER_PAGE, 'id'), pageLocation.search),
@@ -76,6 +80,21 @@ export const HttpMonitor = () => {
     });
 
   const handleSyncList = () => {
+    sortEntities();
+  };
+
+  const openAssignModal = (monitor: any) => {
+    setSelectedMonitor(monitor);
+    setAssignModalOpen(true);
+  };
+
+  const closeAssignModal = () => {
+    setAssignModalOpen(false);
+    setSelectedMonitor(null);
+  };
+
+  const handleAssignSave = () => {
+    // Refresh list after assignments are saved
     sortEntities();
   };
 
@@ -168,6 +187,15 @@ export const HttpMonitor = () => {
                         <FontAwesomeIcon icon="pencil-alt" /> <span className="d-none d-md-inline">Edit</span>
                       </Button>
                       <Button
+                        onClick={() => openAssignModal(httpMonitor)}
+                        color="warning"
+                        size="sm"
+                        data-cy="entityAssignButton"
+                        title="Assign to Datacenters"
+                      >
+                        <FontAwesomeIcon icon="link" /> <span className="d-none d-md-inline">Assign</span>
+                      </Button>
+                      <Button
                         onClick={() =>
                           (window.location.href = `/http-monitor/${httpMonitor.id}/delete?page=${paginationState.activePage}&sort=${paginationState.sort},${paginationState.order}`)
                         }
@@ -204,6 +232,16 @@ export const HttpMonitor = () => {
         </div>
       ) : (
         ''
+      )}
+
+      {selectedMonitor && (
+        <DatacenterMonitorAssign
+          isOpen={assignModalOpen}
+          toggle={closeAssignModal}
+          monitorId={selectedMonitor.id}
+          monitorName={selectedMonitor.name}
+          onSave={handleAssignSave}
+        />
       )}
     </div>
   );

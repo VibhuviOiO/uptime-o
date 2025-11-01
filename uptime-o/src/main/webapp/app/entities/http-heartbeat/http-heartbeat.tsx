@@ -203,9 +203,9 @@ export const HttpHeartbeat = () => {
                   <td>{apiHeartbeat.criticalThresholdMs}</td>
                   <td>{apiHeartbeat.errorType}</td>
                   <td>{apiHeartbeat.errorMessage}</td>
-                  <td>{apiHeartbeat.rawRequestHeaders}</td>
-                  <td>{apiHeartbeat.rawResponseHeaders}</td>
-                  <td>{apiHeartbeat.rawResponseBody}</td>
+                  <td>{apiHeartbeat.rawRequestHeaders ? JSON.stringify(apiHeartbeat.rawRequestHeaders) : ''}</td>
+                  <td>{apiHeartbeat.rawResponseHeaders ? JSON.stringify(apiHeartbeat.rawResponseHeaders) : ''}</td>
+                  <td>{apiHeartbeat.rawResponseBody ? JSON.stringify(apiHeartbeat.rawResponseBody) : ''}</td>
                   <td>
                     {apiHeartbeat.monitor ? <Link to={`/http-monitor/${apiHeartbeat.monitor.id}`}>{apiHeartbeat.monitor.id}</Link> : ''}
                   </td>

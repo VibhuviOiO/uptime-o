@@ -121,3 +121,35 @@ Navbar styles
   top: 0;
   z-index: 1031;
 }
+
+/* Dropdown menu grouping styles */
+.dropdown-menu {
+  .dropdown-header {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #6b7280;
+    padding: 0.75rem 1rem 0.5rem 1rem;
+    margin-top: 0.25rem;
+
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+
+  .dropdown-divider {
+    margin: 0.25rem 0;
+    opacity: 0.5;
+  }
+
+  .dropdown-item {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+
+    &:hover {
+      background-color: #f3f4f6;
+      color: #111827;
+    }
+  }
+}
