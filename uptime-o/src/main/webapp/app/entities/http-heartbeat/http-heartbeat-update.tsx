@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Button, Col, Row } from 'reactstrap';
 import { ValidatedField, ValidatedForm } from 'react-jhipster';
@@ -19,6 +19,8 @@ export const HttpHeartbeatUpdate = () => {
   const { id } = useParams<'id'>();
   const isNew = id === undefined;
 
+  const [formKey, setFormKey] = useState(0);
+
   const apiMonitors = useAppSelector(state => state.httpMonitor.entities);
   const agents = useAppSelector(state => state.agent.entities);
   const apiHeartbeatEntity = useAppSelector(state => state.apiHeartbeat.entity);
@@ -34,18 +36,90 @@ export const HttpHeartbeatUpdate = () => {
     if (isNew) {
       dispatch(reset());
     } else {
+      // Reset state first to clear old entity data, then fetch new entity
+      dispatch(reset());
       dispatch(getEntity(id));
     }
 
     dispatch(getHttpMonitors({}));
     dispatch(getAgents({}));
-  }, []);
+  }, [id, isNew, dispatch]);
 
   useEffect(() => {
     if (updateSuccess) {
       handleClose();
     }
   }, [updateSuccess]);
+
+  useEffect(() => {
+    if (!isNew && apiHeartbeatEntity?.id) {
+      // Force form to re-render when entity data loads
+      setFormKey(prev => prev + 1);
+      console.error('Entity loaded, form key updated:', formKey);
+    }
+  }, [apiHeartbeatEntity?.id]);
+
+  useEffect(() => {
+    // After form mounts with new key, populate textarea values
+    if (formKey > 0 && !isNew) {
+      setTimeout(() => {
+        const rawRequestHeadersField = document.getElementById('http-heartbeat-rawRequestHeaders') as HTMLTextAreaElement;
+        const rawResponseHeadersField = document.getElementById('http-heartbeat-rawResponseHeaders') as HTMLTextAreaElement;
+        const rawResponseBodyField = document.getElementById('http-heartbeat-rawResponseBody') as HTMLTextAreaElement;
+
+        if (rawRequestHeadersField && apiHeartbeatEntity?.rawRequestHeaders) {
+          const formattedHeaders = formatJsonValue(apiHeartbeatEntity.rawRequestHeaders);
+          rawRequestHeadersField.value = formattedHeaders;
+          rawRequestHeadersField.dispatchEvent(new Event('input', { bubbles: true }));
+          rawRequestHeadersField.dispatchEvent(new Event('change', { bubbles: true }));
+          rawRequestHeadersField.dispatchEvent(new Event('blur', { bubbles: true }));
+        }
+
+        if (rawResponseHeadersField && apiHeartbeatEntity?.rawResponseHeaders) {
+          const formattedHeaders = formatJsonValue(apiHeartbeatEntity.rawResponseHeaders);
+          rawResponseHeadersField.value = formattedHeaders;
+          rawResponseHeadersField.dispatchEvent(new Event('input', { bubbles: true }));
+          rawResponseHeadersField.dispatchEvent(new Event('change', { bubbles: true }));
+          rawResponseHeadersField.dispatchEvent(new Event('blur', { bubbles: true }));
+        }
+
+        if (rawResponseBodyField && apiHeartbeatEntity?.rawResponseBody) {
+          const formattedBody = formatJsonValue(apiHeartbeatEntity.rawResponseBody);
+          rawResponseBodyField.value = formattedBody;
+          rawResponseBodyField.dispatchEvent(new Event('input', { bubbles: true }));
+          rawResponseBodyField.dispatchEvent(new Event('change', { bubbles: true }));
+          rawResponseBodyField.dispatchEvent(new Event('blur', { bubbles: true }));
+        }
+      }, 100);
+    }
+  }, [formKey, isNew, apiHeartbeatEntity]);
+
+  const formatJsonValue = (value: any): string => {
+    if (!value) {
+      return '';
+    }
+    try {
+      if (typeof value === 'string') {
+        const parsed = JSON.stringify(JSON.parse(value), null, 2);
+        return parsed;
+      }
+      const stringified = JSON.stringify(value, null, 2);
+      return stringified;
+    } catch (error) {
+      console.error('Error formatting JSON:', error);
+      return '';
+    }
+  };
+
+  const validateJson = (value: string) => {
+    if (!value) return undefined;
+    try {
+      JSON.parse(value);
+      return undefined;
+    } catch {
+      return 'Invalid JSON format.';
+    }
+  };
 
   const saveEntity = values => {
     if (values.id !== undefined && typeof values.id !== 'number') {
@@ -80,9 +154,21 @@ export const HttpHeartbeatUpdate = () => {
       values.criticalThresholdMs = Number(values.criticalThresholdMs);
     }
 
+    // Get latest textarea values from DOM to ensure we have user's edits
+    const rawRequestHeadersField = document.getElementById('http-heartbeat-rawRequestHeaders') as HTMLTextAreaElement;
+    const rawResponseHeadersField = document.getElementById('http-heartbeat-rawResponseHeaders') as HTMLTextAreaElement;
+    const rawResponseBodyField = document.getElementById('http-heartbeat-rawResponseBody') as HTMLTextAreaElement;
+
+    const finalRawRequestHeaders = rawRequestHeadersField?.value || values.rawRequestHeaders;
+    const finalRawResponseHeaders = rawResponseHeadersField?.value || values.rawResponseHeaders;
+    const finalRawResponseBody = rawResponseBodyField?.value || values.rawResponseBody;
+
     const entity = {
       ...apiHeartbeatEntity,
       ...values,
+      rawRequestHeaders: finalRawRequestHeaders ? JSON.parse(finalRawRequestHeaders) : null,
+      rawResponseHeaders: finalRawResponseHeaders ? JSON.parse(finalRawResponseHeaders) : null,
+      rawResponseBody: finalRawResponseBody ? JSON.parse(finalRawResponseBody) : null,
       monitor: apiMonitors.find(it => it.id.toString() === values.monitor?.toString()),
       agent: agents.find(it => it.id.toString() === values.agent?.toString()),
     };
@@ -94,17 +180,37 @@ export const HttpHeartbeatUpdate = () => {
     }
   };
 
-  const defaultValues = () =>
-    isNew
-      ? {
-          executedAt: displayDefaultDateTime(),
-        }
-      : {
-          ...apiHeartbeatEntity,
-          executedAt: convertDateTimeFromServer(apiHeartbeatEntity.executedAt),
-          monitor: apiHeartbeatEntity?.monitor?.id,
-          agent: apiHeartbeatEntity?.agent?.id,
-        };
+  const defaultValues = () => {
+    if (isNew) {
+      return {
+        executedAt: displayDefaultDateTime(),
+      };
+    }
+    return {
+      id: apiHeartbeatEntity?.id,
+      success: apiHeartbeatEntity?.success,
+      responseTimeMs: apiHeartbeatEntity?.responseTimeMs,
+      responseSizeBytes: apiHeartbeatEntity?.responseSizeBytes,
+      responseStatusCode: apiHeartbeatEntity?.responseStatusCode,
+      responseContentType: apiHeartbeatEntity?.responseContentType,
+      responseServer: apiHeartbeatEntity?.responseServer,
+      responseCacheStatus: apiHeartbeatEntity?.responseCacheStatus,
+      dnsLookupMs: apiHeartbeatEntity?.dnsLookupMs,
+      tcpConnectMs: apiHeartbeatEntity?.tcpConnectMs,
+      tlsHandshakeMs: apiHeartbeatEntity?.tlsHandshakeMs,
+      timeToFirstByteMs: apiHeartbeatEntity?.timeToFirstByteMs,
+      warningThresholdMs: apiHeartbeatEntity?.warningThresholdMs,
+      criticalThresholdMs: apiHeartbeatEntity?.criticalThresholdMs,
+      errorType: apiHeartbeatEntity?.errorType,
+      errorMessage: apiHeartbeatEntity?.errorMessage,
+      rawRequestHeaders: formatJsonValue(apiHeartbeatEntity?.rawRequestHeaders),
+      rawResponseHeaders: formatJsonValue(apiHeartbeatEntity?.rawResponseHeaders),
+      rawResponseBody: formatJsonValue(apiHeartbeatEntity?.rawResponseBody),
+      executedAt: convertDateTimeFromServer(apiHeartbeatEntity.executedAt),
+      monitor: apiHeartbeatEntity?.monitor?.id,
+      agent: apiHeartbeatEntity?.agent?.id,
+    };
+  };
 
   return (
     <div>
@@ -120,7 +226,7 @@ export const HttpHeartbeatUpdate = () => {
           {loading ? (
             <p>Loading...</p>
           ) : (
-            <ValidatedForm defaultValues={defaultValues()} onSubmit={saveEntity}>
+            <ValidatedForm key={formKey} defaultValues={defaultValues()} onSubmit={saveEntity}>
               {!isNew ? (
                 <ValidatedField name="id" required readOnly id="http-heartbeat-id" label="ID" validate={{ required: true }} />
               ) : null}
@@ -246,6 +352,7 @@ export const HttpHeartbeatUpdate = () => {
                 name="rawRequestHeaders"
                 data-cy="rawRequestHeaders"
                 type="textarea"
+                validate={{ validate: validateJson }}
               />
               <ValidatedField
                 label="Raw Response Headers"
@@ -253,6 +360,7 @@ export const HttpHeartbeatUpdate = () => {
                 name="rawResponseHeaders"
                 data-cy="rawResponseHeaders"
                 type="textarea"
+                validate={{ validate: validateJson }}
               />
               <ValidatedField
                 label="Raw Response Body"
@@ -260,6 +368,7 @@ export const HttpHeartbeatUpdate = () => {
                 name="rawResponseBody"
                 data-cy="rawResponseBody"
                 type="textarea"
+                validate={{ validate: validateJson }}
               />
               <ValidatedField id="http-heartbeat-monitor" name="monitor" data-cy="monitor" label="Monitor" type="select">
                 <option value="" key="0" />

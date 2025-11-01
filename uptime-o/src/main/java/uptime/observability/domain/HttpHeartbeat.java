@@ -1,10 +1,12 @@
 package uptime.observability.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.time.Instant;
+import org.hibernate.annotations.Type;
 
 /**
  * A HttpHeartbeat.
@@ -76,13 +78,16 @@ public class HttpHeartbeat implements Serializable {
     private String errorMessage;
 
     @Column(name = "raw_request_headers", columnDefinition = "jsonb")
-    private String rawRequestHeaders;
+    @Type(JsonNodeType.class)
+    private JsonNode rawRequestHeaders;
 
     @Column(name = "raw_response_headers", columnDefinition = "jsonb")
-    private String rawResponseHeaders;
+    @Type(JsonNodeType.class)
+    private JsonNode rawResponseHeaders;
 
     @Column(name = "raw_response_body", columnDefinition = "jsonb")
-    private String rawResponseBody;
+    @Type(JsonNodeType.class)
+    private JsonNode rawResponseBody;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnoreProperties(value = { "apiHeartbeats", "datacenterMonitors", "schedule" }, allowSetters = true)
@@ -315,42 +320,42 @@ public class HttpHeartbeat implements Serializable {
         this.errorMessage = errorMessage;
     }
 
-    public String getRawRequestHeaders() {
+    public JsonNode getRawRequestHeaders() {
         return this.rawRequestHeaders;
     }
 
-    public HttpHeartbeat rawRequestHeaders(String rawRequestHeaders) {
+    public HttpHeartbeat rawRequestHeaders(JsonNode rawRequestHeaders) {
         this.setRawRequestHeaders(rawRequestHeaders);
         return this;
     }
 
-    public void setRawRequestHeaders(String rawRequestHeaders) {
+    public void setRawRequestHeaders(JsonNode rawRequestHeaders) {
         this.rawRequestHeaders = rawRequestHeaders;
     }
 
-    public String getRawResponseHeaders() {
+    public JsonNode getRawResponseHeaders() {
         return this.rawResponseHeaders;
     }
 
-    public HttpHeartbeat rawResponseHeaders(String rawResponseHeaders) {
+    public HttpHeartbeat rawResponseHeaders(JsonNode rawResponseHeaders) {
         this.setRawResponseHeaders(rawResponseHeaders);
         return this;
     }
 
-    public void setRawResponseHeaders(String rawResponseHeaders) {
+    public void setRawResponseHeaders(JsonNode rawResponseHeaders) {
         this.rawResponseHeaders = rawResponseHeaders;
     }
 
-    public String getRawResponseBody() {
+    public JsonNode getRawResponseBody() {
         return this.rawResponseBody;
     }
 
-    public HttpHeartbeat rawResponseBody(String rawResponseBody) {
+    public HttpHeartbeat rawResponseBody(JsonNode rawResponseBody) {
         this.setRawResponseBody(rawResponseBody);
         return this;
     }
 
-    public void setRawResponseBody(String rawResponseBody) {
+    public void setRawResponseBody(JsonNode rawResponseBody) {
         this.rawResponseBody = rawResponseBody;
     }
 

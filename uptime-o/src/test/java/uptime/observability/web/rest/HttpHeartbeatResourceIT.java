@@ -84,14 +84,14 @@ class HttpHeartbeatResourceIT {
     private static final String DEFAULT_ERROR_MESSAGE = "AAAAAAAAAA";
     private static final String UPDATED_ERROR_MESSAGE = "BBBBBBBBBB";
 
-    private static final String DEFAULT_RAW_REQUEST_HEADERS = "AAAAAAAAAA";
-    private static final String UPDATED_RAW_REQUEST_HEADERS = "BBBBBBBBBB";
+    private static final String DEFAULT_RAW_REQUEST_HEADERS = "{\"header\":\"value\"}";
+    private static final String UPDATED_RAW_REQUEST_HEADERS = "{\"header\":\"updated\"}";
 
-    private static final String DEFAULT_RAW_RESPONSE_HEADERS = "AAAAAAAAAA";
-    private static final String UPDATED_RAW_RESPONSE_HEADERS = "BBBBBBBBBB";
+    private static final String DEFAULT_RAW_RESPONSE_HEADERS = "{\"response\":\"header\"}";
+    private static final String UPDATED_RAW_RESPONSE_HEADERS = "{\"response\":\"updated\"}";
 
-    private static final String DEFAULT_RAW_RESPONSE_BODY = "AAAAAAAAAA";
-    private static final String UPDATED_RAW_RESPONSE_BODY = "BBBBBBBBBB";
+    private static final String DEFAULT_RAW_RESPONSE_BODY = "{\"key\":\"value\"}";
+    private static final String UPDATED_RAW_RESPONSE_BODY = "{\"key\":\"updated\"}";
 
     private static final String ENTITY_API_URL = "/api/http-heartbeats";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
@@ -124,7 +124,8 @@ class HttpHeartbeatResourceIT {
      * This is a static method, as tests for other entities might also need it,
      * if they test an entity which requires the current entity.
      */
-    public static HttpHeartbeat createEntity() {
+    public static HttpHeartbeat createEntity() throws Exception {
+        ObjectMapper om = new ObjectMapper();
         return new HttpHeartbeat()
             .executedAt(DEFAULT_EXECUTED_AT)
             .success(DEFAULT_SUCCESS)
@@ -142,9 +143,9 @@ class HttpHeartbeatResourceIT {
             .criticalThresholdMs(DEFAULT_CRITICAL_THRESHOLD_MS)
             .errorType(DEFAULT_ERROR_TYPE)
             .errorMessage(DEFAULT_ERROR_MESSAGE)
-            .rawRequestHeaders(DEFAULT_RAW_REQUEST_HEADERS)
-            .rawResponseHeaders(DEFAULT_RAW_RESPONSE_HEADERS)
-            .rawResponseBody(DEFAULT_RAW_RESPONSE_BODY);
+            .rawRequestHeaders(om.readTree(DEFAULT_RAW_REQUEST_HEADERS))
+            .rawResponseHeaders(om.readTree(DEFAULT_RAW_RESPONSE_HEADERS))
+            .rawResponseBody(om.readTree(DEFAULT_RAW_RESPONSE_BODY));
     }
 
     /**
@@ -153,7 +154,8 @@ class HttpHeartbeatResourceIT {
      * This is a static method, as tests for other entities might also need it,
      * if they test an entity which requires the current entity.
      */
-    public static HttpHeartbeat createUpdatedEntity() {
+    public static HttpHeartbeat createUpdatedEntity() throws Exception {
+        ObjectMapper om = new ObjectMapper();
         return new HttpHeartbeat()
             .executedAt(UPDATED_EXECUTED_AT)
             .success(UPDATED_SUCCESS)
@@ -171,13 +173,13 @@ class HttpHeartbeatResourceIT {
             .criticalThresholdMs(UPDATED_CRITICAL_THRESHOLD_MS)
             .errorType(UPDATED_ERROR_TYPE)
             .errorMessage(UPDATED_ERROR_MESSAGE)
-            .rawRequestHeaders(UPDATED_RAW_REQUEST_HEADERS)
-            .rawResponseHeaders(UPDATED_RAW_RESPONSE_HEADERS)
-            .rawResponseBody(UPDATED_RAW_RESPONSE_BODY);
+            .rawRequestHeaders(om.readTree(UPDATED_RAW_REQUEST_HEADERS))
+            .rawResponseHeaders(om.readTree(UPDATED_RAW_RESPONSE_HEADERS))
+            .rawResponseBody(om.readTree(UPDATED_RAW_RESPONSE_BODY));
     }
 
     @BeforeEach
-    void initTest() {
+    void initTest() throws Exception {
         apiHeartbeat = createEntity();
     }
 
@@ -333,6 +335,7 @@ class HttpHeartbeatResourceIT {
         HttpHeartbeat updatedHttpHeartbeat = apiHeartbeatRepository.findById(apiHeartbeat.getId()).orElseThrow();
         // Disconnect from session so that the updates on updatedHttpHeartbeat are not directly saved in db
         em.detach(updatedHttpHeartbeat);
+        ObjectMapper om = new ObjectMapper();
         updatedHttpHeartbeat
             .executedAt(UPDATED_EXECUTED_AT)
             .success(UPDATED_SUCCESS)
@@ -350,9 +353,9 @@ class HttpHeartbeatResourceIT {
             .criticalThresholdMs(UPDATED_CRITICAL_THRESHOLD_MS)
             .errorType(UPDATED_ERROR_TYPE)
             .errorMessage(UPDATED_ERROR_MESSAGE)
-            .rawRequestHeaders(UPDATED_RAW_REQUEST_HEADERS)
-            .rawResponseHeaders(UPDATED_RAW_RESPONSE_HEADERS)
-            .rawResponseBody(UPDATED_RAW_RESPONSE_BODY);
+            .rawRequestHeaders(om.readTree(UPDATED_RAW_REQUEST_HEADERS))
+            .rawResponseHeaders(om.readTree(UPDATED_RAW_RESPONSE_HEADERS))
+            .rawResponseBody(om.readTree(UPDATED_RAW_RESPONSE_BODY));
         HttpHeartbeatDTO apiHeartbeatDTO = apiHeartbeatMapper.toDto(updatedHttpHeartbeat);
 
         restHttpHeartbeatMockMvc
@@ -454,7 +457,7 @@ class HttpHeartbeatResourceIT {
             .timeToFirstByteMs(UPDATED_TIME_TO_FIRST_BYTE_MS)
             .warningThresholdMs(UPDATED_WARNING_THRESHOLD_MS)
             .errorType(UPDATED_ERROR_TYPE)
-            .rawResponseHeaders(UPDATED_RAW_RESPONSE_HEADERS);
+            .rawResponseHeaders(om.readTree(UPDATED_RAW_RESPONSE_HEADERS));
 
         restHttpHeartbeatMockMvc
             .perform(
@@ -502,9 +505,9 @@ class HttpHeartbeatResourceIT {
             .criticalThresholdMs(UPDATED_CRITICAL_THRESHOLD_MS)
             .errorType(UPDATED_ERROR_TYPE)
             .errorMessage(UPDATED_ERROR_MESSAGE)
-            .rawRequestHeaders(UPDATED_RAW_REQUEST_HEADERS)
-            .rawResponseHeaders(UPDATED_RAW_RESPONSE_HEADERS)
-            .rawResponseBody(UPDATED_RAW_RESPONSE_BODY);
+            .rawRequestHeaders(om.readTree(UPDATED_RAW_REQUEST_HEADERS))
+            .rawResponseHeaders(om.readTree(UPDATED_RAW_RESPONSE_HEADERS))
+            .rawResponseBody(om.readTree(UPDATED_RAW_RESPONSE_BODY));
 
         restHttpHeartbeatMockMvc
             .perform(

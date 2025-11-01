@@ -1,6 +1,6 @@
 package uptime.observability.service.dto;
 
-import jakarta.persistence.Lob;
+import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.time.Instant;
@@ -51,11 +51,11 @@ public class HttpHeartbeatDTO implements Serializable {
 
     private String errorMessage;
 
-    private String rawRequestHeaders;
+    private JsonNode rawRequestHeaders;
 
-    private String rawResponseHeaders;
+    private JsonNode rawResponseHeaders;
 
-    private String rawResponseBody;
+    private JsonNode rawResponseBody;
 
     private HttpMonitorDTO monitor;
 
@@ -197,27 +197,27 @@ public class HttpHeartbeatDTO implements Serializable {
         this.errorMessage = errorMessage;
     }
 
-    public String getRawRequestHeaders() {
+    public JsonNode getRawRequestHeaders() {
         return rawRequestHeaders;
     }
 
-    public void setRawRequestHeaders(String rawRequestHeaders) {
+    public void setRawRequestHeaders(JsonNode rawRequestHeaders) {
         this.rawRequestHeaders = rawRequestHeaders;
     }
 
-    public String getRawResponseHeaders() {
+    public JsonNode getRawResponseHeaders() {
         return rawResponseHeaders;
     }
 
-    public void setRawResponseHeaders(String rawResponseHeaders) {
+    public void setRawResponseHeaders(JsonNode rawResponseHeaders) {
         this.rawResponseHeaders = rawResponseHeaders;
     }
 
-    public String getRawResponseBody() {
+    public JsonNode getRawResponseBody() {
         return rawResponseBody;
     }
 
-    public void setRawResponseBody(String rawResponseBody) {
+    public void setRawResponseBody(JsonNode rawResponseBody) {
         this.rawResponseBody = rawResponseBody;
     }
 

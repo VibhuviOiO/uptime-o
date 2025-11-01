@@ -17,6 +17,11 @@ public interface HttpHeartbeatMapper extends EntityMapper<HttpHeartbeatDTO, Http
     @Mapping(target = "agent", source = "agent", qualifiedByName = "agentId")
     HttpHeartbeatDTO toDto(HttpHeartbeat s);
 
+    HttpHeartbeat toEntity(HttpHeartbeatDTO s);
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    void partialUpdate(@MappingTarget HttpHeartbeat entity, HttpHeartbeatDTO dto);
+
     @Named("apiMonitorId")
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
