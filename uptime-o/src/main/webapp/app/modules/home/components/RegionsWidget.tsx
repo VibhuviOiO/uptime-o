@@ -1,14 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faGlobe, faEye, faPencil, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faGlobe, faPencil, faTrash, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { getEntities } from 'app/entities/region/region.reducer';
-import './RegionsWidget.scss';
+import RegionEditModal from './RegionEditModal';
+import RegionDeleteModal from './RegionDeleteModal';
 
 export const RegionsWidget = () => {
   const dispatch = useAppDispatch();
   const [pageNum, setPageNum] = useState(0);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [selectedRegionId, setSelectedRegionId] = useState<number | null>(null);
 
   const regionList = useAppSelector(state => state.region.entities);
   const loading = useAppSelector(state => state.region.loading);
@@ -24,14 +28,66 @@ export const RegionsWidget = () => {
     );
   }, [dispatch, pageNum]);
 
+  const handleCreateClick = () => {
+    setSelectedRegionId(null);
+    setModalOpen(true);
+  };
+
+  const handleEditClick = (regionId: number) => {
+    setSelectedRegionId(regionId);
+    setModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalOpen(false);
+    setSelectedRegionId(null);
+  };
+
+  const handleDeleteClick = (regionId: number) => {
+    setSelectedRegionId(regionId);
+    setDeleteModalOpen(true);
+  };
+
+  const handleCloseDeleteModal = () => {
+    setDeleteModalOpen(false);
+    setSelectedRegionId(null);
+  };
+
+  const handleDeleteSuccess = () => {
+    // Refresh the list after successful delete
+    dispatch(
+      getEntities({
+        page: pageNum,
+        size: 5,
+        sort: 'id,desc',
+      }),
+    );
+  };
+
   return (
     <div className="regions-widget">
       <div className="widget-header">
-        <h3>
-          <FontAwesomeIcon icon={faGlobe} className="me-2" />
-          Regions
-          {totalItems > 0 && <span className="widget-count">{totalItems}</span>}
-        </h3>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <h3 style={{ margin: 0 }}>
+            <FontAwesomeIcon icon={faGlobe} className="me-2" />
+            Regions
+            {totalItems > 0 && <span className="widget-count">{totalItems}</span>}
+          </h3>
+          <button
+            onClick={handleCreateClick}
+            style={{
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              padding: 0,
+              color: '#0d6efd',
+              fontSize: '1rem',
+            }}
+            title="Create Region"
+          >
+            <FontAwesomeIcon icon={faPlus} />
+          </button>
+        </div>
         <Link to="/region" className="widget-link">
           View All
         </Link>
@@ -46,29 +102,36 @@ export const RegionsWidget = () => {
           <table className="widget-table">
             <thead>
               <tr>
-                <th>ID</th>
                 <th>Code</th>
                 <th>Name</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
               {regionList.map((region, i) => (
                 <tr key={`entity-${i}`}>
-                  <td className="id-cell">
-                    <span className="badge">{region.id}</span>
-                  </td>
                   <td className="code-cell">{region.regionCode || '-'}</td>
                   <td className="name-cell">
                     <strong>{region.name || '-'}</strong>
                   </td>
                   <td className="actions-cell">
                     <div className="action-buttons">
-                      <Link to={`/region/${region.id}`} className="action-btn btn-view" title="View">
-                        <FontAwesomeIcon icon={faEye} />
-                      </Link>
-                      <Link to={`/region/${region.id}/edit`} className="action-btn btn-edit" title="Edit">
+                      <button
+                        className="action-btn btn-edit"
+                        title="Edit"
+                        onClick={() => handleEditClick(region.id)}
+                        style={{ border: 'none', background: 'none', cursor: 'pointer', padding: 0 }}
+                      >
                         <FontAwesomeIcon icon={faPencil} />
-                      </Link>
+                      </button>
+                      <button
+                        className="action-btn btn-delete"
+                        title="Delete"
+                        onClick={() => handleDeleteClick(region.id)}
+                        style={{ border: 'none', background: 'none', cursor: 'pointer', padding: 0 }}
+                      >
+                        <FontAwesomeIcon icon={faTrash} />
+                      </button>
                     </div>
                   </td>
                 </tr>
@@ -87,11 +150,19 @@ export const RegionsWidget = () => {
       ) : (
         <div className="widget-empty">
           <p>No regions configured</p>
-          <Link to="/region/new" className="btn btn-sm btn-primary">
+          <button className="btn btn-sm btn-primary" onClick={handleCreateClick} style={{ border: 'none', cursor: 'pointer' }}>
             Create Region
-          </Link>
+          </button>
         </div>
       )}
+
+      <RegionEditModal isOpen={modalOpen} toggle={handleCloseModal} regionId={selectedRegionId} onSave={handleDeleteSuccess} />
+      <RegionDeleteModal
+        isOpen={deleteModalOpen}
+        toggle={handleCloseDeleteModal}
+        regionId={selectedRegionId}
+        onDelete={handleDeleteSuccess}
+      />
     </div>
   );
 };

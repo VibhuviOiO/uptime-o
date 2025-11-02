@@ -10,6 +10,7 @@ import DashboardCard, { ActionCard } from './components/DashboardCard';
 import RegionsWidget from './components/RegionsWidget';
 import { AgentsWidget } from './components/AgentsWidget';
 import { DatacentersWidget } from './components/DatacentersWidget';
+import { MonitorsWidget } from './components/MonitorsWidget';
 import { useDatacentersCount, useAgentsCount, useMonitorsCount, useSystemHealth } from './hooks/useDashboardMetrics';
 import { DashboardKPIs } from 'app/modules/dashboard/components/DashboardKPIs';
 import { useDashboardMetrics } from 'app/modules/dashboard/hooks/useDashboardMetrics';
@@ -83,79 +84,28 @@ export const Home = () => {
       {/* Analytics Grid with Sidebar */}
       <div className="dashboard-main-layout">
         <div className="dashboard-main-content">
-          {/* Analytics Grid */}
-          <div className="dashboard-grid">
-            {/* Datacenters Card */}
-            <DashboardCard
-              title="Datacenters"
-              icon="🏢"
-              metric={{
-                ...datacentersMetric,
-                label: 'Deployed instances',
-              }}
-              linkTo="/infrastructure/datacenters"
-              linkText="View Datacenters"
-              dataMetric="/api/datacenters/count"
-            />
-
-            {/* Agents Card */}
-            <DashboardCard
-              title="Agents"
-              icon="🤖"
-              metric={{
-                ...agentsMetric,
-                label: 'Actively running',
-              }}
-              linkTo="/infrastructure/agents"
-              linkText="View Agents"
-              dataMetric="/api/agents/count"
-            />
-
-            {/* Monitors Card */}
-            <DashboardCard
-              title="Monitors"
-              icon="📊"
-              metric={{
-                ...monitorsMetric,
-                label: 'API tests configured',
-              }}
-              linkTo="/monitoring/monitors"
-              linkText="View Monitors"
-              dataMetric="/api/http-monitors/count"
-            />
-
-            {/* Health Status Card */}
-            <DashboardCard
-              title="System Health"
-              icon="❤️"
-              metric={{
-                ...healthMetric,
-                label: 'All systems operational',
-              }}
-              linkTo="/admin/jhi-health"
-              linkText="View Health"
-              dataMetric="/management/health"
-              statusClass={typeof healthMetric?.value === 'string' && healthMetric.value.includes('Healthy') ? 'status-ok' : 'status-error'}
-            />
-
-            {/* Quick Actions Card */}
-            <ActionCard
-              title="Quick Actions"
-              icon="⚡"
-              actions={[
-                { label: '+ New Region', to: '/infrastructure/regions' },
-                { label: '+ New Monitor', to: '/monitoring/monitors' },
-              ]}
-            />
+          {/* First Row: Regions, Datacenters, Agents */}
+          <div className="dashboard-grid dashboard-grid-row1">
+            <div className="entity-column">
+              <h3 className="column-header">Regions</h3>
+              <RegionsWidget />
+            </div>
+            <div className="entity-column">
+              <h3 className="column-header">Datacenters</h3>
+              <DatacentersWidget />
+            </div>
+            <div className="entity-column">
+              <h3 className="column-header">Agents</h3>
+              <AgentsWidget />
+            </div>
           </div>
-        </div>
 
-        {/* Sidebar - Entity Widgets (25%) */}
-        <div className="dashboard-sidebar">
-          <div className="sidebar-widgets-stack">
-            <RegionsWidget />
-            <AgentsWidget />
-            <DatacentersWidget />
+          {/* Second Row: Monitors */}
+          <div className="dashboard-grid dashboard-grid-row2">
+            <div className="entity-column">
+              <h3 className="column-header">Monitors</h3>
+              <MonitorsWidget />
+            </div>
           </div>
         </div>
       </div>

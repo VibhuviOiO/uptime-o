@@ -4,9 +4,6 @@ import MenuItem from './menu-item';
 // Infrastructure Section
 export const InfrastructureMenuItems = () => (
   <>
-    <MenuItem icon="globe" to="/region" data-cy="regions">
-      Regions
-    </MenuItem>
     <MenuItem icon="building" to="/datacenter" data-cy="datacenters">
       Datacenters
     </MenuItem>

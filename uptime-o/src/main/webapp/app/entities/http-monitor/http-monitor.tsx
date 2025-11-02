@@ -3,13 +3,14 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button, Table } from 'reactstrap';
 import { JhiItemCount, JhiPagination, getPaginationState } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSort, faSortDown, faSortUp } from '@fortawesome/free-solid-svg-icons';
+import { faSort, faSortDown, faSortUp, faEye, faPencil, faLink, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { ASC, DESC, ITEMS_PER_PAGE, SORT } from 'app/shared/util/pagination.constants';
 import { overridePaginationStateWithQueryParams } from 'app/shared/util/entity-utils';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 
 import { getEntities } from './http-monitor.reducer';
 import DatacenterMonitorAssign from './datacenter-monitor-assign';
+import 'app/shared/custom.scss';
 
 export const HttpMonitor = () => {
   const dispatch = useAppDispatch();
@@ -121,96 +122,82 @@ export const HttpMonitor = () => {
           </Link>
         </div>
       </h2>
-      <div className="table-responsive">
+      <div className="entity-list-container">
         {httpMonitorList && httpMonitorList.length > 0 ? (
-          <Table responsive>
-            <thead>
-              <tr>
-                <th className="hand" onClick={sort('id')}>
-                  ID <FontAwesomeIcon icon={getSortIconByFieldName('id')} />
-                </th>
-                <th className="hand" onClick={sort('name')}>
-                  Name <FontAwesomeIcon icon={getSortIconByFieldName('name')} />
-                </th>
-                <th className="hand" onClick={sort('method')}>
-                  Method <FontAwesomeIcon icon={getSortIconByFieldName('method')} />
-                </th>
-                <th className="hand" onClick={sort('type')}>
-                  Type <FontAwesomeIcon icon={getSortIconByFieldName('type')} />
-                </th>
-                <th className="hand" onClick={sort('url')}>
-                  Url <FontAwesomeIcon icon={getSortIconByFieldName('url')} />
-                </th>
-                <th className="hand" onClick={sort('headers')}>
-                  Headers <FontAwesomeIcon icon={getSortIconByFieldName('headers')} />
-                </th>
-                <th className="hand" onClick={sort('body')}>
-                  Body <FontAwesomeIcon icon={getSortIconByFieldName('body')} />
-                </th>
-                <th>
-                  Schedule <FontAwesomeIcon icon="sort" />
-                </th>
-                <th />
-              </tr>
-            </thead>
-            <tbody>
-              {httpMonitorList.map((httpMonitor, i) => (
-                <tr key={`entity-${i}`} data-cy="entityTable">
-                  <td>
-                    <Button tag={Link} to={`/http-monitor/${httpMonitor.id}`} color="link" size="sm">
-                      {httpMonitor.id}
-                    </Button>
-                  </td>
-                  <td>{httpMonitor.name}</td>
-                  <td>{httpMonitor.method}</td>
-                  <td>{httpMonitor.type}</td>
-                  <td>{httpMonitor.url}</td>
-                  <td>
-                    <code style={{ fontSize: '0.8em' }}>{httpMonitor.headers ? JSON.stringify(httpMonitor.headers, null, 2) : 'null'}</code>
-                  </td>
-                  <td>
-                    <code style={{ fontSize: '0.8em' }}>{httpMonitor.body ? JSON.stringify(httpMonitor.body, null, 2) : 'null'}</code>
-                  </td>
-                  <td>{httpMonitor.schedule ? <Link to={`/schedule/${httpMonitor.schedule.id}`}>{httpMonitor.schedule.id}</Link> : ''}</td>
-                  <td className="text-end">
-                    <div className="btn-group flex-btn-group-container">
-                      <Button tag={Link} to={`/http-monitor/${httpMonitor.id}`} color="info" size="sm" data-cy="entityDetailsButton">
-                        <FontAwesomeIcon icon="eye" /> <span className="d-none d-md-inline">View</span>
-                      </Button>
-                      <Button
-                        tag={Link}
-                        to={`/http-monitor/${httpMonitor.id}/edit?page=${paginationState.activePage}&sort=${paginationState.sort},${paginationState.order}`}
-                        color="primary"
-                        size="sm"
-                        data-cy="entityEditButton"
-                      >
-                        <FontAwesomeIcon icon="pencil-alt" /> <span className="d-none d-md-inline">Edit</span>
-                      </Button>
-                      <Button
-                        onClick={() => openAssignModal(httpMonitor)}
-                        color="warning"
-                        size="sm"
-                        data-cy="entityAssignButton"
-                        title="Assign to Datacenters"
-                      >
-                        <FontAwesomeIcon icon="link" /> <span className="d-none d-md-inline">Assign</span>
-                      </Button>
-                      <Button
-                        onClick={() =>
-                          (window.location.href = `/http-monitor/${httpMonitor.id}/delete?page=${paginationState.activePage}&sort=${paginationState.sort},${paginationState.order}`)
-                        }
-                        color="danger"
-                        size="sm"
-                        data-cy="entityDeleteButton"
-                      >
-                        <FontAwesomeIcon icon="trash" /> <span className="d-none d-md-inline">Delete</span>
-                      </Button>
-                    </div>
-                  </td>
+          <div className="table-responsive">
+            <table className="entity-table">
+              <thead>
+                <tr>
+                  <th className="hand" onClick={sort('name')}>
+                    Name <FontAwesomeIcon icon={getSortIconByFieldName('name')} />
+                  </th>
+                  <th className="hand" onClick={sort('url')}>
+                    URL <FontAwesomeIcon icon={getSortIconByFieldName('url')} />
+                  </th>
+                  <th className="hand" onClick={sort('method')}>
+                    Method <FontAwesomeIcon icon={getSortIconByFieldName('method')} />
+                  </th>
+                  <th className="hand" onClick={sort('type')}>
+                    Type <FontAwesomeIcon icon={getSortIconByFieldName('type')} />
+                  </th>
+                  <th>Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </Table>
+              </thead>
+              <tbody>
+                {httpMonitorList.map((httpMonitor, i) => (
+                  <tr key={`entity-${i}`} data-cy="entityTable">
+                    <td className="name-cell">
+                      <strong>{httpMonitor.name}</strong>
+                    </td>
+                    <td className="metadata-cell">
+                      {httpMonitor.url ? (
+                        <a href={httpMonitor.url} target="_blank" rel="noopener noreferrer" title={httpMonitor.url}>
+                          {httpMonitor.url.length > 25 ? `${httpMonitor.url.substring(0, 25)}...` : httpMonitor.url}
+                        </a>
+                      ) : (
+                        <span className="text-muted">-</span>
+                      )}
+                    </td>
+                    <td className="method-cell">
+                      <span className="badge bg-info">{httpMonitor.method || 'GET'}</span>
+                    </td>
+                    <td className="method-cell">
+                      <span className="badge bg-secondary">{httpMonitor.type || '-'}</span>
+                    </td>
+                    <td className="actions-cell">
+                      <div className="action-buttons">
+                        <Link to={`/http-monitor/${httpMonitor.id}`} className="action-btn btn-view" title="View">
+                          <FontAwesomeIcon icon={faEye} />
+                        </Link>
+                        <Link
+                          to={`/http-monitor/${httpMonitor.id}/edit?page=${paginationState.activePage}&sort=${paginationState.sort},${paginationState.order}`}
+                          className="action-btn btn-edit"
+                          title="Edit"
+                        >
+                          <FontAwesomeIcon icon={faPencil} />
+                        </Link>
+                        <button
+                          className="action-btn btn-assign"
+                          title="Assign to Datacenters"
+                          onClick={() => openAssignModal(httpMonitor)}
+                          style={{ border: 'none', background: 'none', cursor: 'pointer', padding: 0 }}
+                        >
+                          <FontAwesomeIcon icon={faLink} />
+                        </button>
+                        <Link
+                          to={`/http-monitor/${httpMonitor.id}/delete?page=${paginationState.activePage}&sort=${paginationState.sort},${paginationState.order}`}
+                          className="action-btn btn-delete"
+                          title="Delete"
+                        >
+                          <FontAwesomeIcon icon={faTrash} />
+                        </Link>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         ) : (
           !loading && <div className="alert alert-warning">No HTTP Monitors found</div>
         )}

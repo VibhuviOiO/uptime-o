@@ -3,12 +3,14 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button, Table } from 'reactstrap';
 import { JhiItemCount, JhiPagination, getPaginationState } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSort, faSortDown, faSortUp, faBuilding, faEye, faPencil, faTrash, faPlus, faSync } from '@fortawesome/free-solid-svg-icons';
+import { faSort, faSortDown, faSortUp, faBuilding, faPencil, faTrash, faSync } from '@fortawesome/free-solid-svg-icons';
 import { ASC, DESC, ITEMS_PER_PAGE, SORT } from 'app/shared/util/pagination.constants';
 import { overridePaginationStateWithQueryParams } from 'app/shared/util/entity-utils';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 
 import { getEntities } from './datacenter.reducer';
+import DatacenterEditModal from 'app/modules/home/components/DatacenterEditModal';
+import DatacenterDeleteModal from 'app/modules/home/components/DatacenterDeleteModal';
 import '../entity.scss';
 
 export const Datacenter = () => {
@@ -20,6 +22,10 @@ export const Datacenter = () => {
   const [paginationState, setPaginationState] = useState(
     overridePaginationStateWithQueryParams(getPaginationState(pageLocation, ITEMS_PER_PAGE, 'id'), pageLocation.search),
   );
+
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [selectedDatacenterId, setSelectedDatacenterId] = useState<number | null>(null);
 
   const datacenterList = useAppSelector(state => state.datacenter.entities);
   const loading = useAppSelector(state => state.datacenter.loading);
@@ -80,6 +86,31 @@ export const Datacenter = () => {
     sortEntities();
   };
 
+  const handleEditClick = (datacenterId: number) => {
+    setSelectedDatacenterId(datacenterId);
+    setEditModalOpen(true);
+  };
+
+  const handleDeleteClick = (datacenterId: number) => {
+    setSelectedDatacenterId(datacenterId);
+    setDeleteModalOpen(true);
+  };
+
+  const handleCloseEditModal = () => {
+    setEditModalOpen(false);
+    setSelectedDatacenterId(null);
+  };
+
+  const handleCloseDeleteModal = () => {
+    setDeleteModalOpen(false);
+    setSelectedDatacenterId(null);
+  };
+
+  const handleSaveSuccess = () => {
+    // Refresh the list after successful save
+    sortEntities();
+  };
+
   const getSortIconByFieldName = (fieldName: string) => {
     const sortFieldName = paginationState.sort;
     const order = paginationState.order;
@@ -102,10 +133,6 @@ export const Datacenter = () => {
           <Button className="me-2" color="info" onClick={handleSyncList} disabled={loading} outline>
             <FontAwesomeIcon icon={faSync} spin={loading} /> Refresh
           </Button>
-          <Link to="/datacenter/new" className="btn btn-primary" id="jh-create-entity" data-cy="entityCreateButton">
-            <FontAwesomeIcon icon={faPlus} className="me-2" />
-            New Datacenter
-          </Link>
         </div>
       </div>
 
@@ -164,43 +191,22 @@ export const Datacenter = () => {
                     </td>
                     <td className="actions-cell">
                       <div className="action-buttons">
-                        <Button
-                          tag={Link}
-                          to={`/datacenter/${datacenter.id}`}
-                          color="info"
-                          size="sm"
-                          outline
-                          data-cy="entityDetailsButton"
-                          className="action-btn btn-view"
-                          title="View"
-                        >
-                          <FontAwesomeIcon icon={faEye} />
-                        </Button>
-                        <Button
-                          tag={Link}
-                          to={`/datacenter/${datacenter.id}/edit?page=${paginationState.activePage}&sort=${paginationState.sort},${paginationState.order}`}
-                          color="primary"
-                          size="sm"
-                          outline
-                          data-cy="entityEditButton"
+                        <button
                           className="action-btn btn-edit"
                           title="Edit"
+                          onClick={() => handleEditClick(datacenter.id)}
+                          style={{ border: 'none', background: 'none', cursor: 'pointer', padding: 0 }}
                         >
                           <FontAwesomeIcon icon={faPencil} />
-                        </Button>
-                        <Button
-                          onClick={() =>
-                            (window.location.href = `/datacenter/${datacenter.id}/delete?page=${paginationState.activePage}&sort=${paginationState.sort},${paginationState.order}`)
-                          }
-                          color="danger"
-                          size="sm"
-                          outline
-                          data-cy="entityDeleteButton"
+                        </button>
+                        <button
                           className="action-btn btn-delete"
                           title="Delete"
+                          onClick={() => handleDeleteClick(datacenter.id)}
+                          style={{ border: 'none', background: 'none', cursor: 'pointer', padding: 0 }}
                         >
                           <FontAwesomeIcon icon={faTrash} />
-                        </Button>
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -231,6 +237,19 @@ export const Datacenter = () => {
       ) : (
         !loading && <div className="alert alert-warning">No Datacenters found</div>
       )}
+
+      <DatacenterEditModal
+        isOpen={editModalOpen}
+        toggle={handleCloseEditModal}
+        datacenterId={selectedDatacenterId}
+        onSave={handleSaveSuccess}
+      />
+      <DatacenterDeleteModal
+        isOpen={deleteModalOpen}
+        toggle={handleCloseDeleteModal}
+        datacenterId={selectedDatacenterId}
+        onDelete={handleSaveSuccess}
+      />
     </div>
   );
 };

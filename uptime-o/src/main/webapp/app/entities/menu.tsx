@@ -12,9 +12,6 @@ const EntitiesMenu = () => {
       <MenuItem icon="asterisk" to="/http-monitor">
         HTTP Monitor
       </MenuItem>
-      <MenuItem icon="asterisk" to="/region">
-        Region
-      </MenuItem>
       <MenuItem icon="asterisk" to="/datacenter">
         Datacenter
       </MenuItem>

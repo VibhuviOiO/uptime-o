@@ -1,6 +1,13 @@
-// Agents Widget Styling for Dashboard
+/* ==========================================================================
+   Custom Dashboard Widgets Styling
+   Consolidated SCSS for all dashboard widgets (Regions, Agents, Datacenters, Monitors)
+========================================================================== */
 
-.agents-widget {
+// Base widget styles used by all widgets
+.regions-widget,
+.agents-widget,
+.datacenters-widget,
+.monitors-widget {
   background: white;
   border-radius: 0.5rem;
   box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
@@ -40,7 +47,6 @@
       }
 
       svg {
-        color: #0d6efd;
         margin-right: 0.5rem;
       }
 
@@ -54,7 +60,6 @@
         padding: 0 0.4rem;
         font-size: 0.75rem;
         font-weight: 700;
-        background-color: #0d6efd;
         color: white;
         border-radius: 12px;
       }
@@ -62,13 +67,11 @@
 
     .widget-link {
       font-size: 0.85rem;
-      color: #0d6efd;
       text-decoration: none;
       font-weight: 500;
       transition: color 0.2s ease;
 
       &:hover {
-        color: #0b5ed7;
         text-decoration: underline;
       }
     }
@@ -111,6 +114,7 @@
       border-collapse: collapse;
       margin: 0;
       font-size: 0.85rem;
+      table-layout: auto;
 
       thead {
         position: sticky;
@@ -168,49 +172,97 @@
               color: #e9ecef;
             }
 
-            &.id-cell {
-              width: 50px;
+            &.badge {
+              padding: 0.25rem 0.5rem;
+              font-size: 0.7rem;
+              font-weight: 600;
+              background-color: #e9ecef;
+              color: #212529;
+              border-radius: 0.25rem;
 
-              .badge {
-                padding: 0.25rem 0.5rem;
-                font-size: 0.7rem;
-                font-weight: 600;
-                background-color: #e9ecef;
-                color: #212529;
-                border-radius: 0.25rem;
-
-                @media (prefers-color-scheme: dark) {
-                  background-color: #3d4147;
-                  color: #e9ecef;
-                }
+              @media (prefers-color-scheme: dark) {
+                background-color: #3d4147;
+                color: #e9ecef;
               }
             }
 
+            &.code-cell {
+              font-family: 'Courier New', monospace;
+              font-size: 0.8rem;
+              width: auto;
+              white-space: nowrap;
+              padding: 0.75rem 0.5rem;
+            }
+
             &.name-cell {
-              flex: 1;
+              width: 35%;
+              min-width: 120px;
 
               strong {
                 font-weight: 600;
               }
             }
 
-            &.datacenter-cell {
-              width: 80px;
+            &.metadata-cell {
               font-size: 0.8rem;
-              color: #0d6efd;
+              color: #6c757d;
+              width: auto;
+              min-width: 80px;
 
-              .text-muted {
-                color: #6c757d;
+              a {
+                text-decoration: none;
+                word-break: break-word;
+                transition: color 0.2s ease;
 
-                @media (prefers-color-scheme: dark) {
-                  color: #adb5bd;
+                &:hover {
+                  text-decoration: underline;
                 }
               }
             }
 
-            &.actions-cell {
-              width: 70px;
+            &.datacenter-cell,
+            &.region-cell,
+            &.url-cell {
+              display: none;
+            }
+
+            &.method-cell {
+              width: auto;
+              min-width: 60px;
+              white-space: nowrap;
+
+              .badge {
+                padding: 0.25rem 0.5rem;
+                font-size: 0.7rem;
+                font-weight: 600;
+                border-radius: 0.25rem;
+
+                &.bg-info {
+                  background-color: #cfe2ff;
+                  color: #084298;
+
+                  @media (prefers-color-scheme: dark) {
+                    background-color: #264970;
+                    color: #9ecaff;
+                  }
+                }
+              }
+            }            &.actions-cell {
+              width: 130px;
+              min-width: 130px;
+              max-width: 130px;
               text-align: center;
+              padding: 0.75rem 0.5rem;
+              flex-shrink: 0;
+              white-space: nowrap;
+            }
+
+            .text-muted {
+              color: #6c757d;
+
+              @media (prefers-color-scheme: dark) {
+                color: #adb5bd;
+              }
             }
           }
         }
@@ -233,8 +285,11 @@
 
   .action-buttons {
     display: flex;
-    gap: 0.3rem;
+    flex-direction: row;
+    gap: 0.35rem;
     justify-content: center;
+    align-items: center;
+    white-space: nowrap;
 
     .action-btn {
       display: inline-flex;
@@ -243,58 +298,124 @@
       width: 28px;
       height: 28px;
       padding: 0;
-      border: 1px solid currentColor;
+      border: none;
       border-radius: 0.25rem;
       font-size: 0.75rem;
       background-color: transparent;
       text-decoration: none;
       transition: all 0.2s ease;
       cursor: pointer;
+      flex-shrink: 0;
 
       svg {
-        width: 12px;
-        height: 12px;
+        width: 14px;
+        height: 14px;
       }
 
       &.btn-view {
-        border-color: #0dcaf0;
         color: #0dcaf0;
 
         &:hover {
           background-color: #0dcaf0;
           color: white;
-          transform: scale(1.1);
+          transform: scale(1.15);
         }
       }
 
       &.btn-edit {
-        border-color: #0d6efd;
         color: #0d6efd;
 
         &:hover {
           background-color: #0d6efd;
           color: white;
-          transform: scale(1.1);
+          transform: scale(1.15);
         }
       }
 
       &.btn-delete {
-        border-color: #dc3545;
         color: #dc3545;
 
         &:hover {
           background-color: #dc3545;
           color: white;
-          transform: scale(1.1);
+          transform: scale(1.15);
         }
       }
     }
   }
 }
 
+// Widget-specific icon colors
+.regions-widget .widget-header h3 svg,
+.regions-widget .widget-link {
+  color: #0d6efd;
+}
+
+.agents-widget .widget-header h3 svg,
+.agents-widget .widget-link {
+  color: #0d6efd;
+}
+
+.agents-widget .widget-count {
+  background-color: #0d6efd;
+}
+
+.datacenters-widget .widget-header h3 svg,
+.datacenters-widget .widget-link {
+  color: #198754;
+}
+
+.datacenters-widget .widget-count {
+  background-color: #198754;
+}
+
+.datacenters-widget .action-btn.btn-edit {
+  color: #198754;
+
+  &:hover {
+    background-color: #198754;
+  }
+}
+
+.monitors-widget .widget-header h3 svg,
+.monitors-widget .widget-link {
+  color: #fd7e14;
+}
+
+.monitors-widget .widget-count {
+  background-color: #fd7e14;
+}
+
+.monitors-widget .url-cell a {
+  color: #fd7e14;
+
+  &:hover {
+    color: #e0640b;
+  }
+}
+
+.monitors-widget .action-btn.btn-edit {
+  color: #fd7e14;
+
+  &:hover {
+    background-color: #fd7e14;
+  }
+}
+
+.regions-widget .widget-count {
+  background-color: #0d6efd;
+}
+
+.regions-widget .code-cell {
+  color: #0d6efd;
+}
+
 // Responsive
 @media (max-width: 768px) {
-  .agents-widget {
+  .regions-widget,
+  .agents-widget,
+  .datacenters-widget,
+  .monitors-widget {
     .widget-table-container {
       .widget-table {
         font-size: 0.75rem;

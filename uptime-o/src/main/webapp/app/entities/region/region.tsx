@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Button, Table } from 'reactstrap';
 import { JhiItemCount, JhiPagination, getPaginationState } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSort, faSortDown, faSortUp, faGlobe, faEye, faPencil, faTrash, faPlus, faSync } from '@fortawesome/free-solid-svg-icons';
+import { faSort, faSortDown, faSortUp, faGlobe, faSync, faPencil, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { ASC, DESC, ITEMS_PER_PAGE, SORT } from 'app/shared/util/pagination.constants';
 import { overridePaginationStateWithQueryParams } from 'app/shared/util/entity-utils';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 
 import { getEntities } from './region.reducer';
+import RegionEditModal from 'app/modules/home/components/RegionEditModal';
+import RegionDeleteModal from 'app/modules/home/components/RegionDeleteModal';
 import '../entity.scss';
 
 export const Region = () => {
@@ -20,6 +22,10 @@ export const Region = () => {
   const [paginationState, setPaginationState] = useState(
     overridePaginationStateWithQueryParams(getPaginationState(pageLocation, ITEMS_PER_PAGE, 'id'), pageLocation.search),
   );
+
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [selectedRegionId, setSelectedRegionId] = useState<number | null>(null);
 
   const regionList = useAppSelector(state => state.region.entities);
   const loading = useAppSelector(state => state.region.loading);
@@ -80,6 +86,31 @@ export const Region = () => {
     sortEntities();
   };
 
+  const handleEditClick = (regionId: number) => {
+    setSelectedRegionId(regionId);
+    setEditModalOpen(true);
+  };
+
+  const handleDeleteClick = (regionId: number) => {
+    setSelectedRegionId(regionId);
+    setDeleteModalOpen(true);
+  };
+
+  const handleCloseEditModal = () => {
+    setEditModalOpen(false);
+    setSelectedRegionId(null);
+  };
+
+  const handleCloseDeleteModal = () => {
+    setDeleteModalOpen(false);
+    setSelectedRegionId(null);
+  };
+
+  const handleSaveSuccess = () => {
+    // Refresh the list after successful save
+    sortEntities();
+  };
+
   const getSortIconByFieldName = (fieldName: string) => {
     const sortFieldName = paginationState.sort;
     const order = paginationState.order;
@@ -102,10 +133,6 @@ export const Region = () => {
           <Button className="me-2" color="info" onClick={handleSyncList} disabled={loading} outline>
             <FontAwesomeIcon icon={faSync} spin={loading} /> Refresh
           </Button>
-          <Link to="/region/new" className="btn btn-primary" id="jh-create-entity" data-cy="entityCreateButton">
-            <FontAwesomeIcon icon={faPlus} className="me-2" />
-            New Region
-          </Link>
         </div>
       </div>
 
@@ -159,43 +186,22 @@ export const Region = () => {
                     <td className="group-cell">{region.groupName ? region.groupName : <span className="text-muted">N/A</span>}</td>
                     <td className="actions-cell">
                       <div className="action-buttons">
-                        <Button
-                          tag={Link}
-                          to={`/region/${region.id}`}
-                          color="info"
-                          size="sm"
-                          outline
-                          data-cy="entityDetailsButton"
-                          className="action-btn btn-view"
-                          title="View"
-                        >
-                          <FontAwesomeIcon icon={faEye} />
-                        </Button>
-                        <Button
-                          tag={Link}
-                          to={`/region/${region.id}/edit?page=${paginationState.activePage}&sort=${paginationState.sort},${paginationState.order}`}
-                          color="primary"
-                          size="sm"
-                          outline
-                          data-cy="entityEditButton"
+                        <button
                           className="action-btn btn-edit"
                           title="Edit"
+                          onClick={() => handleEditClick(region.id)}
+                          style={{ border: 'none', background: 'none', cursor: 'pointer', padding: 0 }}
                         >
                           <FontAwesomeIcon icon={faPencil} />
-                        </Button>
-                        <Button
-                          onClick={() =>
-                            (window.location.href = `/region/${region.id}/delete?page=${paginationState.activePage}&sort=${paginationState.sort},${paginationState.order}`)
-                          }
-                          color="danger"
-                          size="sm"
-                          outline
-                          data-cy="entityDeleteButton"
+                        </button>
+                        <button
                           className="action-btn btn-delete"
                           title="Delete"
+                          onClick={() => handleDeleteClick(region.id)}
+                          style={{ border: 'none', background: 'none', cursor: 'pointer', padding: 0 }}
                         >
                           <FontAwesomeIcon icon={faTrash} />
-                        </Button>
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -226,6 +232,14 @@ export const Region = () => {
       ) : (
         !loading && <div className="alert alert-warning">No Regions found</div>
       )}
+
+      <RegionEditModal isOpen={editModalOpen} toggle={handleCloseEditModal} regionId={selectedRegionId} onSave={handleSaveSuccess} />
+      <RegionDeleteModal
+        isOpen={deleteModalOpen}
+        toggle={handleCloseDeleteModal}
+        regionId={selectedRegionId}
+        onDelete={handleSaveSuccess}
+      />
     </div>
   );
 };

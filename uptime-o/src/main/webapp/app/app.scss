@@ -2,6 +2,9 @@
 @import 'bootstrap-variables';
 // Import Bootstrap source files from node_modules
 @import 'bootstrap/scss/bootstrap';
+// Import custom dashboard widgets styling
+@import 'shared/custom';
+
 body {
   background: #fafafa;
   margin: 0;

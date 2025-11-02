@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faServer, faEye, faPencil } from '@fortawesome/free-solid-svg-icons';
+import { faServer, faEye, faPencil, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { getEntities } from 'app/entities/agent/agent.reducer';
-import './AgentsWidget.scss';
 
 export const AgentsWidget = () => {
   const dispatch = useAppDispatch();
@@ -46,23 +45,20 @@ export const AgentsWidget = () => {
           <table className="widget-table">
             <thead>
               <tr>
-                <th>ID</th>
                 <th>Name</th>
                 <th>Datacenter</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
               {agentList.map((agent, i) => (
                 <tr key={`entity-${i}`}>
-                  <td className="id-cell">
-                    <span className="badge">{agent.id}</span>
-                  </td>
                   <td className="name-cell">
                     <strong>{agent.name || '-'}</strong>
                   </td>
-                  <td className="datacenter-cell">
+                  <td className="metadata-cell">
                     {agent.datacenter ? (
-                      <span className="datacenter-name">{agent.datacenter.name}</span>
+                      <span className="metadata-name">{agent.datacenter.name}</span>
                     ) : (
                       <span className="text-muted">-</span>
                     )}
@@ -74,6 +70,9 @@ export const AgentsWidget = () => {
                       </Link>
                       <Link to={`/agent/${agent.id}/edit`} className="action-btn btn-edit" title="Edit">
                         <FontAwesomeIcon icon={faPencil} />
+                      </Link>
+                      <Link to={`/agent/${agent.id}/delete`} className="action-btn btn-delete" title="Delete">
+                        <FontAwesomeIcon icon={faTrash} />
                       </Link>
                     </div>
                   </td>
