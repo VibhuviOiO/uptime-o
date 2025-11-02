@@ -6,7 +6,7 @@ import { Collapse, Nav, Navbar, NavbarToggler } from 'reactstrap';
 import LoadingBar from 'react-redux-loading-bar';
 
 import { AccountMenu, AdminMenu } from '../menus';
-import { InfrastructureMenu, MonitoringMenu, SettingsMenu, HelpMenu } from '../menus/main-menu';
+import { MonitoringMenu } from '../menus/main-menu';
 import { Brand } from './header-components';
 
 export interface IHeaderProps {
@@ -40,10 +40,7 @@ const Header = (props: IHeaderProps) => {
         <Brand />
         <Collapse isOpen={menuOpen} navbar>
           <Nav id="header-tabs" className="ms-auto" navbar>
-            {props.isAuthenticated && <InfrastructureMenu />}
             {props.isAuthenticated && <MonitoringMenu />}
-            {props.isAuthenticated && <SettingsMenu />}
-            {props.isAuthenticated && <HelpMenu />}
             {props.isAuthenticated && props.isAdmin && <AdminMenu showOpenAPI={props.isOpenAPIEnabled} />}
             <AccountMenu isAuthenticated={props.isAuthenticated} />
           </Nav>

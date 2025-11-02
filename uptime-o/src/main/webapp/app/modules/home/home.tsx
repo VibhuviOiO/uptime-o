@@ -10,6 +10,7 @@ import DashboardCard, { ActionCard } from './components/DashboardCard';
 import RegionsWidget from './components/RegionsWidget';
 import { AgentsWidget } from './components/AgentsWidget';
 import { DatacentersWidget } from './components/DatacentersWidget';
+import { SchedulesWidget } from './components/SchedulesWidget';
 import { MonitorsWidget } from './components/MonitorsWidget';
 import { useDatacentersCount, useAgentsCount, useMonitorsCount, useSystemHealth } from './hooks/useDashboardMetrics';
 import { DashboardKPIs } from 'app/modules/dashboard/components/DashboardKPIs';
@@ -82,33 +83,35 @@ export const Home = () => {
       {/* Analytics Grid with Sidebar */}
       <div className="dashboard-main-layout">
         <div className="dashboard-main-content">
-          {/* First Row: Regions, Datacenters, Agents */}
+          {/* First Row: Regions, Datacenters */}
           <div className="dashboard-grid dashboard-grid-row1">
-            <div className="entity-column">
+            <div className="entity-column entity-column--span2">
               <h3 className="column-header">Regions</h3>
               <RegionsWidget />
             </div>
-            <div className="entity-column">
+            <div className="entity-column entity-column--span2">
               <h3 className="column-header">Datacenters</h3>
               <DatacentersWidget />
             </div>
-            <div className="entity-column">
+          </div>
+
+          {/* Second Row: Agents, Schedules */}
+          <div className="dashboard-grid dashboard-grid-row2">
+            <div className="entity-column entity-column--span2">
               <h3 className="column-header">Agents</h3>
               <AgentsWidget />
             </div>
+            <div className="entity-column entity-column--span2">
+              <h3 className="column-header">Schedules</h3>
+              <SchedulesWidget />
+            </div>
           </div>
 
-          {/* Second Row: HTTP Monitors (2 cols), Schedules (1 col - for later) */}
-          <div className="dashboard-grid dashboard-grid-row2">
-            <div className="entity-column entity-column--span2">
+          {/* Third Row: HTTP Monitors (Full Width) */}
+          <div className="dashboard-grid dashboard-grid-row3">
+            <div className="entity-column entity-column--span4">
               <h3 className="column-header">HTTP Monitors</h3>
               <MonitorsWidget />
-            </div>
-            <div className="entity-column">
-              <h3 className="column-header">Schedules</h3>
-              <div style={{ padding: '2rem', textAlign: 'center', color: '#999' }}>
-                <p>Coming soon...</p>
-              </div>
             </div>
           </div>
         </div>

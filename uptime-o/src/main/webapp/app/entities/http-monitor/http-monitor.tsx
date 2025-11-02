@@ -3,7 +3,18 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from 'reactstrap';
 import { JhiItemCount, JhiPagination, getPaginationState } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSort, faSortDown, faSortUp, faPencil, faLink, faTrash, faCode, faSync } from '@fortawesome/free-solid-svg-icons';
+import {
+  faSort,
+  faSortDown,
+  faSortUp,
+  faPencil,
+  faLink,
+  faTrash,
+  faCode,
+  faSync,
+  faBuilding,
+  faPlus,
+} from '@fortawesome/free-solid-svg-icons';
 import { ASC, DESC, ITEMS_PER_PAGE, SORT } from 'app/shared/util/pagination.constants';
 import { overridePaginationStateWithQueryParams } from 'app/shared/util/entity-utils';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
@@ -292,18 +303,6 @@ export const HttpMonitor = () => {
                       <FontAwesomeIcon icon={getSortIconByFieldName('url')} className="ms-1" />
                     </span>
                   </th>
-                  <th className="sortable" onClick={sort('method')}>
-                    <span className="th-content">
-                      Method
-                      <FontAwesomeIcon icon={getSortIconByFieldName('method')} className="ms-1" />
-                    </span>
-                  </th>
-                  <th className="sortable" onClick={sort('type')}>
-                    <span className="th-content">
-                      Type
-                      <FontAwesomeIcon icon={getSortIconByFieldName('type')} className="ms-1" />
-                    </span>
-                  </th>
                   <th>
                     <span className="th-content">Schedule</span>
                   </th>
@@ -314,7 +313,7 @@ export const HttpMonitor = () => {
                     <span className="th-content">Body</span>
                   </th>
                   <th>
-                    <span className="th-content">Mapped Datacenters</span>
+                    <span className="th-content">Mapped DCs</span>
                   </th>
                   <th className="actions-column">
                     <span className="th-content">Actions</span>
@@ -325,7 +324,26 @@ export const HttpMonitor = () => {
                 {httpMonitorList.map((httpMonitor, i) => (
                   <tr key={`entity-${i}`} className="table-row" data-cy="entityTable">
                     <td className="name-cell">
-                      <strong>{httpMonitor.name}</strong>
+                      <div>
+                        <strong
+                          style={{
+                            display: 'block',
+                            wordWrap: 'break-word',
+                          }}
+                        >
+                          {httpMonitor.name}
+                        </strong>
+                        <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.25rem', flexWrap: 'wrap' }}>
+                          <span className="badge bg-info" style={{ fontSize: '0.65rem' }}>
+                            {httpMonitor.method || 'GET'}
+                          </span>
+                          {httpMonitor.type && (
+                            <span className="badge bg-secondary" style={{ fontSize: '0.65rem' }}>
+                              {httpMonitor.type}
+                            </span>
+                          )}
+                        </div>
+                      </div>
                     </td>
                     <td className="url-cell">
                       {httpMonitor.url ? (
@@ -335,12 +353,6 @@ export const HttpMonitor = () => {
                       ) : (
                         <span className="text-muted">-</span>
                       )}
-                    </td>
-                    <td className="method-cell">
-                      <span className="badge bg-info">{httpMonitor.method || 'GET'}</span>
-                    </td>
-                    <td className="type-cell">
-                      <span className="badge bg-secondary">{httpMonitor.type || '-'}</span>
                     </td>
                     <td className="schedule-cell">
                       {httpMonitor.schedule && httpMonitor.schedule.name ? (
@@ -378,17 +390,83 @@ export const HttpMonitor = () => {
                       )}
                     </td>
                     <td className="datacenters-cell">
-                      {httpMonitor.id && datacenterAssignments[httpMonitor.id] && datacenterAssignments[httpMonitor.id].length > 0 ? (
-                        <div className="datacenter-badges">
-                          {datacenterAssignments[httpMonitor.id].map((dc: any) => (
-                            <span key={dc.id} className="badge bg-success me-1 mb-1">
-                              {dc.name || dc.code || `Datacenter ${dc.id}`}
-                            </span>
-                          ))}
-                        </div>
-                      ) : (
-                        <span className="text-muted text-small">Not assigned</span>
-                      )}
+                      <div
+                        style={{
+                          display: 'flex',
+                          gap: '0.5rem',
+                          flexWrap: 'wrap',
+                          alignItems: 'flex-start',
+                          maxHeight: '50px',
+                          overflowY: 'auto',
+                        }}
+                      >
+                        {httpMonitor.id && datacenterAssignments[httpMonitor.id] && datacenterAssignments[httpMonitor.id].length > 0 ? (
+                          <>
+                            {datacenterAssignments[httpMonitor.id].map((dc: any) => (
+                              <span
+                                key={dc.id}
+                                style={{
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: '0.2rem',
+                                  padding: '0.15rem 0.35rem',
+                                  background: '#e8f5e9',
+                                  color: '#2e7d32',
+                                  borderRadius: '8px',
+                                  fontSize: '0.6rem',
+                                  fontWeight: '500',
+                                  border: '1px solid #a5d6a7',
+                                  whiteSpace: 'nowrap',
+                                }}
+                              >
+                                <FontAwesomeIcon icon={faBuilding} style={{ fontSize: '0.6rem' }} />
+                                <strong>{dc.name}</strong>
+                                {dc.code && <span style={{ color: '#558b2f', fontSize: '0.55rem' }}>({dc.code})</span>}
+                              </span>
+                            ))}
+                            <button
+                              className="action-btn btn-assign"
+                              title="Add Datacenters"
+                              onClick={() => openAssignModal(httpMonitor)}
+                              style={{
+                                border: 'none',
+                                background: 'none',
+                                cursor: 'pointer',
+                                padding: '0.15rem 0.25rem',
+                                color: '#28a745',
+                                fontSize: '0.9rem',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                              }}
+                            >
+                              <FontAwesomeIcon icon={faPlus} />
+                            </button>
+                          </>
+                        ) : (
+                          <>
+                            <span className="text-muted text-small">-</span>
+                            <button
+                              className="action-btn btn-assign"
+                              title="Add Datacenters"
+                              onClick={() => openAssignModal(httpMonitor)}
+                              style={{
+                                border: 'none',
+                                background: 'none',
+                                cursor: 'pointer',
+                                padding: '0.15rem 0.25rem',
+                                color: '#28a745',
+                                fontSize: '0.9rem',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                              }}
+                            >
+                              <FontAwesomeIcon icon={faPlus} />
+                            </button>
+                          </>
+                        )}
+                      </div>
                     </td>
                     <td className="actions-cell">
                       <div className="action-buttons">
@@ -399,14 +477,6 @@ export const HttpMonitor = () => {
                           style={{ border: 'none', background: 'none', cursor: 'pointer', padding: 0 }}
                         >
                           <FontAwesomeIcon icon={faPencil} />
-                        </button>
-                        <button
-                          className="action-btn btn-assign"
-                          title="Assign to Datacenters"
-                          onClick={() => openAssignModal(httpMonitor)}
-                          style={{ border: 'none', background: 'none', cursor: 'pointer', padding: 0 }}
-                        >
-                          <FontAwesomeIcon icon={faLink} />
                         </button>
                         <button
                           className="action-btn btn-delete"

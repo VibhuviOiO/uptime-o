@@ -80,11 +80,16 @@ Dashboard Home Page Styles
 }
 
 .dashboard-grid-row1 {
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
 }
 
 .dashboard-grid-row2 {
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
+  max-width: 100%;
+}
+
+.dashboard-grid-row3 {
+  grid-template-columns: 1fr;
   max-width: 100%;
 }
 
@@ -103,28 +108,44 @@ Dashboard Home Page Styles
   }
 
   &--span2 {
-    grid-column: span 2;
+    grid-column: span 1;
+  }
+
+  &--span3 {
+    grid-column: span 1;
+  }
+
+  &--span4 {
+    grid-column: span 1;
   }
 }
 
 /* Responsive */
 @media (max-width: 1400px) {
   .dashboard-grid-row1 {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
   }
 
   .dashboard-grid-row2 {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .dashboard-grid-row3 {
+    grid-template-columns: 1fr;
   }
 }
 
 @media (max-width: 1200px) {
   .dashboard-grid-row1 {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
   }
 
   .dashboard-grid-row2 {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .dashboard-grid-row3 {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -134,13 +155,18 @@ Dashboard Home Page Styles
   }
 
   .dashboard-grid-row2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .dashboard-grid-row3 {
     grid-template-columns: 1fr;
   }
 }
 
 @media (max-width: 768px) {
   .dashboard-grid-row1,
-  .dashboard-grid-row2 {
+  .dashboard-grid-row2,
+  .dashboard-grid-row3 {
     grid-template-columns: 1fr;
   }
 }
