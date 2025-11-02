@@ -8,6 +8,8 @@ import { faLock, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 import { useAppSelector } from 'app/config/store';
 import DashboardCard, { ActionCard } from './components/DashboardCard';
 import RegionsWidget from './components/RegionsWidget';
+import { AgentsWidget } from './components/AgentsWidget';
+import { DatacentersWidget } from './components/DatacentersWidget';
 import { useDatacentersCount, useAgentsCount, useMonitorsCount, useSystemHealth } from './hooks/useDashboardMetrics';
 import { DashboardKPIs } from 'app/modules/dashboard/components/DashboardKPIs';
 import { useDashboardMetrics } from 'app/modules/dashboard/hooks/useDashboardMetrics';
@@ -148,9 +150,13 @@ export const Home = () => {
           </div>
         </div>
 
-        {/* Sidebar - Regions Widget (25%) */}
+        {/* Sidebar - Entity Widgets (25%) */}
         <div className="dashboard-sidebar">
-          <RegionsWidget />
+          <div className="sidebar-widgets-stack">
+            <RegionsWidget />
+            <AgentsWidget />
+            <DatacentersWidget />
+          </div>
         </div>
       </div>
 

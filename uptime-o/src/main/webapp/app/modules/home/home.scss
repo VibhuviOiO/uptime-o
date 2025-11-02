@@ -68,6 +68,16 @@ Dashboard Home Page Styles
   min-height: 600px;
 }
 
+.sidebar-widgets-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.sidebar-widgets-stack > * {
+  min-height: 250px;
+}
+
 .dashboard-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
