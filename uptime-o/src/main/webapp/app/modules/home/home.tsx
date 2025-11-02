@@ -19,14 +19,12 @@ export const Home = () => {
   const account = useAppSelector(state => state.authentication.account);
   const isAuthenticated = account && account.login;
 
-  // Fetch new dashboard metrics (real-time) - only when authenticated
-  const dashboardData = isAuthenticated ? useDashboardMetrics(30000) : null; // Refresh every 30 seconds
-
-  // Lazy load metrics for infrastructure cards - only when authenticated
-  const datacentersMetric = isAuthenticated ? useDatacentersCount() : null;
-  const agentsMetric = isAuthenticated ? useAgentsCount() : null;
-  const monitorsMetric = isAuthenticated ? useMonitorsCount() : null;
-  const healthMetric = isAuthenticated ? useSystemHealth() : null;
+  // Call all hooks unconditionally - this is required by React's rules of hooks
+  const dashboardData = useDashboardMetrics(30000); // Refresh every 30 seconds
+  const datacentersMetric = useDatacentersCount();
+  const agentsMetric = useAgentsCount();
+  const monitorsMetric = useMonitorsCount();
+  const healthMetric = useSystemHealth();
 
   // Show login prompt if not authenticated
   if (!isAuthenticated) {
@@ -100,11 +98,17 @@ export const Home = () => {
             </div>
           </div>
 
-          {/* Second Row: Monitors */}
+          {/* Second Row: HTTP Monitors (2 cols), Schedules (1 col - for later) */}
           <div className="dashboard-grid dashboard-grid-row2">
-            <div className="entity-column">
-              <h3 className="column-header">Monitors</h3>
+            <div className="entity-column entity-column--span2">
+              <h3 className="column-header">HTTP Monitors</h3>
               <MonitorsWidget />
+            </div>
+            <div className="entity-column">
+              <h3 className="column-header">Schedules</h3>
+              <div style={{ padding: '2rem', textAlign: 'center', color: '#999' }}>
+                <p>Coming soon...</p>
+              </div>
             </div>
           </div>
         </div>

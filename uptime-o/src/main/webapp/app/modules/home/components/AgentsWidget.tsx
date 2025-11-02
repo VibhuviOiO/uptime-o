@@ -1,13 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faServer, faEye, faPencil, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faServer, faPencil, faTrash, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { getEntities } from 'app/entities/agent/agent.reducer';
+import { AgentEditModal } from './AgentEditModal';
+import { AgentDeleteModal } from './AgentDeleteModal';
 
 export const AgentsWidget = () => {
   const dispatch = useAppDispatch();
   const [pageNum, setPageNum] = useState(0);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [selectedAgentId, setSelectedAgentId] = useState<number | null>(null);
 
   const agentList = useAppSelector(state => state.agent.entities);
   const loading = useAppSelector(state => state.agent.loading);
@@ -23,14 +28,75 @@ export const AgentsWidget = () => {
     );
   }, [dispatch, pageNum]);
 
+  const handleEditClick = (agentId: number) => {
+    setSelectedAgentId(agentId);
+    setEditModalOpen(true);
+  };
+
+  const handleCreateClick = () => {
+    setSelectedAgentId(null);
+    setEditModalOpen(true);
+  };
+
+  const handleDeleteClick = (agentId: number) => {
+    setSelectedAgentId(agentId);
+    setDeleteModalOpen(true);
+  };
+
+  const handleCloseEditModal = () => {
+    setEditModalOpen(false);
+    setSelectedAgentId(null);
+  };
+
+  const handleCloseDeleteModal = () => {
+    setDeleteModalOpen(false);
+    setSelectedAgentId(null);
+  };
+
+  const handleEditSuccess = () => {
+    dispatch(
+      getEntities({
+        page: pageNum,
+        size: 5,
+        sort: 'id,desc',
+      }),
+    );
+  };
+
+  const handleDeleteSuccess = () => {
+    dispatch(
+      getEntities({
+        page: pageNum,
+        size: 5,
+        sort: 'id,desc',
+      }),
+    );
+  };
+
   return (
     <div className="agents-widget">
       <div className="widget-header">
-        <h3>
-          <FontAwesomeIcon icon={faServer} className="me-2" />
-          Agents
-          {totalItems > 0 && <span className="widget-count">{totalItems}</span>}
-        </h3>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <h3 style={{ margin: 0 }}>
+            <FontAwesomeIcon icon={faServer} className="me-2" />
+            Agents
+            {totalItems > 0 && <span className="widget-count">{totalItems}</span>}
+          </h3>
+          <button
+            onClick={handleCreateClick}
+            style={{
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              padding: 0,
+              color: '#0d6efd',
+              fontSize: '1rem',
+            }}
+            title="Create Agent"
+          >
+            <FontAwesomeIcon icon={faPlus} />
+          </button>
+        </div>
         <Link to="/agent" className="widget-link">
           View All
         </Link>
@@ -65,15 +131,22 @@ export const AgentsWidget = () => {
                   </td>
                   <td className="actions-cell">
                     <div className="action-buttons">
-                      <Link to={`/agent/${agent.id}`} className="action-btn btn-view" title="View">
-                        <FontAwesomeIcon icon={faEye} />
-                      </Link>
-                      <Link to={`/agent/${agent.id}/edit`} className="action-btn btn-edit" title="Edit">
+                      <button
+                        className="action-btn btn-edit"
+                        title="Edit"
+                        onClick={() => handleEditClick(agent.id)}
+                        style={{ border: 'none', background: 'none', cursor: 'pointer', padding: 0 }}
+                      >
                         <FontAwesomeIcon icon={faPencil} />
-                      </Link>
-                      <Link to={`/agent/${agent.id}/delete`} className="action-btn btn-delete" title="Delete">
+                      </button>
+                      <button
+                        className="action-btn btn-delete"
+                        title="Delete"
+                        onClick={() => handleDeleteClick(agent.id)}
+                        style={{ border: 'none', background: 'none', cursor: 'pointer', padding: 0 }}
+                      >
                         <FontAwesomeIcon icon={faTrash} />
-                      </Link>
+                      </button>
                     </div>
                   </td>
                 </tr>
@@ -92,11 +165,14 @@ export const AgentsWidget = () => {
       ) : (
         <div className="widget-empty">
           <p>No agents configured</p>
-          <Link to="/agent/new" className="btn btn-sm btn-primary">
+          <button className="btn btn-sm btn-primary" onClick={handleCreateClick} style={{ border: 'none', cursor: 'pointer' }}>
             Create Agent
-          </Link>
+          </button>
         </div>
       )}
+
+      <AgentEditModal isOpen={editModalOpen} toggle={handleCloseEditModal} agentId={selectedAgentId} onSave={handleEditSuccess} />
+      <AgentDeleteModal isOpen={deleteModalOpen} toggle={handleCloseDeleteModal} agentId={selectedAgentId} onDelete={handleDeleteSuccess} />
     </div>
   );
 };
