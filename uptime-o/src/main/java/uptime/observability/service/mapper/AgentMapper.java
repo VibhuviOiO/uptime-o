@@ -17,5 +17,6 @@ public interface AgentMapper extends EntityMapper<AgentDTO, Agent> {
     @Named("datacenterId")
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
+    @Mapping(target = "name", source = "name")
     DatacenterDTO toDtoDatacenterId(Datacenter datacenter);
 }

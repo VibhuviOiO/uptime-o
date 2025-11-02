@@ -3,12 +3,13 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button, Table } from 'reactstrap';
 import { JhiItemCount, JhiPagination, getPaginationState } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSort, faSortDown, faSortUp } from '@fortawesome/free-solid-svg-icons';
+import { faSort, faSortDown, faSortUp, faServer, faEye, faPencil, faTrash, faPlus, faSync } from '@fortawesome/free-solid-svg-icons';
 import { ASC, DESC, ITEMS_PER_PAGE, SORT } from 'app/shared/util/pagination.constants';
 import { overridePaginationStateWithQueryParams } from 'app/shared/util/entity-utils';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 
 import { getEntities } from './agent.reducer';
+import '../entity.scss';
 
 export const Agent = () => {
   const dispatch = useAppDispatch();
@@ -89,97 +90,137 @@ export const Agent = () => {
   };
 
   return (
-    <div>
-      <h2 id="agent-heading" data-cy="AgentHeading">
-        Agents
-        <div className="d-flex justify-content-end">
-          <Button className="me-2" color="info" onClick={handleSyncList} disabled={loading}>
-            <FontAwesomeIcon icon="sync" spin={loading} /> Refresh list
+    <div className="agents-page">
+      <div className="agents-header">
+        <div className="header-content">
+          <h1 id="agent-heading" data-cy="AgentHeading">
+            <FontAwesomeIcon icon={faServer} className="me-2" />
+            Agents
+          </h1>
+        </div>
+        <div className="header-actions">
+          <Button className="me-2" color="info" onClick={handleSyncList} disabled={loading} outline>
+            <FontAwesomeIcon icon={faSync} spin={loading} /> Refresh
           </Button>
-          <Link to="/agent/new" className="btn btn-primary jh-create-entity" id="jh-create-entity" data-cy="entityCreateButton">
-            <FontAwesomeIcon icon="plus" />
-            &nbsp; Create a new Agent
+          <Link to="/agent/new" className="btn btn-primary" id="jh-create-entity" data-cy="entityCreateButton">
+            <FontAwesomeIcon icon={faPlus} className="me-2" />
+            New Agent
           </Link>
         </div>
-      </h2>
-      <div className="table-responsive">
-        {agentList && agentList.length > 0 ? (
-          <Table responsive>
-            <thead>
-              <tr>
-                <th className="hand" onClick={sort('id')}>
-                  ID <FontAwesomeIcon icon={getSortIconByFieldName('id')} />
-                </th>
-                <th className="hand" onClick={sort('name')}>
-                  Name <FontAwesomeIcon icon={getSortIconByFieldName('name')} />
-                </th>
-                <th>
-                  Datacenter <FontAwesomeIcon icon="sort" />
-                </th>
-                <th />
-              </tr>
-            </thead>
-            <tbody>
-              {agentList.map((agent, i) => (
-                <tr key={`entity-${i}`} data-cy="entityTable">
-                  <td>
-                    <Button tag={Link} to={`/agent/${agent.id}`} color="link" size="sm">
-                      {agent.id}
-                    </Button>
-                  </td>
-                  <td>{agent.name}</td>
-                  <td>{agent.datacenter ? <Link to={`/datacenter/${agent.datacenter.id}`}>{agent.datacenter.id}</Link> : ''}</td>
-                  <td className="text-end">
-                    <div className="btn-group flex-btn-group-container">
-                      <Button tag={Link} to={`/agent/${agent.id}`} color="info" size="sm" data-cy="entityDetailsButton">
-                        <FontAwesomeIcon icon="eye" /> <span className="d-none d-md-inline">View</span>
-                      </Button>
-                      <Button
-                        tag={Link}
-                        to={`/agent/${agent.id}/edit?page=${paginationState.activePage}&sort=${paginationState.sort},${paginationState.order}`}
-                        color="primary"
-                        size="sm"
-                        data-cy="entityEditButton"
-                      >
-                        <FontAwesomeIcon icon="pencil-alt" /> <span className="d-none d-md-inline">Edit</span>
-                      </Button>
-                      <Button
-                        onClick={() =>
-                          (window.location.href = `/agent/${agent.id}/delete?page=${paginationState.activePage}&sort=${paginationState.sort},${paginationState.order}`)
-                        }
-                        color="danger"
-                        size="sm"
-                        data-cy="entityDeleteButton"
-                      >
-                        <FontAwesomeIcon icon="trash" /> <span className="d-none d-md-inline">Delete</span>
-                      </Button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
-        ) : (
-          !loading && <div className="alert alert-warning">No Agents found</div>
-        )}
       </div>
-      {totalItems ? (
-        <div className={agentList && agentList.length > 0 ? '' : 'd-none'}>
-          <div className="justify-content-center d-flex">
-            <JhiItemCount page={paginationState.activePage} total={totalItems} itemsPerPage={paginationState.itemsPerPage} />
+
+      {agentList && agentList.length > 0 ? (
+        <>
+          <div className="smart-table-wrapper">
+            <table className="smart-table" data-cy="entityTable">
+              <thead>
+                <tr>
+                  <th className="sortable" onClick={sort('id')}>
+                    <span className="th-content">
+                      ID
+                      <FontAwesomeIcon icon={getSortIconByFieldName('id')} className="ms-1" />
+                    </span>
+                  </th>
+                  <th className="sortable" onClick={sort('name')}>
+                    <span className="th-content">
+                      Name
+                      <FontAwesomeIcon icon={getSortIconByFieldName('name')} className="ms-1" />
+                    </span>
+                  </th>
+                  <th>
+                    <span className="th-content">Datacenter</span>
+                  </th>
+                  <th className="actions-column">
+                    <span className="th-content">Actions</span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {agentList.map((agent, i) => (
+                  <tr key={`entity-${i}`} className="table-row">
+                    <td className="id-cell">
+                      <span className="badge bg-secondary">{agent.id}</span>
+                    </td>
+                    <td className="name-cell">
+                      <strong>{agent.name}</strong>
+                    </td>
+                    <td className="datacenter-cell">
+                      {agent.datacenter ? (
+                        <Link to={`/datacenter/${agent.datacenter.id}`} className="datacenter-link">
+                          {agent.datacenter.name}
+                        </Link>
+                      ) : (
+                        <span className="text-muted">N/A</span>
+                      )}
+                    </td>
+                    <td className="actions-cell">
+                      <div className="action-buttons">
+                        <Button
+                          tag={Link}
+                          to={`/agent/${agent.id}`}
+                          color="info"
+                          size="sm"
+                          outline
+                          data-cy="entityDetailsButton"
+                          className="action-btn btn-view"
+                          title="View"
+                        >
+                          <FontAwesomeIcon icon={faEye} />
+                        </Button>
+                        <Button
+                          tag={Link}
+                          to={`/agent/${agent.id}/edit?page=${paginationState.activePage}&sort=${paginationState.sort},${paginationState.order}`}
+                          color="primary"
+                          size="sm"
+                          outline
+                          data-cy="entityEditButton"
+                          className="action-btn btn-edit"
+                          title="Edit"
+                        >
+                          <FontAwesomeIcon icon={faPencil} />
+                        </Button>
+                        <Button
+                          onClick={() =>
+                            (window.location.href = `/agent/${agent.id}/delete?page=${paginationState.activePage}&sort=${paginationState.sort},${paginationState.order}`)
+                          }
+                          color="danger"
+                          size="sm"
+                          outline
+                          data-cy="entityDeleteButton"
+                          className="action-btn btn-delete"
+                          title="Delete"
+                        >
+                          <FontAwesomeIcon icon={faTrash} />
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-          <div className="justify-content-center d-flex">
-            <JhiPagination
-              activePage={paginationState.activePage}
-              onSelect={handlePagination}
-              maxButtons={5}
-              itemsPerPage={paginationState.itemsPerPage}
-              totalItems={totalItems}
-            />
-          </div>
-        </div>
+
+          {totalItems ? (
+            <div className="table-pagination">
+              <div className="pagination-info">
+                <JhiItemCount page={paginationState.activePage} total={totalItems} itemsPerPage={paginationState.itemsPerPage} />
+              </div>
+              <div className="pagination-controls">
+                <JhiPagination
+                  activePage={paginationState.activePage}
+                  onSelect={handlePagination}
+                  maxButtons={5}
+                  itemsPerPage={paginationState.itemsPerPage}
+                  totalItems={totalItems}
+                />
+              </div>
+            </div>
+          ) : (
+            ''
+          )}
+        </>
       ) : (
-        ''
+        !loading && <div className="alert alert-warning">No Agents found</div>
       )}
     </div>
   );

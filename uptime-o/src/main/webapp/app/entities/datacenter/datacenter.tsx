@@ -3,12 +3,13 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button, Table } from 'reactstrap';
 import { JhiItemCount, JhiPagination, getPaginationState } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSort, faSortDown, faSortUp } from '@fortawesome/free-solid-svg-icons';
+import { faSort, faSortDown, faSortUp, faBuilding, faEye, faPencil, faTrash, faPlus, faSync } from '@fortawesome/free-solid-svg-icons';
 import { ASC, DESC, ITEMS_PER_PAGE, SORT } from 'app/shared/util/pagination.constants';
 import { overridePaginationStateWithQueryParams } from 'app/shared/util/entity-utils';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 
 import { getEntities } from './datacenter.reducer';
+import '../entity.scss';
 
 export const Datacenter = () => {
   const dispatch = useAppDispatch();
@@ -89,101 +90,146 @@ export const Datacenter = () => {
   };
 
   return (
-    <div>
-      <h2 id="datacenter-heading" data-cy="DatacenterHeading">
-        Datacenters
-        <div className="d-flex justify-content-end">
-          <Button className="me-2" color="info" onClick={handleSyncList} disabled={loading}>
-            <FontAwesomeIcon icon="sync" spin={loading} /> Refresh list
+    <div className="datacenters-page">
+      <div className="datacenters-header">
+        <div className="header-content">
+          <h1 id="datacenter-heading" data-cy="DatacenterHeading">
+            <FontAwesomeIcon icon={faBuilding} className="me-2" />
+            Datacenters
+          </h1>
+        </div>
+        <div className="header-actions">
+          <Button className="me-2" color="info" onClick={handleSyncList} disabled={loading} outline>
+            <FontAwesomeIcon icon={faSync} spin={loading} /> Refresh
           </Button>
-          <Link to="/datacenter/new" className="btn btn-primary jh-create-entity" id="jh-create-entity" data-cy="entityCreateButton">
-            <FontAwesomeIcon icon="plus" />
-            &nbsp; Create a new Datacenter
+          <Link to="/datacenter/new" className="btn btn-primary" id="jh-create-entity" data-cy="entityCreateButton">
+            <FontAwesomeIcon icon={faPlus} className="me-2" />
+            New Datacenter
           </Link>
         </div>
-      </h2>
-      <div className="table-responsive">
-        {datacenterList && datacenterList.length > 0 ? (
-          <Table responsive>
-            <thead>
-              <tr>
-                <th className="hand" onClick={sort('id')}>
-                  ID <FontAwesomeIcon icon={getSortIconByFieldName('id')} />
-                </th>
-                <th className="hand" onClick={sort('code')}>
-                  Code <FontAwesomeIcon icon={getSortIconByFieldName('code')} />
-                </th>
-                <th className="hand" onClick={sort('name')}>
-                  Name <FontAwesomeIcon icon={getSortIconByFieldName('name')} />
-                </th>
-                <th>
-                  Region <FontAwesomeIcon icon="sort" />
-                </th>
-                <th />
-              </tr>
-            </thead>
-            <tbody>
-              {datacenterList.map((datacenter, i) => (
-                <tr key={`entity-${i}`} data-cy="entityTable">
-                  <td>
-                    <Button tag={Link} to={`/datacenter/${datacenter.id}`} color="link" size="sm">
-                      {datacenter.id}
-                    </Button>
-                  </td>
-                  <td>{datacenter.code}</td>
-                  <td>{datacenter.name}</td>
-                  <td>{datacenter.region ? <Link to={`/region/${datacenter.region.id}`}>{datacenter.region.id}</Link> : ''}</td>
-                  <td className="text-end">
-                    <div className="btn-group flex-btn-group-container">
-                      <Button tag={Link} to={`/datacenter/${datacenter.id}`} color="info" size="sm" data-cy="entityDetailsButton">
-                        <FontAwesomeIcon icon="eye" /> <span className="d-none d-md-inline">View</span>
-                      </Button>
-                      <Button
-                        tag={Link}
-                        to={`/datacenter/${datacenter.id}/edit?page=${paginationState.activePage}&sort=${paginationState.sort},${paginationState.order}`}
-                        color="primary"
-                        size="sm"
-                        data-cy="entityEditButton"
-                      >
-                        <FontAwesomeIcon icon="pencil-alt" /> <span className="d-none d-md-inline">Edit</span>
-                      </Button>
-                      <Button
-                        onClick={() =>
-                          (window.location.href = `/datacenter/${datacenter.id}/delete?page=${paginationState.activePage}&sort=${paginationState.sort},${paginationState.order}`)
-                        }
-                        color="danger"
-                        size="sm"
-                        data-cy="entityDeleteButton"
-                      >
-                        <FontAwesomeIcon icon="trash" /> <span className="d-none d-md-inline">Delete</span>
-                      </Button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
-        ) : (
-          !loading && <div className="alert alert-warning">No Datacenters found</div>
-        )}
       </div>
-      {totalItems ? (
-        <div className={datacenterList && datacenterList.length > 0 ? '' : 'd-none'}>
-          <div className="justify-content-center d-flex">
-            <JhiItemCount page={paginationState.activePage} total={totalItems} itemsPerPage={paginationState.itemsPerPage} />
+
+      {datacenterList && datacenterList.length > 0 ? (
+        <>
+          <div className="smart-table-wrapper">
+            <table className="smart-table" data-cy="entityTable">
+              <thead>
+                <tr>
+                  <th className="sortable" onClick={sort('id')}>
+                    <span className="th-content">
+                      ID
+                      <FontAwesomeIcon icon={getSortIconByFieldName('id')} className="ms-1" />
+                    </span>
+                  </th>
+                  <th className="sortable" onClick={sort('code')}>
+                    <span className="th-content">
+                      Code
+                      <FontAwesomeIcon icon={getSortIconByFieldName('code')} className="ms-1" />
+                    </span>
+                  </th>
+                  <th className="sortable" onClick={sort('name')}>
+                    <span className="th-content">
+                      Name
+                      <FontAwesomeIcon icon={getSortIconByFieldName('name')} className="ms-1" />
+                    </span>
+                  </th>
+                  <th>
+                    <span className="th-content">Region</span>
+                  </th>
+                  <th className="actions-column">
+                    <span className="th-content">Actions</span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {datacenterList.map((datacenter, i) => (
+                  <tr key={`entity-${i}`} className="table-row">
+                    <td className="id-cell">
+                      <span className="badge bg-secondary">{datacenter.id}</span>
+                    </td>
+                    <td className="code-cell">
+                      <code className="code-badge">{datacenter.code}</code>
+                    </td>
+                    <td className="name-cell">
+                      <strong>{datacenter.name}</strong>
+                    </td>
+                    <td className="region-cell">
+                      {datacenter.region ? (
+                        <Link to={`/region/${datacenter.region.id}`} className="region-link">
+                          {datacenter.region.name}
+                        </Link>
+                      ) : (
+                        <span className="text-muted">N/A</span>
+                      )}
+                    </td>
+                    <td className="actions-cell">
+                      <div className="action-buttons">
+                        <Button
+                          tag={Link}
+                          to={`/datacenter/${datacenter.id}`}
+                          color="info"
+                          size="sm"
+                          outline
+                          data-cy="entityDetailsButton"
+                          className="action-btn btn-view"
+                          title="View"
+                        >
+                          <FontAwesomeIcon icon={faEye} />
+                        </Button>
+                        <Button
+                          tag={Link}
+                          to={`/datacenter/${datacenter.id}/edit?page=${paginationState.activePage}&sort=${paginationState.sort},${paginationState.order}`}
+                          color="primary"
+                          size="sm"
+                          outline
+                          data-cy="entityEditButton"
+                          className="action-btn btn-edit"
+                          title="Edit"
+                        >
+                          <FontAwesomeIcon icon={faPencil} />
+                        </Button>
+                        <Button
+                          onClick={() =>
+                            (window.location.href = `/datacenter/${datacenter.id}/delete?page=${paginationState.activePage}&sort=${paginationState.sort},${paginationState.order}`)
+                          }
+                          color="danger"
+                          size="sm"
+                          outline
+                          data-cy="entityDeleteButton"
+                          className="action-btn btn-delete"
+                          title="Delete"
+                        >
+                          <FontAwesomeIcon icon={faTrash} />
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-          <div className="justify-content-center d-flex">
-            <JhiPagination
-              activePage={paginationState.activePage}
-              onSelect={handlePagination}
-              maxButtons={5}
-              itemsPerPage={paginationState.itemsPerPage}
-              totalItems={totalItems}
-            />
-          </div>
-        </div>
+
+          {totalItems ? (
+            <div className="table-pagination">
+              <div className="pagination-info">
+                <JhiItemCount page={paginationState.activePage} total={totalItems} itemsPerPage={paginationState.itemsPerPage} />
+              </div>
+              <div className="pagination-controls">
+                <JhiPagination
+                  activePage={paginationState.activePage}
+                  onSelect={handlePagination}
+                  maxButtons={5}
+                  itemsPerPage={paginationState.itemsPerPage}
+                  totalItems={totalItems}
+                />
+              </div>
+            </div>
+          ) : (
+            ''
+          )}
+        </>
       ) : (
-        ''
+        !loading && <div className="alert alert-warning">No Datacenters found</div>
       )}
     </div>
   );

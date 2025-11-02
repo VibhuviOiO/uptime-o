@@ -17,5 +17,6 @@ public interface DatacenterMapper extends EntityMapper<DatacenterDTO, Datacenter
     @Named("regionId")
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
+    @Mapping(target = "name", source = "name")
     RegionDTO toDtoRegionId(Region region);
 }
