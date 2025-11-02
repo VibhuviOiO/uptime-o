@@ -53,11 +53,44 @@ Dashboard Home Page Styles
 }
 
 /* Grid Layout */
+.dashboard-main-layout {
+  display: grid;
+  grid-template-columns: 1fr 350px;
+  gap: 2rem;
+  align-items: start;
+}
+
+.dashboard-main-content {
+  min-width: 0;
+}
+
+.dashboard-sidebar {
+  min-height: 600px;
+}
+
 .dashboard-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 1.5rem;
-  max-width: 1400px;
+  max-width: 100%;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .dashboard-main-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-sidebar {
+    min-height: auto;
+    max-height: 500px;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* Cards */

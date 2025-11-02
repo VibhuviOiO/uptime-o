@@ -7,7 +7,8 @@ import { faLock, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 
 import { useAppSelector } from 'app/config/store';
 import DashboardCard, { ActionCard } from './components/DashboardCard';
-import { useRegionsCount, useDatacentersCount, useAgentsCount, useMonitorsCount, useSystemHealth } from './hooks/useDashboardMetrics';
+import RegionsWidget from './components/RegionsWidget';
+import { useDatacentersCount, useAgentsCount, useMonitorsCount, useSystemHealth } from './hooks/useDashboardMetrics';
 import { DashboardKPIs } from 'app/modules/dashboard/components/DashboardKPIs';
 import { useDashboardMetrics } from 'app/modules/dashboard/hooks/useDashboardMetrics';
 
@@ -19,7 +20,6 @@ export const Home = () => {
   const dashboardData = isAuthenticated ? useDashboardMetrics(30000) : null; // Refresh every 30 seconds
 
   // Lazy load metrics for infrastructure cards - only when authenticated
-  const regionsMetric = isAuthenticated ? useRegionsCount() : null;
   const datacentersMetric = isAuthenticated ? useDatacentersCount() : null;
   const agentsMetric = isAuthenticated ? useAgentsCount() : null;
   const monitorsMetric = isAuthenticated ? useMonitorsCount() : null;
@@ -78,83 +78,80 @@ export const Home = () => {
         )}
       </div>
 
-      {/* Analytics Grid */}
-      <div className="dashboard-grid">
-        {/* Regions Card */}
-        <DashboardCard
-          title="Regions"
-          icon="🌍"
-          metric={{
-            ...regionsMetric,
-            label: 'Configured globally',
-          }}
-          linkTo="/infrastructure/regions"
-          linkText="View Regions"
-          dataMetric="/api/regions/count"
-        />
+      {/* Analytics Grid with Sidebar */}
+      <div className="dashboard-main-layout">
+        <div className="dashboard-main-content">
+          {/* Analytics Grid */}
+          <div className="dashboard-grid">
+            {/* Datacenters Card */}
+            <DashboardCard
+              title="Datacenters"
+              icon="🏢"
+              metric={{
+                ...datacentersMetric,
+                label: 'Deployed instances',
+              }}
+              linkTo="/infrastructure/datacenters"
+              linkText="View Datacenters"
+              dataMetric="/api/datacenters/count"
+            />
 
-        {/* Datacenters Card */}
-        <DashboardCard
-          title="Datacenters"
-          icon="🏢"
-          metric={{
-            ...datacentersMetric,
-            label: 'Deployed instances',
-          }}
-          linkTo="/infrastructure/datacenters"
-          linkText="View Datacenters"
-          dataMetric="/api/datacenters/count"
-        />
+            {/* Agents Card */}
+            <DashboardCard
+              title="Agents"
+              icon="🤖"
+              metric={{
+                ...agentsMetric,
+                label: 'Actively running',
+              }}
+              linkTo="/infrastructure/agents"
+              linkText="View Agents"
+              dataMetric="/api/agents/count"
+            />
 
-        {/* Agents Card */}
-        <DashboardCard
-          title="Agents"
-          icon="🤖"
-          metric={{
-            ...agentsMetric,
-            label: 'Actively running',
-          }}
-          linkTo="/infrastructure/agents"
-          linkText="View Agents"
-          dataMetric="/api/agents/count"
-        />
+            {/* Monitors Card */}
+            <DashboardCard
+              title="Monitors"
+              icon="📊"
+              metric={{
+                ...monitorsMetric,
+                label: 'API tests configured',
+              }}
+              linkTo="/monitoring/monitors"
+              linkText="View Monitors"
+              dataMetric="/api/http-monitors/count"
+            />
 
-        {/* Monitors Card */}
-        <DashboardCard
-          title="Monitors"
-          icon="📊"
-          metric={{
-            ...monitorsMetric,
-            label: 'API tests configured',
-          }}
-          linkTo="/monitoring/monitors"
-          linkText="View Monitors"
-          dataMetric="/api/http-monitors/count"
-        />
+            {/* Health Status Card */}
+            <DashboardCard
+              title="System Health"
+              icon="❤️"
+              metric={{
+                ...healthMetric,
+                label: 'All systems operational',
+              }}
+              linkTo="/admin/jhi-health"
+              linkText="View Health"
+              dataMetric="/management/health"
+              statusClass={typeof healthMetric?.value === 'string' && healthMetric.value.includes('Healthy') ? 'status-ok' : 'status-error'}
+            />
 
-        {/* Health Status Card */}
-        <DashboardCard
-          title="System Health"
-          icon="❤️"
-          metric={{
-            ...healthMetric,
-            label: 'All systems operational',
-          }}
-          linkTo="/admin/jhi-health"
-          linkText="View Health"
-          dataMetric="/management/health"
-          statusClass={typeof healthMetric?.value === 'string' && healthMetric.value.includes('Healthy') ? 'status-ok' : 'status-error'}
-        />
+            {/* Quick Actions Card */}
+            <ActionCard
+              title="Quick Actions"
+              icon="⚡"
+              actions={[
+                { label: '+ New Region', to: '/infrastructure/regions' },
+                { label: '+ New Monitor', to: '/monitoring/monitors' },
+              ]}
+            />
+          </div>
+        </div>
 
-        {/* Quick Actions Card */}
-        <ActionCard
-          title="Quick Actions"
-          icon="⚡"
-          actions={[
-            { label: '+ New Region', to: '/infrastructure/regions' },
-            { label: '+ New Monitor', to: '/monitoring/monitors' },
-          ]}
-        />
+        {/* Sidebar - Regions Widget (25%) */}
+        <div className="dashboard-sidebar">
+          <RegionsWidget />
+        </div>
       </div>
 
       {/* User Info Footer */}
