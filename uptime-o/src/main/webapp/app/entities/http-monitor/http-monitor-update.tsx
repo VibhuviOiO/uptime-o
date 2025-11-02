@@ -257,7 +257,7 @@ export const HttpMonitorUpdate = () => {
                 {schedules
                   ? schedules.map(otherEntity => (
                       <option value={otherEntity.id} key={otherEntity.id}>
-                        {otherEntity.id}
+                        {otherEntity.name || otherEntity.id}
                       </option>
                     ))
                   : null}

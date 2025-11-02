@@ -17,5 +17,6 @@ public interface HttpMonitorMapper extends EntityMapper<HttpMonitorDTO, HttpMoni
     @Named("scheduleId")
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
+    @Mapping(target = "name", source = "name")
     ScheduleDTO toDtoScheduleId(Schedule schedule);
 }

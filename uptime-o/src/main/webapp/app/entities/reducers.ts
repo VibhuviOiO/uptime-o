@@ -6,7 +6,6 @@ import agent from 'app/entities/agent/agent.reducer';
 import apiHeartbeat from 'app/entities/http-heartbeat/http-heartbeat.reducer';
 import apiHeartbeatAggregated from 'app/entities/http-heartbeat/http-heartbeat-aggregated.reducer';
 import auditLog from 'app/entities/audit-log/audit-log.reducer';
-import datacenterMonitor from 'app/entities/datacenter-monitor/datacenter-monitor.reducer';
 /* jhipster-needle-add-reducer-import - JHipster will add reducer here */
 
 const entitiesReducers = {
@@ -18,7 +17,6 @@ const entitiesReducers = {
   apiHeartbeat,
   apiHeartbeatAggregated,
   auditLog,
-  datacenterMonitor,
   /* jhipster-needle-add-reducer-combine - JHipster will add reducer here */
 };
 

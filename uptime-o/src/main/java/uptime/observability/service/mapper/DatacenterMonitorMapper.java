@@ -13,17 +13,20 @@ import uptime.observability.service.dto.DatacenterMonitorDTO;
  */
 @Mapper(componentModel = "spring")
 public interface DatacenterMonitorMapper extends EntityMapper<DatacenterMonitorDTO, DatacenterMonitor> {
-    @Mapping(target = "datacenter", source = "datacenter", qualifiedByName = "datacenterId")
+    @Mapping(target = "datacenter", source = "datacenter", qualifiedByName = "datacenterWithDetails")
     @Mapping(target = "monitor", source = "monitor", qualifiedByName = "apiMonitorId")
     DatacenterMonitorDTO toDto(DatacenterMonitor s);
 
-    @Named("datacenterId")
+    @Named("datacenterWithDetails")
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
-    DatacenterDTO toDtoDatacenterId(Datacenter datacenter);
+    @Mapping(target = "name", source = "name")
+    @Mapping(target = "code", source = "code")
+    DatacenterDTO toDtoDatacenterWithDetails(Datacenter datacenter);
 
     @Named("apiMonitorId")
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
     HttpMonitorDTO toDtoHttpMonitorId(HttpMonitor apiMonitor);
 }
+

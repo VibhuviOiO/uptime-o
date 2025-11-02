@@ -21,7 +21,7 @@ public class DatacenterMonitor implements Serializable {
     @Column(name = "id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "datacenter_id")
     @JsonIgnoreProperties(value = { "agents", "datacenterMonitors", "region" }, allowSetters = true)
     private Datacenter datacenter;

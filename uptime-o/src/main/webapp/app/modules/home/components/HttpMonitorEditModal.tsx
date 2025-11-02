@@ -238,6 +238,21 @@ export const HttpMonitorEditModal: React.FC<HttpMonitorEditModalProps> = ({ isOp
               rows={3}
             />
           </FormGroup>
+          <FormGroup>
+            <Label for="scheduleId">Schedule (Optional)</Label>
+            <Input type="select" name="scheduleId" id="scheduleId" value={formData.scheduleId} onChange={handleChange} disabled={updating}>
+              <option value="">-- Select a Schedule --</option>
+              {schedules && schedules.length > 0 ? (
+                schedules.map(schedule => (
+                  <option key={schedule.id} value={schedule.id}>
+                    {schedule.name || `Schedule ${schedule.id}`}
+                  </option>
+                ))
+              ) : (
+                <option disabled>No schedules available</option>
+              )}
+            </Input>
+          </FormGroup>
         </Form>
       </ModalBody>
       <ModalFooter>

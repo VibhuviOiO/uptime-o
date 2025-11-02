@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChartLine, faEye, faPencil, faTrash, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faChartLine, faEye, faPencil, faTrash, faPlus, faCode } from '@fortawesome/free-solid-svg-icons';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { getEntities } from 'app/entities/http-monitor/http-monitor.reducer';
 import { IHttpMonitor } from 'app/shared/model/http-monitor.model';
 import { HttpMonitorEditModal } from './HttpMonitorEditModal';
 import { HttpMonitorDeleteModal } from './HttpMonitorDeleteModal';
 import { HttpMonitorViewModal } from './HttpMonitorViewModal';
+import { BodyViewModal } from './BodyViewModal';
+import { HeadersViewModal } from './HeadersViewModal';
 
 export const MonitorsWidget = () => {
   const dispatch = useAppDispatch();
@@ -15,6 +17,8 @@ export const MonitorsWidget = () => {
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [viewModalOpen, setViewModalOpen] = useState(false);
+  const [bodyViewOpen, setBodyViewOpen] = useState(false);
+  const [headersViewOpen, setHeadersViewOpen] = useState(false);
   const [selectedMonitor, setSelectedMonitor] = useState<IHttpMonitor | null>(null);
 
   const monitorList = useAppSelector(state => state.httpMonitor.entities);
@@ -63,6 +67,26 @@ export const MonitorsWidget = () => {
 
   const handleCloseViewModal = () => {
     setViewModalOpen(false);
+    setSelectedMonitor(null);
+  };
+
+  const handleViewBody = (monitor: IHttpMonitor) => {
+    setSelectedMonitor(monitor);
+    setBodyViewOpen(true);
+  };
+
+  const handleCloseBodyModal = () => {
+    setBodyViewOpen(false);
+    setSelectedMonitor(null);
+  };
+
+  const handleViewHeaders = (monitor: IHttpMonitor) => {
+    setSelectedMonitor(monitor);
+    setHeadersViewOpen(true);
+  };
+
+  const handleCloseHeadersModal = () => {
+    setHeadersViewOpen(false);
     setSelectedMonitor(null);
   };
 
@@ -139,6 +163,8 @@ export const MonitorsWidget = () => {
           onDelete={handleDeleteSuccess}
         />
         <HttpMonitorViewModal isOpen={viewModalOpen} toggle={handleCloseViewModal} monitor={selectedMonitor} />
+        <BodyViewModal isOpen={bodyViewOpen} toggle={handleCloseBodyModal} monitor={selectedMonitor} />
+        <HeadersViewModal isOpen={headersViewOpen} toggle={handleCloseHeadersModal} monitor={selectedMonitor} />
       </div>
     );
   }
@@ -180,6 +206,8 @@ export const MonitorsWidget = () => {
               <th>Method</th>
               <th>Type</th>
               <th>Schedule</th>
+              <th>Headers</th>
+              <th>Body</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -203,7 +231,47 @@ export const MonitorsWidget = () => {
                 </td>
                 <td className="type-cell">{monitor.type ? <span>{monitor.type}</span> : <span className="text-muted">-</span>}</td>
                 <td className="schedule-cell">
-                  {monitor.schedule ? <span>{monitor.schedule.name}</span> : <span className="text-muted">-</span>}
+                  {monitor.schedule && monitor.schedule.name ? <span>{monitor.schedule.name}</span> : <span className="text-muted">-</span>}
+                </td>
+                <td className="headers-cell">
+                  {monitor.headers ? (
+                    <button
+                      className="action-btn btn-headers"
+                      title="View Headers"
+                      onClick={() => handleViewHeaders(monitor)}
+                      style={{
+                        border: 'none',
+                        background: 'none',
+                        cursor: 'pointer',
+                        padding: 0,
+                        color: '#0056b3',
+                      }}
+                    >
+                      <FontAwesomeIcon icon={faCode} />
+                    </button>
+                  ) : (
+                    <span className="text-muted">-</span>
+                  )}
+                </td>
+                <td className="body-cell">
+                  {monitor.body ? (
+                    <button
+                      className="action-btn btn-body"
+                      title="View Body"
+                      onClick={() => handleViewBody(monitor)}
+                      style={{
+                        border: 'none',
+                        background: 'none',
+                        cursor: 'pointer',
+                        padding: 0,
+                        color: '#198754',
+                      }}
+                    >
+                      <FontAwesomeIcon icon={faCode} />
+                    </button>
+                  ) : (
+                    <span className="text-muted">-</span>
+                  )}
                 </td>
                 <td className="actions-cell">
                   <div className="action-buttons">
@@ -250,6 +318,8 @@ export const MonitorsWidget = () => {
         onDelete={handleDeleteSuccess}
       />
       <HttpMonitorViewModal isOpen={viewModalOpen} toggle={handleCloseViewModal} monitor={selectedMonitor} />
+      <BodyViewModal isOpen={bodyViewOpen} toggle={handleCloseBodyModal} monitor={selectedMonitor} />
+      <HeadersViewModal isOpen={headersViewOpen} toggle={handleCloseHeadersModal} monitor={selectedMonitor} />
     </div>
   );
 };

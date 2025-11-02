@@ -3,7 +3,6 @@ package uptime.observability.domain;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uptime.observability.domain.HttpHeartbeatTestSamples.*;
 import static uptime.observability.domain.HttpMonitorTestSamples.*;
-import static uptime.observability.domain.DatacenterMonitorTestSamples.*;
 import static uptime.observability.domain.ScheduleTestSamples.*;
 
 import java.util.HashSet;
@@ -47,28 +46,6 @@ class HttpMonitorTest {
         apiMonitor.setHttpHeartbeats(new HashSet<>());
         assertThat(apiMonitor.getHttpHeartbeats()).doesNotContain(apiHeartbeatBack);
         assertThat(apiHeartbeatBack.getMonitor()).isNull();
-    }
-
-    @Test
-    void datacenterMonitorTest() {
-        HttpMonitor apiMonitor = getHttpMonitorRandomSampleGenerator();
-        DatacenterMonitor datacenterMonitorBack = getDatacenterMonitorRandomSampleGenerator();
-
-        apiMonitor.addDatacenterMonitor(datacenterMonitorBack);
-        assertThat(apiMonitor.getDatacenterMonitors()).containsOnly(datacenterMonitorBack);
-        assertThat(datacenterMonitorBack.getMonitor()).isEqualTo(apiMonitor);
-
-        apiMonitor.removeDatacenterMonitor(datacenterMonitorBack);
-        assertThat(apiMonitor.getDatacenterMonitors()).doesNotContain(datacenterMonitorBack);
-        assertThat(datacenterMonitorBack.getMonitor()).isNull();
-
-        apiMonitor.datacenterMonitors(new HashSet<>(Set.of(datacenterMonitorBack)));
-        assertThat(apiMonitor.getDatacenterMonitors()).containsOnly(datacenterMonitorBack);
-        assertThat(datacenterMonitorBack.getMonitor()).isEqualTo(apiMonitor);
-
-        apiMonitor.setDatacenterMonitors(new HashSet<>());
-        assertThat(apiMonitor.getDatacenterMonitors()).doesNotContain(datacenterMonitorBack);
-        assertThat(datacenterMonitorBack.getMonitor()).isNull();
     }
 
     @Test

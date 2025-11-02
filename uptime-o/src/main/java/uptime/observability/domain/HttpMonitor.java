@@ -59,7 +59,7 @@ public class HttpMonitor implements Serializable {
     @JsonIgnoreProperties(value = { "datacenter", "monitor" }, allowSetters = true)
     private Set<DatacenterMonitor> datacenterMonitors = new HashSet<>();
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JsonIgnoreProperties(value = { "apiMonitors" }, allowSetters = true)
     private Schedule schedule;
 

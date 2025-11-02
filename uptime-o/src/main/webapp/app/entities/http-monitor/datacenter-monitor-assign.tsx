@@ -26,6 +26,8 @@ export const DatacenterMonitorAssign: React.FC<IDatacenterMonitorAssignProps> = 
 
   useEffect(() => {
     if (isOpen) {
+      // Clear previous selections when opening for a new monitor
+      setSelectedDatacenters(new Set());
       fetchDatacentersAndAssignments();
     }
   }, [isOpen, monitorId]);
@@ -40,9 +42,20 @@ export const DatacenterMonitorAssign: React.FC<IDatacenterMonitorAssignProps> = 
       const dcData = Array.isArray(datacentersResponse.data) ? datacentersResponse.data : datacentersResponse.data.content || [];
       setDatacenters(dcData);
 
-      // Fetch current assignments for this monitor
-      const assignmentsResponse = await axios.get<any>(`/api/datacenter-monitors?size=1000&filter=monitor.id=${monitorId}`);
-      const assignments = Array.isArray(assignmentsResponse.data) ? assignmentsResponse.data : assignmentsResponse.data.content || [];
+      // Fetch current assignments for this monitor - try different query approaches
+      let assignmentsResponse;
+      try {
+        // First try with filter parameter
+        assignmentsResponse = await axios.get<any>(`/api/datacenter-monitors?size=1000&filter=monitor.id=${monitorId}`);
+      } catch {
+        // Fallback: fetch all and filter client-side
+        assignmentsResponse = await axios.get<any>('/api/datacenter-monitors?size=1000');
+      }
+
+      const allAssignments = Array.isArray(assignmentsResponse.data) ? assignmentsResponse.data : assignmentsResponse.data.content || [];
+
+      // Filter assignments for the current monitor if not already filtered by backend
+      const assignments = allAssignments.filter((a: any) => a.httpMonitor?.id === monitorId || a.monitor?.id === monitorId);
 
       // Build set of assigned datacenter IDs
       const assigned = new Set<number>(assignments.map((a: any) => a.datacenter?.id).filter((id: any) => id));
@@ -70,14 +83,28 @@ export const DatacenterMonitorAssign: React.FC<IDatacenterMonitorAssignProps> = 
       setSaving(true);
       setError(null);
 
-      // Get current assignments
-      const currentResponse = await axios.get<any>(`/api/datacenter-monitors?size=1000&filter=monitor.id=${monitorId}`);
-      const current = Array.isArray(currentResponse.data) ? currentResponse.data : currentResponse.data.content || [];
+      // Get all assignments (since backend doesn't support filtering)
+      const currentResponse = await axios.get<any>('/api/datacenter-monitors?size=10000');
+      const allAssignments = Array.isArray(currentResponse.data) ? currentResponse.data : currentResponse.data.content || [];
+
+      // Filter to only assignments for this monitor
+      const current = allAssignments.filter((a: any) => a.monitor?.id === monitorId);
 
       // Prepare changes
       const currentIds = new Set(current.map((a: any) => a.datacenter?.id));
       const toDelete = current.filter((a: any) => !selectedDatacenters.has(a.datacenter?.id));
       const toCreate = Array.from(selectedDatacenters).filter(dcId => !currentIds.has(dcId));
+
+      console.warn(
+        'Current assignments:',
+        current.map((a: any) => a.datacenter?.id),
+      );
+      console.warn('Selected datacenters:', selectedDatacenters);
+      console.warn(
+        'To delete:',
+        toDelete.map((a: any) => ({ id: a.id, dcId: a.datacenter?.id })),
+      );
+      console.warn('To create:', toCreate);
 
       // Delete assignments that were unchecked
       for (const assignment of toDelete) {
@@ -86,6 +113,7 @@ export const DatacenterMonitorAssign: React.FC<IDatacenterMonitorAssignProps> = 
 
       // Create new assignments
       for (const datacenterId of toCreate) {
+        console.warn('Creating assignment for monitor', monitorId, 'datacenter', datacenterId);
         await axios.post('/api/datacenter-monitors', {
           monitor: { id: monitorId },
           datacenter: { id: datacenterId },
