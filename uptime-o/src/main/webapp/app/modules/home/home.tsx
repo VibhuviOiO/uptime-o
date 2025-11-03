@@ -13,15 +13,12 @@ import { DatacentersWidget } from './components/DatacentersWidget';
 import { SchedulesWidget } from './components/SchedulesWidget';
 import { MonitorsWidget } from './components/MonitorsWidget';
 import { useDatacentersCount, useAgentsCount, useMonitorsCount, useSystemHealth } from './hooks/useDashboardMetrics';
-import { DashboardKPIs } from 'app/modules/dashboard/components/DashboardKPIs';
-import { useDashboardMetrics } from 'app/modules/dashboard/hooks/useDashboardMetrics';
 
 export const Home = () => {
   const account = useAppSelector(state => state.authentication.account);
   const isAuthenticated = account && account.login;
 
   // Call all hooks unconditionally - this is required by React's rules of hooks
-  const dashboardData = useDashboardMetrics(30000); // Refresh every 30 seconds
   const datacentersMetric = useDatacentersCount();
   const agentsMetric = useAgentsCount();
   const monitorsMetric = useMonitorsCount();
@@ -60,24 +57,6 @@ export const Home = () => {
           <h1>Dashboard</h1>
           <p className="header-subtitle">Overview of your monitoring infrastructure</p>
         </div>
-      </div>
-
-      {/* Modern KPI Cards - Real-time Metrics */}
-      <div className="dashboard-kpis-section">
-        <h2 className="section-title">Performance Metrics</h2>
-        {dashboardData && (
-          <DashboardKPIs
-            uptimePercentage={dashboardData.metrics?.uptimePercentage || 0}
-            averageResponseTime={dashboardData.metrics?.averageResponseTime || 0}
-            totalMonitors={dashboardData.metrics?.totalMonitors || 0}
-            failedCount={dashboardData.metrics?.failedCount || 0}
-            healthyCount={dashboardData.healthSummary?.healthyCount || 0}
-            degradedCount={dashboardData.healthSummary?.degradedCount || 0}
-            failedMonitors={dashboardData.healthSummary?.failedCount || 0}
-            loading={dashboardData.loading}
-            error={dashboardData.error}
-          />
-        )}
       </div>
 
       {/* Analytics Grid with Sidebar */}
