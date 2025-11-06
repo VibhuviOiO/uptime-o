@@ -1,0 +1,451 @@
+// Color Palette
+$primary: #0052cc;
+$success: #10b981;
+$warning: #fbbf24;
+$critical: #f97316;
+$danger: #ef4444;
+$info: #06b6d4;
+$gray-50: #f9fafb;
+$gray-100: #f3f4f6;
+$gray-200: #e5e7eb;
+$gray-300: #d1d5db;
+$gray-400: #9ca3af;
+$gray-500: #6b7280;
+$gray-600: #4b5563;
+$gray-700: #374151;
+$gray-800: #1f2937;
+$gray-900: #111827;
+
+.monitor-detail-page {
+  padding: 24px;
+  background: $gray-50;
+  min-height: 100vh;
+
+  .loading,
+  .no-data {
+    text-align: center;
+    padding: 60px 20px;
+    color: $gray-600;
+    font-size: 16px;
+  }
+
+  // ========== PAGE HEADER ==========
+  .page-header {
+    margin-bottom: 32px;
+    background: white;
+    border-radius: 16px;
+    padding: 32px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+    .header-row-1 {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+
+      .back-button {
+        color: $gray-700;
+        font-weight: 500;
+        text-decoration: none;
+        transition: all 0.2s ease;
+
+        &:hover {
+          color: $primary;
+        }
+      }
+
+      .header-actions {
+        display: flex;
+        gap: 12px;
+
+        .auto-refresh-btn {
+          transition: all 0.3s ease;
+
+          &.btn-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border-color: #10b981;
+            color: white;
+          }
+        }
+      }
+    }
+
+    .header-row-2 {
+      margin-bottom: 20px;
+
+      .monitor-title {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 12px;
+
+        h1 {
+          font-size: 32px;
+          font-weight: 700;
+          color: $gray-900;
+          margin: 0;
+          letter-spacing: -0.5px;
+        }
+
+        .status-badge {
+          font-size: 13px;
+          font-weight: 600;
+          padding: 6px 12px;
+          border-radius: 6px;
+        }
+      }
+
+      .monitor-url {
+        background: $gray-50;
+        border: 1px solid $gray-200;
+        border-radius: 8px;
+        padding: 12px 16px;
+
+        code {
+          font-family: 'Monaco', 'Courier New', monospace;
+          font-size: 14px;
+          color: $gray-800;
+        }
+      }
+    }
+
+    .header-row-3 {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+
+      .metadata-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: $gray-600;
+        font-size: 14px;
+
+        .metadata-icon {
+          color: $gray-400;
+        }
+
+        .metadata-label {
+          color: $gray-500;
+          font-weight: 500;
+        }
+
+        .metadata-value {
+          font-weight: 600;
+          color: $gray-900;
+        }
+
+        .badge {
+          font-weight: 600;
+        }
+      }
+
+      .divider {
+        width: 1px;
+        height: 16px;
+        background: $gray-300;
+      }
+    }
+  }
+
+  // ========== FILTERS CARD ==========
+  .filters-card {
+    margin-bottom: 32px;
+    border: 0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+
+    .card-body {
+      padding: 24px;
+    }
+
+    label {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: $gray-700;
+      margin-bottom: 8px;
+    }
+
+    .form-control {
+      border-radius: 8px;
+      border: 1px solid $gray-300;
+      padding: 10px 14px;
+      font-size: 14px;
+      transition: all 0.2s ease;
+
+      &:focus {
+        border-color: $primary;
+        box-shadow: 0 0 0 3px rgba($primary, 0.1);
+      }
+    }
+  }
+
+  // ========== AGENT CARDS ==========
+  .agent-cards {
+    display: grid;
+    gap: 16px;
+
+    .agent-card {
+      border: 0;
+      border-radius: 12px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+      transition: all 0.3s ease;
+      overflow: visible;
+      background: white;
+      position: relative;
+      z-index: 1;
+
+      &:hover {
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        transform: translateY(-1px);
+        z-index: 100;
+      }
+
+      .card-body {
+        padding: 20px;
+      }
+
+      // Agent Header Section
+      .agent-header {
+        margin-bottom: 16px;
+
+        .agent-info-section {
+          .agent-title-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+
+            .agent-name {
+              font-size: 20px;
+              font-weight: 700;
+              color: $gray-900;
+              margin: 0;
+              letter-spacing: -0.3px;
+            }
+
+            .status-indicator {
+              width: 24px;
+              height: 24px;
+              border-radius: 8px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+              &.status-up {
+                background: linear-gradient(135deg, $success 0%, #059669 100%);
+                color: white;
+              }
+
+              &.status-down {
+                background: linear-gradient(135deg, $danger 0%, #dc2626 100%);
+                color: white;
+              }
+
+              svg {
+                font-size: 14px;
+              }
+            }
+
+            .history-btn {
+              padding: 6px 12px;
+              font-size: 13px;
+              font-weight: 600;
+              border-radius: 6px;
+              transition: all 0.2s ease;
+              margin-left: auto;
+
+              &.btn-primary {
+                background: linear-gradient(135deg, $primary 0%, darken($primary, 10%) 100%);
+                border: none;
+
+                &:hover {
+                  transform: translateY(-1px);
+                  box-shadow: 0 4px 6px -1px rgba($primary, 0.3);
+                }
+              }
+            }
+          }
+
+          // Info Tiles Grid
+          .info-tiles {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 10px;
+            max-width: 900px;
+
+            .info-tile {
+              display: flex;
+              align-items: center;
+              gap: 10px;
+              background: linear-gradient(135deg, $gray-50 0%, white 100%);
+              border: 1px solid $gray-200;
+              border-radius: 8px;
+              padding: 10px 12px;
+              transition: all 0.2s ease;
+
+              &:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+                border-color: $gray-300;
+              }
+
+              .tile-icon {
+                width: 32px;
+                height: 32px;
+                border-radius: 6px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-shrink: 0;
+                background: linear-gradient(135deg, $gray-500 0%, $gray-600 100%);
+                color: white;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+
+                svg {
+                  font-size: 14px;
+                }
+              }
+
+              .tile-content {
+                flex: 1;
+                min-width: 0;
+
+                .tile-label {
+                  font-size: 9px;
+                  font-weight: 600;
+                  color: $gray-500;
+                  text-transform: uppercase;
+                  letter-spacing: 0.5px;
+                  margin-bottom: 2px;
+                  line-height: 1;
+                }
+
+                .tile-value {
+                  font-size: 14px;
+                  font-weight: 700;
+                  color: $gray-900;
+                  line-height: 1.2;
+                  white-space: nowrap;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                }
+              }
+
+              // Agent tile styling
+              &.agent-tile {
+                .tile-icon {
+                  background: linear-gradient(135deg, $gray-600 0%, $gray-700 100%);
+                }
+              }
+
+              // Time tile styling
+              &.time-tile {
+                .tile-icon {
+                  background: linear-gradient(135deg, $info 0%, #0891b2 100%);
+                }
+              }
+
+              // Availability tile
+              &.availability {
+                .tile-icon {
+                  background: linear-gradient(135deg, $success 0%, #059669 100%);
+                }
+              }
+
+              // P95 tile
+              &.p95 {
+                .tile-icon {
+                  background: linear-gradient(135deg, $info 0%, #0891b2 100%);
+                }
+              }
+
+              // P99 tile
+              &.p99 {
+                .tile-icon {
+                  background: linear-gradient(135deg, $warning 0%, #d97706 100%);
+                }
+              }
+            }
+          }
+        }
+      }
+
+      // Agent Chart
+      .agent-chart {
+        margin-top: 16px;
+        padding-top: 16px;
+        border-top: 1px solid $gray-100;
+        position: relative;
+        z-index: 1;
+      }
+    }
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 1400px) {
+  .monitor-detail-page {
+    .agent-cards .agent-card {
+      .agent-header {
+        .agent-info-section {
+          .info-tiles {
+            grid-template-columns: repeat(3, 1fr);
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .monitor-detail-page {
+    padding: 16px;
+
+    .page-header {
+      padding: 20px;
+
+      .header-row-1 {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+      }
+
+      .header-row-2 .monitor-title h1 {
+        font-size: 24px;
+      }
+
+      .header-row-3 {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+
+        .divider {
+          display: none;
+        }
+      }
+    }
+
+    .agent-cards .agent-card {
+      .card-body {
+        padding: 20px;
+      }
+
+      .agent-header {
+        .agent-info-section {
+          .agent-title-row .agent-name {
+            font-size: 18px;
+          }
+
+          .info-tiles {
+            grid-template-columns: repeat(2, 1fr);
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,84 @@
+.agent-bar-chart {
+  width: 100%;
+  position: relative;
+  padding: 12px 0;
+
+  .chart-container {
+    display: flex;
+    align-items: flex-end;
+    height: 100%;
+    gap: 1px;
+    padding: 0 4px;
+  }
+
+  .chart-bar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    height: 100%;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+
+    &:hover {
+      transform: translateY(-2px);
+      
+      .bar-stack {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      }
+    }
+
+    .bar-stack {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      width: 100%;
+      min-height: 4px;
+      border-radius: 2px 2px 0 0;
+      transition: box-shadow 0.2s ease;
+    }
+
+    .bar-segment {
+      width: 100%;
+      transition: all 0.3s ease;
+
+      &.healthy {
+        background: linear-gradient(180deg, #10b981 0%, #059669 100%);
+      }
+
+      &.warning {
+        background: linear-gradient(180deg, #fbbf24 0%, #f59e0b 100%);
+      }
+
+      &.critical {
+        background: linear-gradient(180deg, #f97316 0%, #ea580c 100%);
+      }
+
+      &.failed {
+        background: linear-gradient(180deg, #ef4444 0%, #dc2626 100%);
+      }
+
+      &:first-child {
+        border-radius: 2px 2px 0 0;
+      }
+    }
+
+    .time-label {
+      font-size: 9px;
+      color: #6b7280;
+      margin-top: 4px;
+      transform: rotate(-45deg);
+      transform-origin: top left;
+      white-space: nowrap;
+      position: absolute;
+      bottom: -16px;
+    }
+  }
+}
+
+// Make bars more visible on small ranges
+@media (max-width: 768px) {
+  .agent-bar-chart .chart-container {
+    gap: 2px;
+  }
+}

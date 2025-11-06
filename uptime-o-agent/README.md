@@ -131,7 +131,7 @@ The `api_heartbeats` table is partitioned by `executed_at` (daily ranges) to han
 
 ### Advantages of Partitioning
 - **Performance**: Faster queries, inserts, and deletes on date ranges (e.g., last 24 hours).
-- **Maintenance**: Easy to archive/drop old partitions (e.g., delete data older than 90 days).
+- **Maintenance**: Easy to archive/drop old partitions (e.g., delete data older than 90 days).doc
 - **Scalability**: Reduces index size and improves vacuum/analyze operations on large tables.
 - **Storage**: Better for time-series data like heartbeats, avoiding full table scans.
 

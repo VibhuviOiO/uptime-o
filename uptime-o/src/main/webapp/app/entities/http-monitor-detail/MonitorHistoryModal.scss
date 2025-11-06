@@ -1,0 +1,524 @@
+// Monitor History Modal Styles
+
+$primary: #0052cc;
+$success: #10b981;
+$warning: #fbbf24;
+$critical: #f97316;
+$danger: #ef4444;
+$gray-50: #f9fafb;
+$gray-100: #f3f4f6;
+$gray-200: #e5e7eb;
+$gray-300: #d1d5db;
+$gray-500: #6b7280;
+$gray-600: #4b5563;
+$gray-700: #374151;
+$gray-800: #1f2937;
+$gray-900: #111827;
+
+.monitor-history-modal {
+  .modal-content {
+    border-radius: 16px;
+    border: none;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  }
+
+  .modal-header {
+    border-bottom: 1px solid $gray-200;
+    padding: 24px 32px;
+    background: white;
+    border-radius: 16px 16px 0 0;
+
+    .modal-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: $gray-900;
+    }
+
+    .btn-close {
+      opacity: 0.6;
+      transition: opacity 0.2s ease;
+
+      &:hover {
+        opacity: 1;
+      }
+    }
+  }
+
+  .modal-body {
+    padding: 0;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  .history-modal-content {
+    padding: 24px 32px 32px;
+  }
+
+  // Header Section
+  .modal-header-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 16px;
+
+    .instruction-text {
+      font-size: 14px;
+      color: $gray-500;
+    }
+
+    .legend {
+      display: flex;
+      gap: 24px;
+
+      .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+        color: $gray-600;
+
+        .legend-dot {
+          width: 16px;
+          height: 16px;
+          border-radius: 50%;
+          border: 2px solid white;
+          box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+
+          &.healthy {
+            background: $success;
+          }
+
+          &.warning {
+            background: $warning;
+          }
+
+          &.critical {
+            background: $critical;
+          }
+
+          &.failed {
+            background: $danger;
+          }
+        }
+      }
+    }
+  }
+
+  // Squares Grid
+  .squares-grid-container {
+    background: $gray-50;
+    border: 1px solid $gray-200;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    max-height: 240px;
+    overflow-y: auto;
+
+    .squares-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+
+      .status-square {
+        width: 20px;
+        height: 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border: 2px solid transparent;
+        position: relative;
+
+        &:hover {
+          transform: scale(1.25);
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+          z-index: 10;
+        }
+
+        &.selected {
+          border-color: $primary;
+          box-shadow: 0 0 0 2px rgba($primary, 0.3);
+          transform: scale(1.15);
+        }
+
+        .selected-tooltip {
+          position: absolute;
+          top: -35px;
+          left: 50%;
+          transform: translateX(-50%);
+          background: rgba(0, 0, 0, 0.9);
+          color: white;
+          padding: 6px 10px;
+          border-radius: 6px;
+          font-size: 11px;
+          white-space: nowrap;
+          pointer-events: none;
+          z-index: 100;
+
+          &::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 5px solid transparent;
+            border-top-color: rgba(0, 0, 0, 0.9);
+          }
+        }
+      }
+    }
+  }
+
+  // Summary Stats
+  .summary-stats {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 0;
+    border-bottom: 1px solid $gray-200;
+    margin-bottom: 24px;
+
+    .total-checks {
+      font-size: 14px;
+      color: $gray-600;
+    }
+
+    .status-counts {
+      display: flex;
+      gap: 24px;
+
+      .status-count {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        .count-dot {
+          width: 16px;
+          height: 16px;
+          border-radius: 50%;
+          border: 2px solid white;
+          box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        span {
+          font-weight: 600;
+          font-size: 14px;
+          color: $gray-900;
+        }
+
+        &.healthy .count-dot {
+          background: $success;
+        }
+
+        &.warning .count-dot {
+          background: $warning;
+        }
+
+        &.critical .count-dot {
+          background: $critical;
+        }
+
+        &.failed .count-dot {
+          background: $danger;
+        }
+      }
+    }
+  }
+
+  // Call Details Section
+  .call-details {
+    .section-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: $gray-900;
+      margin-bottom: 16px;
+    }
+
+    .call-timestamp {
+      font-size: 14px;
+      font-weight: 600;
+      color: $gray-900;
+      padding-bottom: 16px;
+      border-bottom: 1px solid $gray-200;
+      margin-bottom: 16px;
+    }
+
+    .status-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 24px;
+
+      .status-badge {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        .status-dot {
+          width: 12px;
+          height: 12px;
+          border-radius: 50%;
+        }
+
+        span {
+          font-size: 14px;
+          font-weight: 600;
+          color: $gray-700;
+        }
+      }
+
+      .response-time {
+        font-size: 18px;
+        font-weight: 600;
+        color: $gray-700;
+      }
+    }
+
+    // Info Grid
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+
+      .info-card {
+        background: $gray-50;
+        border-radius: 8px;
+        padding: 16px;
+
+        .info-label {
+          display: block;
+          font-size: 12px;
+          color: $gray-500;
+          margin-bottom: 6px;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+
+        .info-value {
+          font-size: 16px;
+          font-weight: 700;
+          color: $gray-900;
+        }
+      }
+    }
+
+    // Timing Breakdown Section
+    .timing-section {
+      border-top: 1px solid $gray-200;
+      padding-top: 24px;
+      margin-top: 24px;
+
+      .timing-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 16px;
+
+        .timing-card {
+          border-radius: 8px;
+          padding: 16px;
+
+          &.dns {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+
+            .timing-label {
+              color: #2563eb;
+            }
+
+            .timing-value {
+              color: #1e40af;
+            }
+          }
+
+          &.tcp {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+
+            .timing-label {
+              color: #16a34a;
+            }
+
+            .timing-value {
+              color: #15803d;
+            }
+          }
+
+          &.tls {
+            background: #faf5ff;
+            border: 1px solid #e9d5ff;
+
+            .timing-label {
+              color: #9333ea;
+            }
+
+            .timing-value {
+              color: #7e22ce;
+            }
+          }
+
+          &.ttfb {
+            background: #fff7ed;
+            border: 1px solid #fed7aa;
+
+            .timing-label {
+              color: #ea580c;
+            }
+
+            .timing-value {
+              color: #c2410c;
+            }
+          }
+
+          .timing-label {
+            display: block;
+            font-size: 12px;
+            margin-bottom: 8px;
+            font-weight: 600;
+          }
+
+          .timing-value {
+            font-size: 20px;
+            font-weight: 700;
+          }
+        }
+      }
+    }
+
+    // Response Headers Section
+    .headers-section {
+      border-top: 1px solid $gray-200;
+      padding-top: 24px;
+      margin-top: 24px;
+
+      .headers-content {
+        background: $gray-50;
+        border-radius: 8px;
+        padding: 16px;
+        max-height: 320px;
+        overflow-y: auto;
+
+        .headers-code {
+          font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+          font-size: 13px;
+
+          .header-line {
+            display: flex;
+            margin-bottom: 4px;
+            line-height: 1.6;
+
+            .header-key {
+              color: #2563eb;
+              font-weight: 600;
+              min-width: 0;
+              flex-shrink: 0;
+              margin-right: 8px;
+            }
+
+            .header-value {
+              color: $gray-800;
+              word-break: break-all;
+            }
+          }
+
+          .parse-error {
+            color: $gray-500;
+            font-style: italic;
+          }
+        }
+      }
+    }
+
+    // Response Body Section
+    .body-section {
+      border-top: 1px solid $gray-200;
+      padding-top: 24px;
+      margin-top: 24px;
+
+      .body-content {
+        background: $gray-50;
+        border-radius: 8px;
+        padding: 16px;
+        max-height: 320px;
+        overflow-y: auto;
+
+        .body-code {
+          font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+          font-size: 13px;
+          color: $gray-800;
+          white-space: pre-wrap;
+          word-break: break-all;
+          margin: 0;
+          line-height: 1.5;
+        }
+      }
+    }
+
+    // Error Section
+    .error-section {
+      border-top: 1px solid $gray-200;
+      padding-top: 24px;
+      margin-top: 24px;
+
+      .error-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: $danger;
+        margin-bottom: 12px;
+      }
+
+      .error-message {
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+        border-radius: 8px;
+        padding: 16px;
+
+        .error-type {
+          font-weight: 600;
+          color: $danger;
+          margin-bottom: 8px;
+          font-size: 14px;
+        }
+
+        .error-text {
+          color: #991b1b;
+          font-size: 14px;
+          line-height: 1.5;
+        }
+      }
+    }
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .monitor-history-modal {
+    .modal-header-section {
+      flex-direction: column;
+      align-items: flex-start;
+
+      .legend {
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+    }
+
+    .squares-grid-container {
+      max-height: 180px;
+    }
+
+    .summary-stats {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .call-details {
+      .info-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+  }
+}
