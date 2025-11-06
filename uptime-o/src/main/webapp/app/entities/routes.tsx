@@ -10,6 +10,7 @@ import Datacenter from './datacenter';
 import Agent from './agent';
 import HttpHeartbeat from './http-heartbeat';
 import HttpHeartbeatAggregated from './http-heartbeat/http-heartbeat-aggregated';
+import HttpMetrics from './http-metrics/http-metrics';
 import AuditLog from './audit-log';
 /* jhipster-needle-add-route-import - JHipster will add routes here */
 
@@ -25,6 +26,7 @@ export default () => {
         <Route path="agent/*" element={<Agent />} />
         <Route path="http-heartbeats/*" element={<HttpHeartbeat />} />
         <Route path="http-heartbeat-aggregated" element={<HttpHeartbeatAggregated />} />
+        <Route path="http-metrics" element={<HttpMetrics />} />
         <Route path="audit-log/*" element={<AuditLog />} />
         {/* jhipster-needle-add-route-path - JHipster will add routes here */}
       </ErrorBoundaryRoutes>
