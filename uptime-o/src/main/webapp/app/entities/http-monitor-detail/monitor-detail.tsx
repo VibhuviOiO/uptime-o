@@ -239,6 +239,25 @@ const MonitorDetail: React.FC = () => {
     return ['all', ...Array.from(new Set(agentMetrics.map(a => a.agentRegion)))];
   }, [agentMetrics]);
 
+  // Calculate current uptime from agent metrics (weighted by total checks)
+  const currentUptime = useMemo(() => {
+    if (agentMetrics.length === 0) return monitor?.uptimePercentage || 0;
+
+    const totalChecks = agentMetrics.reduce((sum, agent) => sum + agent.totalChecks, 0);
+    if (totalChecks === 0) return monitor?.uptimePercentage || 0;
+
+    const weightedUptime = agentMetrics.reduce((sum, agent) => sum + agent.uptimePercentage * agent.totalChecks, 0);
+
+    return weightedUptime / totalChecks;
+  }, [agentMetrics, monitor]);
+
+  // Get uptime status color
+  const getUptimeColor = (uptime: number) => {
+    if (uptime >= 99.5) return 'success';
+    if (uptime >= 95) return 'warning';
+    return 'danger';
+  };
+
   if (!monitor) {
     return <div className="loading">Loading...</div>;
   }
@@ -311,10 +330,13 @@ const MonitorDetail: React.FC = () => {
             <span className="metadata-value">{monitor.frequency}s</span>
           </div>
           <div className="divider" />
-          <div className="metadata-item">
+          <div className="metadata-item uptime-item">
             <FontAwesomeIcon icon={faChartLine} className="metadata-icon" />
             <span className="metadata-label">Uptime:</span>
-            <span className="metadata-value text-success">{monitor.uptimePercentage.toFixed(2)}%</span>
+            <div className="uptime-display">
+              <FontAwesomeIcon icon={faCircle} className={`uptime-indicator uptime-${getUptimeColor(currentUptime)}`} />
+              <span className={`metadata-value uptime-value text-${getUptimeColor(currentUptime)}`}>{currentUptime.toFixed(2)}%</span>
+            </div>
           </div>
         </div>
       </div>

@@ -1,20 +1,9 @@
-// Color Palette - Modern Datadog/Checkly inspired
-$primary: #0052cc;
+// Import shared variables and mixins
+@import '../entity.scss';
+
+// Additional custom variables for http-metrics
 $primary-dark: #003da5;
-$success: #06b6d4;
-$danger: #dc2626;
-$warning: #ea580c;
-$gray-50: #fafbfc;
-$gray-100: #f3f4f6;
 $gray-150: #eef2f7;
-$gray-200: #e5e7eb;
-$gray-300: #d1d5db;
-$gray-400: #9ca3af;
-$gray-500: #6b7280;
-$gray-600: #4b5563;
-$gray-700: #374151;
-$gray-800: #1f2937;
-$gray-900: #111827;
 
 .http-metrics-container {
   padding: $gray-100;

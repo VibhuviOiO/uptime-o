@@ -13,34 +13,139 @@
 //   - .smart-table-wrapper, .smart-table, .action-buttons, etc.
 // ============================================================================
 
+// ============================================================================
+// SHARED COLOR PALETTE - Use across all entity pages
+// ============================================================================
+$primary: #0052cc;
+$primary-dark: #003da5;
+$primary-hover: #0b5ed7;
+$success: #10b981;
+$success-dark: #059669;
+$danger: #ef4444;
+$danger-dark: #dc2626;
+$warning: #fbbf24;
+$warning-dark: #ea580c;
+$critical: #f97316;
+$info: #06b6d4;
+$info-dark: #0891b2;
+
+// Gray Scale
+$gray-50: #f9fafb;
+$gray-100: #f3f4f6;
+$gray-150: #eef2f7;
+$gray-200: #e5e7eb;
+$gray-300: #d1d5db;
+$gray-400: #9ca3af;
+$gray-500: #6b7280;
+$gray-600: #4b5563;
+$gray-700: #374151;
+$gray-800: #1f2937;
+$gray-900: #111827;
+
+// Background colors
+$bg-light: #f8f9fa;
+$bg-dark: #212529;
+
+// Text colors
+$text-muted: #6c757d;
+
+// Border and shadows
+$border-color: #dee2e6;
+$table-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+$table-shadow-hover: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+$row-hover-bg: #f0f7ff;
+
 :root {
-  --primary-color: #0d6efd;
-  --primary-hover: #0b5ed7;
-  --border-color: #dee2e6;
-  --table-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-  --table-shadow-hover: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-  --text-muted: #6c757d;
-  --bg-light: #f8f9fa;
-  --bg-dark: #212529;
-  --info-color: #0dcaf0;
-  --warning-color: #ffc107;
-  --danger-color: #dc3545;
-  --success-color: #198754;
-  --row-hover-bg: #f0f7ff;
+  --primary-color: #{$primary};
+  --primary-hover: #{$primary-hover};
+  --border-color: #{$border-color};
+  --table-shadow: #{$table-shadow};
+  --table-shadow-hover: #{$table-shadow-hover};
+  --text-muted: #{$text-muted};
+  --bg-light: #{$bg-light};
+  --bg-dark: #{$bg-dark};
+  --info-color: #{$info};
+  --warning-color: #{$warning};
+  --danger-color: #{$danger};
+  --success-color: #{$success};
+  --row-hover-bg: #{$row-hover-bg};
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --primary-color: #0d6efd;
-    --primary-hover: #0b5ed7;
+    --primary-color: #{$primary};
+    --primary-hover: #{$primary-hover};
     --border-color: #495057;
     --table-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.3);
     --table-shadow-hover: 0 0.5rem 1rem rgba(0, 0, 0, 0.4);
     --text-muted: #adb5bd;
-    --bg-light: #f8f9fa;
-    --bg-dark: #212529;
+    --bg-light: #{$bg-light};
+    --bg-dark: #{$bg-dark};
     --row-hover-bg: #2d3139;
   }
+}
+
+// ============================================================================
+// SHARED MIXINS - Reusable style patterns
+// ============================================================================
+
+// Card with hover effect
+@mixin card-hover {
+  transition: all 0.2s ease;
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+  }
+}
+
+// Gradient button
+@mixin gradient-button($color1, $color2) {
+  background: linear-gradient(135deg, $color1 0%, $color2 100%);
+  border: none;
+  color: white;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba($color1, 0.3);
+  }
+}
+
+// Status indicator dot
+@mixin status-dot($size: 12px) {
+  width: $size;
+  height: $size;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+// Stat card icon
+@mixin stat-icon($size: 40px, $bg-color: $gray-500) {
+  width: $size;
+  height: $size;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, $bg-color 0%, darken($bg-color, 10%) 100%);
+  color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+// Loading state
+@mixin loading-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: $gray-600;
+  font-size: 16px;
+}
+
+// Modal header
+@mixin modal-header-style {
+  border-bottom: 1px solid $gray-200;
+  padding: 24px 32px;
+  background: white;
+  border-radius: 16px 16px 0 0;
 }
 
 // ============================================================================
