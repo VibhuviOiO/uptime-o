@@ -25,6 +25,9 @@ public interface HttpHeartbeatRepository extends JpaRepository<HttpHeartbeat, Lo
     @Query("SELECT DISTINCT h FROM HttpHeartbeat h LEFT JOIN FETCH h.agent a LEFT JOIN FETCH a.datacenter dc LEFT JOIN FETCH dc.region WHERE h.monitor.id = :monitorId ORDER BY h.executedAt DESC")
     List<HttpHeartbeat> findByMonitorIdOrderByExecutedAtDesc(Long monitorId);
 
+    @Query("SELECT DISTINCT h FROM HttpHeartbeat h LEFT JOIN FETCH h.agent a LEFT JOIN FETCH a.datacenter dc LEFT JOIN FETCH dc.region WHERE h.monitor.id = :monitorId AND h.executedAt BETWEEN :startTime AND :endTime ORDER BY h.executedAt DESC")
+    List<HttpHeartbeat> findByMonitorIdAndExecutedAtBetweenOrderByExecutedAtDesc(Long monitorId, Instant startTime, Instant endTime);
+
     @Query("SELECT COUNT(DISTINCT h.agent.id) FROM HttpHeartbeat h WHERE h.monitor.id = :monitorId")
     Integer countDistinctAgentsByMonitorId(Long monitorId);
 }

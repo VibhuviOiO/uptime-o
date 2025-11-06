@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { Button, Input, Row, Col, Table, Badge, Card, CardHeader, CardBody } from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -7,10 +8,11 @@ import { HttpMetricsDTO } from 'app/entities/http-metrics/http-metrics.model';
 import { HttpMetricsService } from './http-metrics.service';
 import './http-metrics.scss';
 
-const HttpMetrics = () => {
+export const HttpMetrics = () => {
+  const navigate = useNavigate();
   const [metrics, setMetrics] = useState<HttpMetricsDTO[]>([]);
   const [filteredMetrics, setFilteredMetrics] = useState<HttpMetricsDTO[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [searchName, setSearchName] = useState('');
   const [selectedRegion, setSelectedRegion] = useState('');
   const [selectedDatacenter, setSelectedDatacenter] = useState('');
@@ -291,7 +293,13 @@ const HttpMetrics = () => {
                           <div className="monitor-info">
                             <div className={`status-indicator ${metric.lastSuccess ? 'up' : 'down'}`}></div>
                             <div className="monitor-details">
-                              <div className="monitor-name">{metric.monitorName}</div>
+                              <div
+                                className="monitor-name monitor-link"
+                                onClick={() => navigate(`/http-monitor-detail/${metric.monitorId}`)}
+                                style={{ cursor: 'pointer' }}
+                              >
+                                {metric.monitorName}
+                              </div>
                               <div className="monitor-type">HTTP Monitor</div>
                             </div>
                           </div>

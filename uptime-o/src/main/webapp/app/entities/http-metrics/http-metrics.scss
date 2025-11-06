@@ -377,6 +377,17 @@ $gray-900: #111827;
       color: $gray-900;
       margin-bottom: 3px;
       font-size: 13px;
+
+      &.monitor-link {
+        color: $primary;
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        &:hover {
+          color: darken($primary, 10%);
+          text-decoration: underline;
+        }
+      }
     }
 
     .monitor-type {

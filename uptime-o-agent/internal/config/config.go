@@ -3,6 +3,7 @@ package config
 import (
 	"UptimeOAgent/internal/models"
 	"context"
+	"encoding/json"
 
 	"github.com/jackc/pgx/v4/pgxpool"
 )
@@ -18,8 +19,16 @@ func Load(pool *pgxpool.Pool) (*models.Config, error) {
 	defer rows.Close()
 	for rows.Next() {
 		var s models.Schedule
-		if err := rows.Scan(&s.ID, &s.Name, &s.Interval, &s.IncludeResponseBody, &s.ThresholdsWarning, &s.ThresholdsCritical); err != nil {
+		var thresholdsWarning, thresholdsCritical *int
+		if err := rows.Scan(&s.ID, &s.Name, &s.Interval, &s.IncludeResponseBody, &thresholdsWarning, &thresholdsCritical); err != nil {
 			return nil, err
+		}
+		// Handle NULL values by setting to 0 or a default value
+		if thresholdsWarning != nil {
+			s.ThresholdsWarning = *thresholdsWarning
+		}
+		if thresholdsCritical != nil {
+			s.ThresholdsCritical = *thresholdsCritical
 		}
 		cfg.Schedules = append(cfg.Schedules, s)
 	}
@@ -33,8 +42,16 @@ func Load(pool *pgxpool.Pool) (*models.Config, error) {
 	regions := make(map[int]models.Region)
 	for rows.Next() {
 		var r models.Region
-		if err := rows.Scan(&r.ID, &r.Name, &r.RegionCode, &r.Group); err != nil {
+		var regionCode, groupName *string
+		if err := rows.Scan(&r.ID, &r.Name, &regionCode, &groupName); err != nil {
 			return nil, err
+		}
+		// Handle NULL values
+		if regionCode != nil {
+			r.RegionCode = *regionCode
+		}
+		if groupName != nil {
+			r.Group = *groupName
 		}
 		regions[r.ID] = r
 	}
@@ -48,11 +65,14 @@ func Load(pool *pgxpool.Pool) (*models.Config, error) {
 	datacenters := make(map[int]models.Datacenter)
 	for rows.Next() {
 		var d models.Datacenter
-		var regionID int
+		var regionID *int
 		if err := rows.Scan(&d.ID, &d.Code, &d.Name, &regionID); err != nil {
 			return nil, err
 		}
-		d.Region = regions[regionID]
+		// Handle NULL region_id
+		if regionID != nil {
+			d.Region = regions[*regionID]
+		}
 		datacenters[d.ID] = d
 	}
 
@@ -64,11 +84,14 @@ func Load(pool *pgxpool.Pool) (*models.Config, error) {
 	defer rows.Close()
 	for rows.Next() {
 		var a models.Agent
-		var datacenterID int
+		var datacenterID *int
 		if err := rows.Scan(&a.ID, &a.Name, &datacenterID); err != nil {
 			return nil, err
 		}
-		a.Datacenter = datacenters[datacenterID]
+		// Handle NULL datacenter_id
+		if datacenterID != nil {
+			a.Datacenter = datacenters[*datacenterID]
+		}
 		a.GlobalThresholds = models.Thresholds{Warning: 300, Critical: 800} // Assuming default
 		a.GlobalSchedules = cfg.Schedules
 		cfg.Agents = append(cfg.Agents, a)
@@ -83,16 +106,31 @@ func Load(pool *pgxpool.Pool) (*models.Config, error) {
 		defer rows.Close()
 		for rows.Next() {
 			var mon models.Monitor
-			var headers, body *string
-			if err := rows.Scan(&mon.ID, &mon.Name, &mon.Method, &mon.Type, &mon.URL, &mon.ScheduleID, &headers, &body); err != nil {
+			var scheduleID *int
+			var headers, body []byte
+			if err := rows.Scan(&mon.ID, &mon.Name, &mon.Method, &mon.Type, &mon.URL, &scheduleID, &headers, &body); err != nil {
 				return nil, err
 			}
-			if headers != nil {
-				// Parse headers if needed, but for simplicity, assume JSON string
-				mon.Headers = make(map[string]string) // Implement parsing if necessary
+			// Handle NULL schedule_id
+			if scheduleID != nil {
+				mon.ScheduleID = *scheduleID
 			}
-			if body != nil {
-				mon.Body = *body
+			// Parse JSONB headers into map[string]string
+			if len(headers) > 0 {
+				if err := json.Unmarshal(headers, &mon.Headers); err == nil {
+					// Successfully parsed headers
+				}
+			}
+			// Parse JSONB body - it could be an object or string
+			if len(body) > 0 {
+				// Try to unmarshal as string first
+				var bodyStr string
+				if err := json.Unmarshal(body, &bodyStr); err == nil {
+					mon.Body = bodyStr
+				} else {
+					// If it's not a string, convert the JSON object to string
+					mon.Body = string(body)
+				}
 			}
 			cfg.Agents[i].Monitors = append(cfg.Agents[i].Monitors, mon)
 		}
