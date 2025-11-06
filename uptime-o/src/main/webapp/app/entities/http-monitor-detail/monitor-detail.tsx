@@ -266,22 +266,31 @@ const MonitorDetail: React.FC = () => {
     <div className="monitor-detail-page">
       {/* Header */}
       <div className="page-header">
-        <div className="header-row-1">
-          <Button color="link" onClick={() => navigate('/http-metrics')} className="back-button">
-            <FontAwesomeIcon icon={faArrowLeft} /> Back to Monitors
-          </Button>
+        <div className="header-main">
+          <div className="header-left">
+            <Button color="link" onClick={() => navigate('/http-metrics')} className="back-button">
+              <FontAwesomeIcon icon={faArrowLeft} />
+            </Button>
+            <div className="monitor-info">
+              <div className="monitor-title-row">
+                <h1>{monitor.name}</h1>
+                <Badge color={monitor.lastSuccess ? 'success' : 'danger'} className="status-badge">
+                  <FontAwesomeIcon icon={monitor.lastSuccess ? faCheckCircle : faTimesCircle} className="status-icon" />
+                  {monitor.lastSuccess ? 'UP' : 'DOWN'}
+                </Badge>
+              </div>
+              <div className="monitor-url">
+                <code>{monitor.url}</code>
+              </div>
+            </div>
+          </div>
           <div className="header-actions">
-            <Button
-              color={autoRefresh ? 'success' : 'secondary'}
-              outline
-              onClick={() => setAutoRefresh(!autoRefresh)}
-              className="auto-refresh-btn"
-            >
+            <Button color={autoRefresh ? 'success' : 'secondary'} size="sm" outline onClick={() => setAutoRefresh(!autoRefresh)}>
               <FontAwesomeIcon icon={faRefresh} spin={autoRefresh} />
-              {autoRefresh ? ' Auto-refresh ON' : ' Auto-refresh OFF'}
             </Button>
             <Button
               color="primary"
+              size="sm"
               outline
               onClick={() => {
                 fetchAgentMetrics();
@@ -293,85 +302,94 @@ const MonitorDetail: React.FC = () => {
           </div>
         </div>
 
-        <div className="header-row-2">
-          <div className="monitor-title">
-            <h1>{monitor.name}</h1>
-            <Badge color={monitor.lastSuccess ? 'success' : 'danger'} className="status-badge">
-              {monitor.lastSuccess ? 'UP' : 'DOWN'}
-            </Badge>
-          </div>
-          <div className="monitor-url">
-            <code>{monitor.url}</code>
-          </div>
-        </div>
-
-        <div className="header-row-3">
+        <div className="header-metadata">
           <div className="metadata-item">
             <FontAwesomeIcon icon={faServer} className="metadata-icon" />
-            <span className="metadata-label">Method:</span>
-            <Badge color="secondary">{monitor.method}</Badge>
+            <span className="metadata-label">Method</span>
+            <Badge color="secondary" className="metadata-badge">
+              {monitor.method}
+            </Badge>
           </div>
-          <div className="divider" />
           <div className="metadata-item">
             <FontAwesomeIcon icon={faGlobe} className="metadata-icon" />
-            <span className="metadata-label">Protocol:</span>
-            <Badge color="info">{monitor.protocol}</Badge>
+            <span className="metadata-label">Protocol</span>
+            <Badge color="info" className="metadata-badge">
+              {monitor.protocol}
+            </Badge>
           </div>
-          <div className="divider" />
           <div className="metadata-item">
             <FontAwesomeIcon icon={faMapMarkerAlt} className="metadata-icon" />
-            <span className="metadata-label">Regions:</span>
+            <span className="metadata-label">Regions</span>
             <span className="metadata-value">{monitor.regions.length}</span>
           </div>
-          <div className="divider" />
           <div className="metadata-item">
             <FontAwesomeIcon icon={faClock} className="metadata-icon" />
-            <span className="metadata-label">Interval:</span>
+            <span className="metadata-label">Interval</span>
             <span className="metadata-value">{monitor.frequency}s</span>
           </div>
-          <div className="divider" />
           <div className="metadata-item uptime-item">
             <FontAwesomeIcon icon={faChartLine} className="metadata-icon" />
-            <span className="metadata-label">Uptime:</span>
+            <span className="metadata-label">Uptime</span>
             <div className="uptime-display">
               <FontAwesomeIcon icon={faCircle} className={`uptime-indicator uptime-${getUptimeColor(currentUptime)}`} />
-              <span className={`metadata-value uptime-value text-${getUptimeColor(currentUptime)}`}>{currentUptime.toFixed(2)}%</span>
+              <span className={`uptime-value text-${getUptimeColor(currentUptime)}`}>{currentUptime.toFixed(2)}%</span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Filters */}
-      <Card className="filters-card">
-        <CardBody>
-          <Row>
-            <Col md={4}>
-              <Label>Time Range</Label>
-              <Input type="select" value={timeRange} onChange={e => setTimeRange(e.target.value)}>
-                <option value="5m">Last 5 minutes</option>
-                <option value="15m">Last 15 minutes</option>
-                <option value="30m">Last 30 minutes</option>
-                <option value="1h">Last 1 hour</option>
-                <option value="4h">Last 4 hours</option>
-                <option value="24h">Last 24 hours</option>
-                <option value="2d">Last 2 days</option>
-                <option value="7d">Last 7 days</option>
-                <option value="30d">Last 30 days</option>
-              </Input>
-            </Col>
-            <Col md={4}>
-              <Label>Filter by Region</Label>
-              <Input type="select" value={selectedRegion} onChange={e => setSelectedRegion(e.target.value)}>
-                {uniqueRegions.map(region => (
-                  <option key={region} value={region}>
-                    {region === 'all' ? 'All Regions' : region}
-                  </option>
-                ))}
-              </Input>
-            </Col>
-          </Row>
-        </CardBody>
-      </Card>
+      {/* Integrated Filters */}
+      <div className="filters-section">
+        <div className="filter-group">
+          <label className="filter-label">TIME RANGE</label>
+          <div className="time-range-buttons">
+            <Button color={timeRange === '5m' ? 'primary' : 'secondary'} size="sm" outline onClick={() => setTimeRange('5m')}>
+              5m
+            </Button>
+            <Button color={timeRange === '15m' ? 'primary' : 'secondary'} size="sm" outline onClick={() => setTimeRange('15m')}>
+              15m
+            </Button>
+            <Button color={timeRange === '30m' ? 'primary' : 'secondary'} size="sm" outline onClick={() => setTimeRange('30m')}>
+              30m
+            </Button>
+            <Button color={timeRange === '1h' ? 'primary' : 'secondary'} size="sm" outline onClick={() => setTimeRange('1h')}>
+              1h
+            </Button>
+            <Button color={timeRange === '4h' ? 'primary' : 'secondary'} size="sm" outline onClick={() => setTimeRange('4h')}>
+              4h
+            </Button>
+            <Button color={timeRange === '24h' ? 'primary' : 'secondary'} size="sm" outline onClick={() => setTimeRange('24h')}>
+              24h
+            </Button>
+            <Button color={timeRange === '2d' ? 'primary' : 'secondary'} size="sm" outline onClick={() => setTimeRange('2d')}>
+              2d
+            </Button>
+            <Button color={timeRange === '7d' ? 'primary' : 'secondary'} size="sm" outline onClick={() => setTimeRange('7d')}>
+              7d
+            </Button>
+            <Button color={timeRange === '30d' ? 'primary' : 'secondary'} size="sm" outline onClick={() => setTimeRange('30d')}>
+              30d
+            </Button>
+          </div>
+        </div>
+
+        <div className="filter-group">
+          <label className="filter-label">REGION</label>
+          <Input
+            type="select"
+            value={selectedRegion}
+            onChange={e => setSelectedRegion(e.target.value)}
+            className="region-select"
+            bsSize="sm"
+          >
+            {uniqueRegions.map(region => (
+              <option key={region} value={region}>
+                {region === 'all' ? 'All Regions' : region}
+              </option>
+            ))}
+          </Input>
+        </div>
+      </div>
 
       {/* Agent Cards */}
       <div className="agent-cards">
