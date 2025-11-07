@@ -256,3 +256,24 @@ To configure CI for your project, run the ci-cd sub-generator (`jhipster ci-cd`)
 [Jest]: https://jestjs.io
 [Leaflet]: https://leafletjs.com/
 [DefinitelyTyped]: https://definitelytyped.org/
+
+docke
+
+{"level":"info","msg":"Executing monitor 1 (IPfy Public IP Info)","time":"2025-11-06T20:31:12Z"}
+{"level":"error","msg":"Failed to insert heartbeat:ERROR: no partition of relation \"api_heartbeats\" found for row (SQLSTATE 23514)","time":"2025-11-06T20:31:12Z"}
+{"level":"error","msg":"Failed to save heartbeat:ERROR: no partition of relation \"api_heartbeats\" found for row (SQLSTATE 23514)","time":"2025-11-06T20:31:12Z"}
+{"level":"info","msg":"Executing monitor 4 (Realty Auto-Complete)","time":"2025-11-06T20:31:12Z"}
+{"level":"error","msg":"Failed to insert heartbeat:ERROR: no partition of relation \"api_heartbeats\" found for row (SQLSTATE 23514)","time":"2025-11-06T20:31:12Z"}
+{"level":"error","msg":"Failed to save heartbeat:ERROR: no partition of relation \"api_heartbeats\" found for row (SQLSTATE 23514)","time":"2025-11-06T20:31:12Z"}
+{"level":"info","msg":"Executing monitor 1201 (Updated Test2 Monitor)","time":"2025-11-06T20:31:13Z"}
+{"level":"info","msg":"Executing monitor 2 (Official Joke API)","time":"2025-11-06T20:31:13Z"}
+{"level":"error","msg":"Failed to insert heartbeat:ERROR: invalid input syntax for type json (SQLSTATE 22P02)","time":"2025-11-06T20:31:13Z"}
+{"level":"error","msg":"Failed to save heartbeat:ERROR: invalid input syntax for type json (SQLSTATE 22P02)","time":"2025-11-06T20:31:13Z"}
+{"level":"error","msg":"Failed to insert heartbeat:ERROR: no partition of relation \"api_heartbeats\" found for row (SQLSTATE 23514)","time":"2025-11-06T20:31:13Z"}
+{"level":"error","msg":"Failed to save heartbeat:ERROR: no partition of relation \"api_heartbeats\" found for row (SQLSTATE 23514)","time":"2025-11-06T20:31:13Z"}
+
+## Create the the partition. : 
+
+CREATE TABLE IF NOT EXISTS api_heartbeats_2025_11_08
+PARTITION OF api_heartbeats
+FOR VALUES FROM ('2025-11-08 00:00:00') TO ('2025-11-09 00:00:00');
