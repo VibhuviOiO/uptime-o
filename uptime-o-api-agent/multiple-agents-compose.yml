@@ -6,10 +6,10 @@ services:
     - ./data/agent-va:/data
     environment:
       AGENT_ID: "1"
-      DATACENTER_ID: "1"
       API_KEY: "uptimeo_k2oXaUuhtxjZopopcSSFvnsQlI4avy2dSWe1o5Z30WA"
       API_BASE_URL: "http://localhost:8080"
       QUEUE_PATH: "/data/queue"
+      CONFIG_RELOAD_INTERVAL: "1m"
     restart: unless-stopped
 
   agent-ny:
@@ -21,7 +21,6 @@ services:
     - ./data/agent-ny:/data
     environment:
       AGENT_ID: "2"
-      DATACENTER_ID: "2"
       API_KEY: "uptimeo_k2oXaUuhtxjZopopcSSFvnsQlI4avy2dSWe1o5Z30WA"
       API_BASE_URL: "http://localhost:8080"
       HEALTH_PORT: "9090"
@@ -37,7 +36,6 @@ services:
     - ./data/agent-rdn:/data
     environment:
       AGENT_ID: "3"
-      DATACENTER_ID: "3"
       API_KEY: "uptimeo_k2oXaUuhtxjZopopcSSFvnsQlI4avy2dSWe1o5Z30WA"
       API_BASE_URL: "http://localhost:8080"
       HEALTH_PORT: "9090"
@@ -53,7 +51,6 @@ services:
     - ./data/agent-chi:/data
     environment:
       AGENT_ID: "4"
-      DATACENTER_ID: "4"
       API_KEY: "uptimeo_k2oXaUuhtxjZopopcSSFvnsQlI4avy2dSWe1o5Z30WA"
       API_BASE_URL: "http://localhost:8080"
       HEALTH_PORT: "9090"
@@ -69,7 +66,6 @@ services:
     - ./data/agent-sf:/data
     environment:
       AGENT_ID: "5"
-      DATACENTER_ID: "5"
       API_KEY: "uptimeo_k2oXaUuhtxjZopopcSSFvnsQlI4avy2dSWe1o5Z30WA"
       API_BASE_URL: "http://localhost:8080"
       HEALTH_PORT: "9090"
@@ -85,7 +81,6 @@ services:
     - ./data/agent-lon:/data
     environment:
       AGENT_ID: "6"
-      DATACENTER_ID: "6"
       API_KEY: "uptimeo_k2oXaUuhtxjZopopcSSFvnsQlI4avy2dSWe1o5Z30WA"
       API_BASE_URL: "http://localhost:8080"
       HEALTH_PORT: "9090"
@@ -101,7 +96,6 @@ services:
     - ./data/agent-dam:/data
     environment:
       AGENT_ID: "7"
-      DATACENTER_ID: "7"
       API_KEY: "uptimeo_k2oXaUuhtxjZopopcSSFvnsQlI4avy2dSWe1o5Z30WA"
       API_BASE_URL: "http://localhost:8080"
       HEALTH_PORT: "9090"
@@ -117,7 +111,6 @@ services:
     - ./data/agent-sto:/data
     environment:
       AGENT_ID: "8"
-      DATACENTER_ID: "8"
       API_KEY: "uptimeo_k2oXaUuhtxjZopopcSSFvnsQlI4avy2dSWe1o5Z30WA"
       API_BASE_URL: "http://localhost:8080"
       HEALTH_PORT: "9090"
@@ -133,7 +126,6 @@ services:
     - ./data/agent-syd:/data
     environment:
       AGENT_ID: "9"
-      DATACENTER_ID: "9"
       API_KEY: "uptimeo_k2oXaUuhtxjZopopcSSFvnsQlI4avy2dSWe1o5Z30WA"
       API_BASE_URL: "http://localhost:8080"
       HEALTH_PORT: "9090"

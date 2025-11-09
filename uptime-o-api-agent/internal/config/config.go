@@ -11,7 +11,7 @@ import (
 )
 
 // LoadFromAPI loads configuration from the API instead of database
-func LoadFromAPI(apiClient *api.Client, agentID int, datacenterID int) (*models.Config, *models.Agent, error) {
+func LoadFromAPI(apiClient *api.Client, agentID int) (*models.Config, *models.Agent, error) {
 	// Fetch monitors and schedules from API
 	monitors, schedules, err := apiClient.GetMonitors(agentID)
 	if err != nil {
@@ -32,9 +32,7 @@ func LoadFromAPI(apiClient *api.Client, agentID int, datacenterID int) (*models.
 		GlobalThresholds: models.Thresholds{Warning: 300, Critical: 800},
 		GlobalSchedules:  schedules,
 		Monitors:         monitors,
-		Datacenter: models.Datacenter{
-			ID: datacenterID,
-		},
+		Datacenter:       models.Datacenter{}, // Empty datacenter (not used by API)
 	}
 
 	cfg := &models.Config{

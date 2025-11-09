@@ -20,7 +20,6 @@ Start your UptimeO server where you'll create agents and monitors through the ad
 export API_BASE_URL="http://localhost:8080"
 export API_KEY="uptimeo_YOUR_API_KEY"
 export AGENT_ID=2
-export DATACENTER_ID=1
 go build -o agent ./cmd/agent
 ./agent
 ```
@@ -35,7 +34,6 @@ docker run --rm -p 9090:9090 \
   -e API_BASE_URL="http://host.docker.internal:8080" \
   -e API_KEY="uptimeo_YOUR_API_KEY" \
   -e AGENT_ID=1 \
-  -e DATACENTER_ID=1 \
   api-agent:latest
 
 # Run all agents (update multiple-agents-compose.yml first)
@@ -50,7 +48,6 @@ docker compose -f multiple-agents-compose.yml logs -f
 | API_BASE_URL | Yes | UptimeO server URL |
 | API_KEY | Yes | API key from UptimeO admin |
 | AGENT_ID | Yes | Agent ID from database |
-| DATACENTER_ID | Yes | Datacenter ID from database |
 | HEALTH_PORT | No | Health check port (default: 9090) |
 | QUEUE_PATH | No | Queue file path (default: /data/queue) |
 | CONFIG_RELOAD_INTERVAL | No | How often to check for new monitors (default: 24h)<br>Examples: `1m`, `5m`, `1h`, `24h` |

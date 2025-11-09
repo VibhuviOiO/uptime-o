@@ -4,10 +4,8 @@ import (
 	"UptimeOAgent/internal/api"
 	"UptimeOAgent/internal/collector"
 	"UptimeOAgent/internal/config"
-	"UptimeOAgent/internal/db"
 	"UptimeOAgent/internal/models"
 	"context"
-	"math/rand"
 	"net/http"
 	"os"
 	"os/signal"
@@ -15,7 +13,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/sirupsen/logrus"
 )
 
@@ -59,15 +56,6 @@ func main() {
 		logrus.Fatal("Invalid AGENT_ID:", errParse)
 	}
 
-	datacenterIDStr := os.Getenv("DATACENTER_ID")
-	if datacenterIDStr == "" {
-		logrus.Fatal("DATACENTER_ID not set")
-	}
-	datacenterID, errParse := strconv.Atoi(datacenterIDStr)
-	if errParse != nil {
-		logrus.Fatal("Invalid DATACENTER_ID:", errParse)
-	}
-
 	// Get health server port (default to 9090 to avoid conflict with main app on 8080)
 	healthPort := os.Getenv("HEALTH_PORT")
 	if healthPort == "" {
@@ -85,7 +73,7 @@ func main() {
 		}
 	}
 
-	logrus.Infof("application configuration: agentId=%d, datacenterId=%d, apiBaseUrl=%s, healthPort=%s, configReloadInterval=%v", agentID, datacenterID, apiBaseURL, healthPort, configReloadInterval)
+	logrus.Infof("application configuration: agentId=%d, apiBaseUrl=%s, healthPort=%s, configReloadInterval=%v", agentID, apiBaseURL, healthPort, configReloadInterval)
 
 	// Create API client
 	apiClient := api.NewClient(apiBaseURL, apiKey)
@@ -98,7 +86,7 @@ func main() {
 	// Try to load config with retries
 	maxAttempts := 10
 	for attempt := 1; attempt <= maxAttempts; attempt++ {
-		cfg, agent, err = config.LoadFromAPI(apiClient, agentID, datacenterID)
+		cfg, agent, err = config.LoadFromAPI(apiClient, agentID)
 		if err == nil {
 			break
 		}
@@ -122,9 +110,7 @@ func main() {
 				GlobalThresholds: models.Thresholds{Warning: 300, Critical: 800},
 				GlobalSchedules:  []models.Schedule{},
 				Monitors:         []models.Monitor{},
-				Datacenter: models.Datacenter{
-					ID: datacenterID,
-				},
+				Datacenter:       models.Datacenter{}, // Empty datacenter (not used by API)
 			}
 			cfg = &models.Config{
 				Schedules: []models.Schedule{},
@@ -137,65 +123,14 @@ func main() {
 		logrus.Warn("No monitors configured yet. Agent will retry loading configuration periodically.")
 	}
 
-	// Optional: Connect to DB only for distributed locking if needed
-	connString := os.Getenv("DB_CONN_STRING")
-	var dbConn *pgxpool.Pool
-	var hasLocking bool
-	if connString != "" {
-		conn, err := db.Connect(connString)
-		if err != nil {
-			logrus.WithError(err).Warn("Failed to connect to DB for locking, will run without distributed lock")
-			hasLocking = false
-		} else {
-			dbConn = conn
-			defer conn.Close()
-			logrus.Info("application postgres connection: successful (for locking)")
-			hasLocking = true
-		}
-	} else {
-		logrus.Info("DB_CONN_STRING not set, running without distributed lock")
-		hasLocking = false
-	}
-
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
 	// Start health server
 	startHealthServer(healthPort)
 
-	// If we have locking, use it; otherwise run directly
-	if hasLocking {
-		go func() {
-			rand.Seed(time.Now().UnixNano())
-			for {
-				select {
-				case <-ctx.Done():
-					return
-				default:
-					acquired, err := db.AcquireLock(ctx, dbConn, datacenterID)
-					if err != nil {
-						logrus.Error("Failed to acquire lock:", err)
-						time.Sleep(10 * time.Second)
-						continue
-					}
-					if acquired {
-						logrus.Info("Acquired lock for datacenter:", datacenterID)
-						collector.NewAPIHeartbeatCollector(ctx, *agent, cfg, apiClient).Start()
-						if err := db.ReleaseLock(ctx, dbConn, datacenterID); err != nil {
-							logrus.Error("Failed to release lock:", err)
-						}
-						logrus.Info("Released lock for datacenter:", datacenterID)
-					} else {
-						jitter := time.Duration(rand.Intn(10)) * time.Second
-						time.Sleep(60*time.Second + jitter)
-					}
-				}
-			}
-		}()
-	} else {
-		// Run directly without locking
-		go collector.NewAPIHeartbeatCollector(ctx, *agent, cfg, apiClient).Start()
-	}
+	// Start collector
+	go collector.NewAPIHeartbeatCollector(ctx, *agent, cfg, apiClient).Start()
 
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
@@ -220,7 +155,7 @@ func main() {
 			logrus.Info("Application shut down")
 			return
 		case <-configReloadTicker.C:
-			newCfg, newAgent, err := config.LoadFromAPI(apiClient, agentID, datacenterID)
+			newCfg, newAgent, err := config.LoadFromAPI(apiClient, agentID)
 			if err != nil {
 				logrus.Warnf("Failed to reload config from API: %v. Will retry later.", err)
 			} else {
