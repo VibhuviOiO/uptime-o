@@ -1,81 +1,49 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { Button } from 'reactstrap';
-import { JhiItemCount, JhiPagination, getPaginationState } from 'react-jhipster';
+import { Button, Table, Spinner, Card, CardBody } from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faSort,
-  faSortDown,
-  faSortUp,
-  faPencil,
-  faLink,
-  faTrash,
-  faCode,
-  faSync,
-  faBuilding,
-  faPlus,
-} from '@fortawesome/free-solid-svg-icons';
-import { ASC, DESC, ITEMS_PER_PAGE, SORT } from 'app/shared/util/pagination.constants';
-import { overridePaginationStateWithQueryParams } from 'app/shared/util/entity-utils';
-import { useAppDispatch, useAppSelector } from 'app/config/store';
+import { faPencil, faTrash, faCode, faBuilding, faPlus, faGlobe } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
-
-import { getEntities } from './http-monitor.reducer';
+import { toast } from 'react-toastify';
 import { IHttpMonitor } from 'app/shared/model/http-monitor.model';
 import AgentMonitorAssign from './agent-monitor-assign';
 import { BodyViewModal } from 'app/modules/home/components/BodyViewModal';
 import { HeadersViewModal } from 'app/modules/home/components/HeadersViewModal';
 import { HttpMonitorEditModal } from 'app/modules/home/components/HttpMonitorEditModal';
 import { HttpMonitorDeleteModal } from 'app/modules/home/components/HttpMonitorDeleteModal';
-import '../entity.scss';
 
 export const HttpMonitor = () => {
-  const dispatch = useAppDispatch();
-  const pageLocation = useLocation();
-  const navigate = useNavigate();
-
-  // Pagination state
-  const [paginationState, setPaginationState] = useState(
-    overridePaginationStateWithQueryParams(getPaginationState(pageLocation, ITEMS_PER_PAGE, 'id'), pageLocation.search),
-  );
-
-  // Modal states
+  const [monitors, setMonitors] = useState<IHttpMonitor[]>([]);
+  const [loading, setLoading] = useState(true);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [assignModalOpen, setAssignModalOpen] = useState(false);
   const [bodyViewOpen, setBodyViewOpen] = useState(false);
   const [headersViewOpen, setHeadersViewOpen] = useState(false);
-
-  // Monitor selection
   const [selectedMonitor, setSelectedMonitor] = useState<IHttpMonitor | null>(null);
-
-  // Agent assignments mapping
   const [agentAssignments, setAgentAssignments] = useState<{ [monitorId: number]: any[] }>({});
 
-  // Redux selectors
-  const httpMonitorList = useAppSelector(state => state.httpMonitor.entities);
-  const loading = useAppSelector(state => state.httpMonitor.loading);
-  const totalItems = useAppSelector(state => state.httpMonitor.totalItems);
-
-  // Fetch data
-  const getAllEntities = () => {
-    dispatch(
-      getEntities({
-        page: paginationState.activePage - 1,
-        size: paginationState.itemsPerPage,
-        sort: `${paginationState.sort},${paginationState.order}`,
-      }),
-    );
+  useEffect(() => {
+    loadMonitors();
     fetchAgentAssignments();
+  }, []);
+
+  const loadMonitors = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get<IHttpMonitor[]>('/api/http-monitors?page=0&size=1000&sort=id,desc');
+      setMonitors(response.data);
+      setLoading(false);
+    } catch (error) {
+      toast.error('Failed to load HTTP monitors');
+      setLoading(false);
+    }
   };
 
   const fetchAgentAssignments = async () => {
     try {
-      // Fetch all agent-monitor assignments using axios
       const response = await axios.get<any>('/api/agent-monitors?size=10000');
       const responseData = response.data;
 
-      // Handle paginated response - axios.data contains response.data
       let assignments = [];
       if (Array.isArray(responseData)) {
         assignments = responseData;
@@ -83,12 +51,6 @@ export const HttpMonitor = () => {
         assignments = responseData.content;
       }
 
-      // Debug: Log what we received
-      if (assignments.length > 0) {
-        console.warn('Sample assignment:', assignments[0]);
-      }
-
-      // Group by monitor ID
       const grouped: { [key: number]: any[] } = {};
       assignments.forEach((assignment: any) => {
         const monitorId = assignment.monitorId;
@@ -96,83 +58,23 @@ export const HttpMonitor = () => {
           if (!grouped[monitorId]) {
             grouped[monitorId] = [];
           }
-          // Store agent name for display
           if (assignment.agentName) {
-            grouped[monitorId].push({ name: assignment.agentName });
+            grouped[monitorId].push({ id: assignment.agentId, name: assignment.agentName });
           }
         }
       });
 
       setAgentAssignments(grouped);
     } catch (error) {
-      console.error('Failed to fetch datacenter assignments:', error);
+      console.error('Failed to fetch agent assignments:', error);
     }
   };
 
-  const sortEntities = () => {
-    getAllEntities();
-    const endURL = `?page=${paginationState.activePage}&sort=${paginationState.sort},${paginationState.order}`;
-    if (pageLocation.search !== endURL) {
-      navigate(`${pageLocation.pathname}${endURL}`);
-    }
+  const handleCreateClick = () => {
+    setSelectedMonitor(null);
+    setEditModalOpen(true);
   };
 
-  useEffect(() => {
-    sortEntities();
-  }, [paginationState.activePage, paginationState.order, paginationState.sort]);
-
-  useEffect(() => {
-    const params = new URLSearchParams(pageLocation.search);
-    const page = params.get('page');
-    const sort = params.get(SORT);
-    if (page && sort) {
-      const sortSplit = sort.split(',');
-      setPaginationState({
-        ...paginationState,
-        activePage: +page,
-        sort: sortSplit[0],
-        order: sortSplit[1],
-      });
-    }
-  }, [pageLocation.search]);
-
-  // Fetch agent assignments whenever the monitor list changes
-  useEffect(() => {
-    if (httpMonitorList && httpMonitorList.length > 0) {
-      fetchAgentAssignments();
-    }
-  }, [httpMonitorList]);
-
-  // Sorting
-  const sort = p => () => {
-    setPaginationState({
-      ...paginationState,
-      order: paginationState.order === ASC ? DESC : ASC,
-      sort: p,
-    });
-  };
-
-  const getSortIconByFieldName = (fieldName: string) => {
-    const sortFieldName = paginationState.sort;
-    const order = paginationState.order;
-    if (sortFieldName !== fieldName) {
-      return faSort;
-    }
-    return order === ASC ? faSortUp : faSortDown;
-  };
-
-  // Pagination
-  const handlePagination = currentPage =>
-    setPaginationState({
-      ...paginationState,
-      activePage: currentPage,
-    });
-
-  const handleSyncList = () => {
-    sortEntities();
-  };
-
-  // Modal handlers - Edit
   const handleEdit = (monitor: IHttpMonitor) => {
     setSelectedMonitor(monitor);
     setEditModalOpen(true);
@@ -184,11 +86,10 @@ export const HttpMonitor = () => {
   };
 
   const handleEditSuccess = () => {
-    sortEntities();
-    handleCloseEditModal();
+    loadMonitors();
+    fetchAgentAssignments();
   };
 
-  // Modal handlers - Delete
   const handleDelete = (monitor: IHttpMonitor) => {
     setSelectedMonitor(monitor);
     setDeleteModalOpen(true);
@@ -200,11 +101,10 @@ export const HttpMonitor = () => {
   };
 
   const handleDeleteSuccess = () => {
-    sortEntities();
-    handleCloseDeleteModal();
+    loadMonitors();
+    fetchAgentAssignments();
   };
 
-  // Modal handlers - Assign
   const openAssignModal = (monitor: IHttpMonitor) => {
     setSelectedMonitor(monitor);
     setAssignModalOpen(true);
@@ -215,38 +115,11 @@ export const HttpMonitor = () => {
     setSelectedMonitor(null);
   };
 
-  const handleAssignSave = async () => {
-    // Refresh only the assignments for the current monitor
-    if (selectedMonitor?.id) {
-      try {
-        const response = await axios.get<any>('/api/datacenter-monitors?size=10000');
-        const responseData = response.data;
-
-        let assignments = [];
-        if (Array.isArray(responseData)) {
-          assignments = responseData;
-        } else if (responseData.content && Array.isArray(responseData.content)) {
-          assignments = responseData.content;
-        }
-
-        // Update only this monitor's assignments
-        const monitorAssignments = assignments.filter((a: any) => a.monitor?.id === selectedMonitor.id);
-        const agents = monitorAssignments.map((a: any) => ({ name: a.agentName })).filter((ag: any) => ag.name);
-
-        // Update the state with just this monitor's data
-        setAgentAssignments(prev => ({
-          ...prev,
-          [selectedMonitor.id]: agents,
-        }));
-      } catch (error) {
-        console.error('Failed to refresh agent assignments:', error);
-      }
-    }
-
+  const handleAssignSave = () => {
+    fetchAgentAssignments();
     closeAssignModal();
   };
 
-  // Modal handlers - View Body
   const handleViewBody = (monitor: IHttpMonitor) => {
     setSelectedMonitor(monitor);
     setBodyViewOpen(true);
@@ -257,7 +130,6 @@ export const HttpMonitor = () => {
     setSelectedMonitor(null);
   };
 
-  // Modal handlers - View Headers
   const handleViewHeaders = (monitor: IHttpMonitor) => {
     setSelectedMonitor(monitor);
     setHeadersViewOpen(true);
@@ -268,254 +140,178 @@ export const HttpMonitor = () => {
     setSelectedMonitor(null);
   };
 
-  return (
-    <div className="monitors-page">
-      <div className="monitors-header">
-        <div className="header-content">
-          <h1 id="http-monitor-heading" data-cy="HttpMonitorHeading">
-            <FontAwesomeIcon icon={faCode} className="me-2" />
-            HTTP Monitors
-          </h1>
-        </div>
-        <div className="header-actions">
-          <Button className="me-2" color="info" onClick={handleSyncList} disabled={loading} outline>
-            <FontAwesomeIcon icon={faSync} spin={loading} /> Refresh
-          </Button>
-        </div>
+  if (loading) {
+    return (
+      <div className="text-center p-4">
+        <Spinner color="primary" />
+        <p className="mt-2">Loading HTTP monitors...</p>
       </div>
+    );
+  }
 
-      {httpMonitorList && httpMonitorList.length > 0 ? (
-        <>
-          <div className="smart-table-wrapper">
-            <table className="smart-table" data-cy="entityTable">
+  return (
+    <div className="tab-content-wrapper">
+      <Card>
+        <CardBody>
+          <div className="d-flex justify-content-between align-items-center mb-3">
+            <h5>
+              <FontAwesomeIcon icon={faGlobe} className="me-2" />
+              HTTP Monitors
+            </h5>
+            <Button color="primary" size="sm" onClick={handleCreateClick}>
+              <FontAwesomeIcon icon={faPlus} className="me-2" />
+              New Monitor
+            </Button>
+          </div>
+
+          {!monitors || monitors.length === 0 ? (
+            <div className="alert alert-info">
+              <p>No HTTP monitors found. Create one to get started.</p>
+            </div>
+          ) : (
+            <Table responsive striped hover>
               <thead>
                 <tr>
-                  <th className="sortable" onClick={sort('name')}>
-                    <span className="th-content">
-                      Name
-                      <FontAwesomeIcon icon={getSortIconByFieldName('name')} className="ms-1" />
-                    </span>
-                  </th>
-                  <th className="sortable" onClick={sort('url')}>
-                    <span className="th-content">
-                      URL
-                      <FontAwesomeIcon icon={getSortIconByFieldName('url')} className="ms-1" />
-                    </span>
-                  </th>
-                  <th>
-                    <span className="th-content">Schedule</span>
-                  </th>
-                  <th>
-                    <span className="th-content">Headers</span>
-                  </th>
-                  <th>
-                    <span className="th-content">Body</span>
-                  </th>
-                  <th>
-                    <span className="th-content">Mapped DCs</span>
-                  </th>
-                  <th className="actions-column">
-                    <span className="th-content">Actions</span>
-                  </th>
+                  <th>Name</th>
+                  <th>URL</th>
+                  <th>Schedule</th>
+                  <th>Headers</th>
+                  <th>Body</th>
+                  <th>Mapped Agents</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {httpMonitorList.map((httpMonitor, i) => (
-                  <tr key={`entity-${i}`} className="table-row" data-cy="entityTable">
-                    <td className="name-cell">
+                {monitors.map((monitor, i) => (
+                  <tr key={`entity-${i}`}>
+                    <td>
                       <div>
-                        <strong
-                          style={{
-                            display: 'block',
-                            wordWrap: 'break-word',
-                          }}
-                        >
-                          {httpMonitor.name}
-                        </strong>
+                        <strong>{monitor.name}</strong>
                         <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.25rem', flexWrap: 'wrap' }}>
                           <span className="badge bg-info" style={{ fontSize: '0.65rem' }}>
-                            {httpMonitor.method || 'GET'}
+                            {monitor.method || 'GET'}
                           </span>
-                          {httpMonitor.type && (
+                          {monitor.type && (
                             <span className="badge bg-secondary" style={{ fontSize: '0.65rem' }}>
-                              {httpMonitor.type}
+                              {monitor.type}
                             </span>
                           )}
                         </div>
                       </div>
                     </td>
-                    <td className="url-cell">
-                      {httpMonitor.url ? (
-                        <a href={httpMonitor.url} target="_blank" rel="noopener noreferrer" title={httpMonitor.url}>
-                          {httpMonitor.url.length > 25 ? `${httpMonitor.url.substring(0, 25)}...` : httpMonitor.url}
+                    <td>
+                      {monitor.url ? (
+                        <a href={monitor.url} target="_blank" rel="noopener noreferrer" title={monitor.url}>
+                          {monitor.url.length > 30 ? `${monitor.url.substring(0, 30)}...` : monitor.url}
                         </a>
                       ) : (
-                        <span className="text-muted">-</span>
+                        '-'
                       )}
                     </td>
-                    <td className="schedule-cell">
-                      {httpMonitor.schedule && httpMonitor.schedule.name ? (
-                        <span>{httpMonitor.schedule.name}</span>
-                      ) : (
-                        <span className="text-muted">-</span>
-                      )}
-                    </td>
-                    <td className="headers-cell">
-                      {httpMonitor.headers ? (
-                        <button
-                          className="action-btn btn-headers"
+                    <td>{monitor.schedule?.name || '-'}</td>
+                    <td>
+                      {monitor.headers ? (
+                        <Button
+                          color="link"
+                          size="sm"
+                          onClick={() => handleViewHeaders(monitor)}
                           title="View Headers"
-                          onClick={() => handleViewHeaders(httpMonitor)}
-                          style={{ border: 'none', background: 'none', cursor: 'pointer', padding: 0, color: '#0056b3' }}
+                          style={{ padding: 0 }}
                         >
                           <FontAwesomeIcon icon={faCode} />
-                        </button>
+                        </Button>
                       ) : (
-                        <span className="text-muted">-</span>
+                        '-'
                       )}
                     </td>
-                    <td className="body-cell">
-                      {httpMonitor.body ? (
-                        <button
-                          className="action-btn btn-body"
+                    <td>
+                      {monitor.body ? (
+                        <Button
+                          color="link"
+                          size="sm"
+                          onClick={() => handleViewBody(monitor)}
                           title="View Body"
-                          onClick={() => handleViewBody(httpMonitor)}
-                          style={{ border: 'none', background: 'none', cursor: 'pointer', padding: 0, color: '#198754' }}
+                          style={{ padding: 0, color: '#198754' }}
                         >
                           <FontAwesomeIcon icon={faCode} />
-                        </button>
+                        </Button>
                       ) : (
-                        <span className="text-muted">-</span>
+                        '-'
                       )}
                     </td>
-                    <td className="datacenters-cell">
-                      <div
-                        style={{
-                          display: 'flex',
-                          gap: '0.5rem',
-                          flexWrap: 'wrap',
-                          alignItems: 'flex-start',
-                          maxHeight: '50px',
-                          overflowY: 'auto',
-                        }}
-                      >
-                        {httpMonitor.id && agentAssignments[httpMonitor.id] && agentAssignments[httpMonitor.id].length > 0 ? (
+                    <td>
+                      <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
+                        {monitor.id && agentAssignments[monitor.id] && agentAssignments[monitor.id].length > 0 ? (
                           <>
-                            {agentAssignments[httpMonitor.id].map((agent: any, index: number) => (
+                            {agentAssignments[monitor.id].map((agent: any) => (
                               <span
-                                key={index}
+                                key={agent.id}
+                                className="badge bg-success"
                                 style={{
+                                  fontSize: '0.65rem',
                                   display: 'inline-flex',
                                   alignItems: 'center',
                                   gap: '0.2rem',
-                                  padding: '0.15rem 0.35rem',
-                                  background: '#e8f5e9',
-                                  color: '#2e7d32',
-                                  borderRadius: '8px',
-                                  fontSize: '0.6rem',
-                                  fontWeight: '500',
-                                  border: '1px solid #a5d6a7',
-                                  whiteSpace: 'nowrap',
                                 }}
                               >
                                 <FontAwesomeIcon icon={faBuilding} style={{ fontSize: '0.6rem' }} />
-                                <strong>{agent.name}</strong>
+                                {agent.name}
                               </span>
                             ))}
-                            <button
-                              className="action-btn btn-assign"
-                              title="Assign Agents"
-                              onClick={() => openAssignModal(httpMonitor)}
-                              style={{
-                                border: 'none',
-                                background: 'none',
-                                cursor: 'pointer',
-                                padding: '0.15rem 0.25rem',
-                                color: '#28a745',
-                                fontSize: '0.9rem',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                              }}
+                            <Button
+                              color="link"
+                              size="sm"
+                              onClick={() => openAssignModal(monitor)}
+                              title="Manage Agents"
+                              style={{ padding: 0, color: '#28a745' }}
                             >
                               <FontAwesomeIcon icon={faPlus} />
-                            </button>
+                            </Button>
                           </>
                         ) : (
                           <>
-                            <span className="text-muted text-small">-</span>
-                            <button
-                              className="action-btn btn-assign"
-                              title="Add Datacenters"
-                              onClick={() => openAssignModal(httpMonitor)}
-                              style={{
-                                border: 'none',
-                                background: 'none',
-                                cursor: 'pointer',
-                                padding: '0.15rem 0.25rem',
-                                color: '#28a745',
-                                fontSize: '0.9rem',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                              }}
+                            <span>-</span>
+                            <Button
+                              color="link"
+                              size="sm"
+                              onClick={() => openAssignModal(monitor)}
+                              title="Assign Agents"
+                              style={{ padding: 0, color: '#28a745' }}
                             >
                               <FontAwesomeIcon icon={faPlus} />
-                            </button>
+                            </Button>
                           </>
                         )}
                       </div>
                     </td>
-                    <td className="actions-cell">
-                      <div className="action-buttons">
-                        <button
-                          className="action-btn btn-edit"
-                          title="Edit"
-                          onClick={() => handleEdit(httpMonitor)}
-                          style={{ border: 'none', background: 'none', cursor: 'pointer', padding: 0 }}
-                        >
-                          <FontAwesomeIcon icon={faPencil} />
-                        </button>
-                        <button
-                          className="action-btn btn-delete"
-                          title="Delete"
-                          onClick={() => handleDelete(httpMonitor)}
-                          style={{ border: 'none', background: 'none', cursor: 'pointer', padding: 0 }}
-                        >
-                          <FontAwesomeIcon icon={faTrash} />
-                        </button>
-                      </div>
+                    <td>
+                      <Button
+                        color="link"
+                        size="sm"
+                        onClick={() => handleEdit(monitor)}
+                        title="Edit"
+                        style={{ padding: 0, marginRight: '0.5rem' }}
+                      >
+                        <FontAwesomeIcon icon={faPencil} />
+                      </Button>
+                      <Button
+                        color="link"
+                        size="sm"
+                        onClick={() => handleDelete(monitor)}
+                        title="Delete"
+                        style={{ padding: 0, color: '#dc3545' }}
+                      >
+                        <FontAwesomeIcon icon={faTrash} />
+                      </Button>
                     </td>
                   </tr>
                 ))}
               </tbody>
-            </table>
-          </div>
-
-          {totalItems ? (
-            <div className="table-pagination">
-              <div className="pagination-info">
-                <JhiItemCount page={paginationState.activePage} total={totalItems} itemsPerPage={paginationState.itemsPerPage} />
-              </div>
-              <div className="pagination-controls">
-                <JhiPagination
-                  activePage={paginationState.activePage}
-                  onSelect={handlePagination}
-                  maxButtons={5}
-                  itemsPerPage={paginationState.itemsPerPage}
-                  totalItems={totalItems}
-                />
-              </div>
-            </div>
-          ) : (
-            ''
+            </Table>
           )}
-        </>
-      ) : (
-        !loading && <div className="alert alert-warning">No HTTP Monitors found</div>
-      )}
+        </CardBody>
+      </Card>
 
-      {/* Modals */}
       <HttpMonitorEditModal isOpen={editModalOpen} toggle={handleCloseEditModal} monitor={selectedMonitor} onSave={handleEditSuccess} />
       <HttpMonitorDeleteModal
         isOpen={deleteModalOpen}
@@ -525,7 +321,6 @@ export const HttpMonitor = () => {
       />
       <BodyViewModal isOpen={bodyViewOpen} toggle={handleCloseBodyModal} monitor={selectedMonitor} />
       <HeadersViewModal isOpen={headersViewOpen} toggle={handleCloseHeadersModal} monitor={selectedMonitor} />
-
       {selectedMonitor && (
         <AgentMonitorAssign
           isOpen={assignModalOpen}

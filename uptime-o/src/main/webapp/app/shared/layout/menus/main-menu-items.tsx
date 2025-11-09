@@ -16,6 +16,9 @@ export const InfrastructureMenuItems = () => (
 // Monitoring Section
 export const MonitoringMenuItems = () => (
   <>
+    <MenuItem icon="globe" to="/http-monitor" data-cy="http-monitors">
+      HTTP Monitors
+    </MenuItem>
     <MenuItem icon="heartbeat" to="/http-heartbeats" data-cy="http-heartbeats">
       HTTP Heartbeats
     </MenuItem>
@@ -31,9 +34,6 @@ export const MonitoringMenuItems = () => (
 // Settings Section
 export const SettingsMenuItems = () => (
   <>
-    <MenuItem icon="globe" to="/http-monitor" data-cy="http-monitors">
-      HTTP Monitors
-    </MenuItem>
     <MenuItem icon="clock" to="/schedule" data-cy="schedules">
       Schedules
     </MenuItem>
