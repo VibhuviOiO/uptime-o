@@ -74,7 +74,18 @@ func main() {
 		healthPort = "9090"
 	}
 
-	logrus.Infof("application configuration: agentId=%d, datacenterId=%d, apiBaseUrl=%s, healthPort=%s", agentID, datacenterID, apiBaseURL, healthPort)
+	// Get config reload interval (supports formats like: 1m, 5m, 1h, 24h)
+	configReloadInterval := 24 * time.Hour // Default: 24 hours
+	if reloadIntervalStr := os.Getenv("CONFIG_RELOAD_INTERVAL"); reloadIntervalStr != "" {
+		if parsedInterval, err := time.ParseDuration(reloadIntervalStr); err == nil {
+			configReloadInterval = parsedInterval
+			logrus.Infof("CONFIG_RELOAD_INTERVAL set to: %v", configReloadInterval)
+		} else {
+			logrus.Warnf("Invalid CONFIG_RELOAD_INTERVAL '%s': %v. Using default: 24h", reloadIntervalStr, err)
+		}
+	}
+
+	logrus.Infof("application configuration: agentId=%d, datacenterId=%d, apiBaseUrl=%s, healthPort=%s, configReloadInterval=%v", agentID, datacenterID, apiBaseURL, healthPort, configReloadInterval)
 
 	// Create API client
 	apiClient := api.NewClient(apiBaseURL, apiKey)
@@ -199,12 +210,12 @@ func main() {
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
 
-	// Reload config more frequently if we have no monitors (every 5 minutes vs 24 hours)
+	// Use shorter interval if no monitors configured (for faster discovery)
 	getReloadInterval := func() time.Duration {
 		if len(agent.Monitors) == 0 {
-			return 5 * time.Minute
+			return 5 * time.Minute // Check every 5 minutes when no monitors
 		}
-		return 24 * time.Hour
+		return configReloadInterval // Use configured interval when monitors exist
 	}
 
 	configReloadTicker := time.NewTicker(getReloadInterval())

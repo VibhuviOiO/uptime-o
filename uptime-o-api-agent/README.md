@@ -53,6 +53,7 @@ docker compose -f multiple-agents-compose.yml logs -f
 | DATACENTER_ID | Yes | Datacenter ID from database |
 | HEALTH_PORT | No | Health check port (default: 9090) |
 | QUEUE_PATH | No | Queue file path (default: /data/queue) |
+| CONFIG_RELOAD_INTERVAL | No | How often to check for new monitors (default: 24h)<br>Examples: `1m`, `5m`, `1h`, `24h` |
 
 ## Resilience Features
 
