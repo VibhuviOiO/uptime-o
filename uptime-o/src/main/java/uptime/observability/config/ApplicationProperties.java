@@ -12,11 +12,16 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class ApplicationProperties {
 
     private final Liquibase liquibase = new Liquibase();
+    private final Encryption encryption = new Encryption();
 
     // jhipster-needle-application-properties-property
 
     public Liquibase getLiquibase() {
         return liquibase;
+    }
+
+    public Encryption getEncryption() {
+        return encryption;
     }
 
     // jhipster-needle-application-properties-property-getter
@@ -31,6 +36,19 @@ public class ApplicationProperties {
 
         public void setAsyncStart(Boolean asyncStart) {
             this.asyncStart = asyncStart;
+        }
+    }
+
+    public static class Encryption {
+
+        private String secretKey;
+
+        public String getSecretKey() {
+            return secretKey;
+        }
+
+        public void setSecretKey(String secretKey) {
+            this.secretKey = secretKey;
         }
     }
     // jhipster-needle-application-properties-property-class

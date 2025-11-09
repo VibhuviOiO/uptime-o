@@ -110,4 +110,6 @@ jhipster:
 # https://www.jhipster.tech/common-application-properties/
 # ===================================================================
 
-# application:
+application:
+  encryption:
+    secret-key: Zx6YF8vKjN9pQr3TmW7nU2hV5sC1bL4eA8dG0fJ # Generated key for dev environment (DO NOT use in production!)

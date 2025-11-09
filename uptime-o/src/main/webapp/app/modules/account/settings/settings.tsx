@@ -1,90 +1,89 @@
-import React, { useEffect } from 'react';
-import { Button, Col, Row } from 'reactstrap';
-import { ValidatedField, ValidatedForm, isEmail } from 'react-jhipster';
-import { toast } from 'react-toastify';
+import React, { useState } from 'react';
+import { Container, Row, Col, Nav } from 'reactstrap';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUser, faLock, faUsers, faUserShield } from '@fortawesome/free-solid-svg-icons';
+import { useAppSelector } from 'app/config/store';
+import { hasAnyAuthority } from 'app/shared/auth/private-route';
+import { AUTHORITIES } from 'app/config/constants';
+import ProfileTab from './tabs/profile-tab';
+import SecurityTab from './tabs/security-tab';
+import UserManagementTab from './tabs/user-management-tab';
+import RoleManagementTab from './tabs/role-management-tab';
+import './settings.scss';
 
-import { useAppDispatch, useAppSelector } from 'app/config/store';
-import { getSession } from 'app/shared/reducers/authentication';
-import { reset, saveAccountSettings } from './settings.reducer';
+export type SettingsTab = 'profile' | 'security' | 'user-management' | 'role-management';
 
 export const SettingsPage = () => {
-  const dispatch = useAppDispatch();
+  const [activeTab, setActiveTab] = useState<SettingsTab>('profile');
   const account = useAppSelector(state => state.authentication.account);
-  const successMessage = useAppSelector(state => state.settings.successMessage);
+  const isAdmin = useAppSelector(state => hasAnyAuthority(state.authentication.account.authorities, [AUTHORITIES.ADMIN]));
 
-  useEffect(() => {
-    dispatch(getSession());
-    return () => {
-      dispatch(reset());
-    };
-  }, []);
-
-  useEffect(() => {
-    if (successMessage) {
-      toast.success(successMessage);
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 'profile':
+        return <ProfileTab />;
+      case 'security':
+        return <SecurityTab />;
+      case 'user-management':
+        return <UserManagementTab />;
+      case 'role-management':
+        return <RoleManagementTab />;
+      default:
+        return <ProfileTab />;
     }
-  }, [successMessage]);
-
-  const handleValidSubmit = values => {
-    dispatch(
-      saveAccountSettings({
-        ...account,
-        ...values,
-      }),
-    );
   };
 
   return (
-    <div>
-      <Row className="justify-content-center">
-        <Col md="8">
-          <h2 id="settings-title">
-            User settings for [<strong>{account.login}</strong>]
-          </h2>
-          <ValidatedForm id="settings-form" onSubmit={handleValidSubmit} defaultValues={account}>
-            <ValidatedField
-              name="firstName"
-              label="First Name"
-              id="firstName"
-              placeholder="Your first name"
-              validate={{
-                required: { value: true, message: 'Your first name is required.' },
-                minLength: { value: 1, message: 'Your first name is required to be at least 1 character' },
-                maxLength: { value: 50, message: 'Your first name cannot be longer than 50 characters' },
-              }}
-              data-cy="firstname"
-            />
-            <ValidatedField
-              name="lastName"
-              label="Last Name"
-              id="lastName"
-              placeholder="Your last name"
-              validate={{
-                required: { value: true, message: 'Your last name is required.' },
-                minLength: { value: 1, message: 'Your last name is required to be at least 1 character' },
-                maxLength: { value: 50, message: 'Your last name cannot be longer than 50 characters' },
-              }}
-              data-cy="lastname"
-            />
-            <ValidatedField
-              name="email"
-              label="Email"
-              placeholder="Your email"
-              type="email"
-              validate={{
-                required: { value: true, message: 'Your email is required.' },
-                minLength: { value: 5, message: 'Your email is required to be at least 5 characters.' },
-                maxLength: { value: 254, message: 'Your email cannot be longer than 50 characters.' },
-                validate: v => isEmail(v) || 'Your email is invalid.',
-              }}
-              data-cy="email"
-            />
-            <Button color="primary" type="submit" data-cy="submit">
-              Save
-            </Button>
-          </ValidatedForm>
-        </Col>
-      </Row>
+    <div className="settings-page">
+      <Container fluid>
+        <Row>
+          {/* Sidebar Navigation */}
+          <Col md={3} lg={2} className="settings-sidebar p-0">
+            <div className="sidebar-header">
+              <h4>Settings</h4>
+              <p className="text-muted small">{account.login}</p>
+            </div>
+            <Nav vertical className="settings-nav">
+              <button className={`nav-link ${activeTab === 'profile' ? 'active' : ''}`} onClick={() => setActiveTab('profile')}>
+                <FontAwesomeIcon icon={faUser} className="me-2" />
+                Profile
+              </button>
+              <button className={`nav-link ${activeTab === 'security' ? 'active' : ''}`} onClick={() => setActiveTab('security')}>
+                <FontAwesomeIcon icon={faLock} className="me-2" />
+                Security
+              </button>
+
+              {/* Admin Only Tabs */}
+              {isAdmin && (
+                <>
+                  <div className="nav-section-divider">
+                    <span className="text-muted small">ADMINISTRATION</span>
+                  </div>
+                  <button
+                    className={`nav-link ${activeTab === 'user-management' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('user-management')}
+                  >
+                    <FontAwesomeIcon icon={faUsers} className="me-2" />
+                    User Management
+                  </button>
+                  <button
+                    className={`nav-link ${activeTab === 'role-management' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('role-management')}
+                  >
+                    <FontAwesomeIcon icon={faUserShield} className="me-2" />
+                    Role Management
+                  </button>
+                </>
+              )}
+            </Nav>
+          </Col>
+
+          {/* Main Content Area */}
+          <Col md={9} lg={10} className="settings-content">
+            {renderTabContent()}
+          </Col>
+        </Row>
+      </Container>
     </div>
   );
 };
