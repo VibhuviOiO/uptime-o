@@ -8,8 +8,8 @@ const accountMenuItemsAuthenticated = () => (
     <MenuItem icon="wrench" to="/account/settings" data-cy="settings">
       Settings
     </MenuItem>
-    <MenuItem icon="lock" to="/account/password" data-cy="passwordItem">
-      Password
+    <MenuItem icon="lock" to="/account/settings/security" data-cy="passwordItem">
+      Security
     </MenuItem>
     <MenuItem icon="sign-out-alt" to="/logout" data-cy="logout">
       Sign out
