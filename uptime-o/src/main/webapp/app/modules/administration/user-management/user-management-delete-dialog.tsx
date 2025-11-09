@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -11,6 +11,7 @@ export const UserManagementDeleteDialog = () => {
   const dispatch = useAppDispatch();
 
   const navigate = useNavigate();
+  const location = useLocation();
   const { login } = useParams<'login'>();
 
   useEffect(() => {
@@ -19,14 +20,14 @@ export const UserManagementDeleteDialog = () => {
 
   const handleClose = event => {
     event.stopPropagation();
-    navigate('/admin/user-management');
+    navigate(-1);
   };
 
   const user = useAppSelector(state => state.userManagement.user);
 
-  const confirmDelete = event => {
-    dispatch(deleteUser(user.login));
-    handleClose(event);
+  const confirmDelete = async event => {
+    await dispatch(deleteUser(user.login));
+    navigate('/account/settings/user', { state: { refresh: Date.now() } });
   };
 
   return (

@@ -1,22 +1,38 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Container, Row, Col, Nav } from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faLock, faUsers, faUserShield } from '@fortawesome/free-solid-svg-icons';
 import { useAppSelector } from 'app/config/store';
 import { hasAnyAuthority } from 'app/shared/auth/private-route';
 import { AUTHORITIES } from 'app/config/constants';
+import { useNavigate, useParams } from 'react-router-dom';
 import ProfileTab from './tabs/profile-tab';
 import SecurityTab from './tabs/security-tab';
 import UserManagementTab from './tabs/user-management-tab';
 import RoleManagementTab from './tabs/role-management-tab';
 import './settings.scss';
 
-export type SettingsTab = 'profile' | 'security' | 'user-management' | 'role-management';
+export type SettingsTab = 'profile' | 'security' | 'user' | 'user-roles';
 
 export const SettingsPage = () => {
+  const { tab } = useParams<{ tab?: string }>();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<SettingsTab>('profile');
   const account = useAppSelector(state => state.authentication.account);
   const isAdmin = useAppSelector(state => hasAnyAuthority(state.authentication.account.authorities, [AUTHORITIES.ADMIN]));
+
+  useEffect(() => {
+    if (tab && (tab === 'profile' || tab === 'security' || tab === 'user' || tab === 'user-roles')) {
+      setActiveTab(tab as SettingsTab);
+    } else {
+      setActiveTab('profile');
+    }
+  }, [tab]);
+
+  const handleTabChange = (newTab: SettingsTab) => {
+    setActiveTab(newTab);
+    navigate(`/account/settings/${newTab}`);
+  };
 
   const renderTabContent = () => {
     switch (activeTab) {
@@ -24,9 +40,9 @@ export const SettingsPage = () => {
         return <ProfileTab />;
       case 'security':
         return <SecurityTab />;
-      case 'user-management':
+      case 'user':
         return <UserManagementTab />;
-      case 'role-management':
+      case 'user-roles':
         return <RoleManagementTab />;
       default:
         return <ProfileTab />;
@@ -44,11 +60,11 @@ export const SettingsPage = () => {
               <p className="text-muted small">{account.login}</p>
             </div>
             <Nav vertical className="settings-nav">
-              <button className={`nav-link ${activeTab === 'profile' ? 'active' : ''}`} onClick={() => setActiveTab('profile')}>
+              <button className={`nav-link ${activeTab === 'profile' ? 'active' : ''}`} onClick={() => handleTabChange('profile')}>
                 <FontAwesomeIcon icon={faUser} className="me-2" />
                 Profile
               </button>
-              <button className={`nav-link ${activeTab === 'security' ? 'active' : ''}`} onClick={() => setActiveTab('security')}>
+              <button className={`nav-link ${activeTab === 'security' ? 'active' : ''}`} onClick={() => handleTabChange('security')}>
                 <FontAwesomeIcon icon={faLock} className="me-2" />
                 Security
               </button>
@@ -59,16 +75,13 @@ export const SettingsPage = () => {
                   <div className="nav-section-divider">
                     <span className="text-muted small">ADMINISTRATION</span>
                   </div>
-                  <button
-                    className={`nav-link ${activeTab === 'user-management' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('user-management')}
-                  >
+                  <button className={`nav-link ${activeTab === 'user' ? 'active' : ''}`} onClick={() => handleTabChange('user')}>
                     <FontAwesomeIcon icon={faUsers} className="me-2" />
                     User Management
                   </button>
                   <button
-                    className={`nav-link ${activeTab === 'role-management' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('role-management')}
+                    className={`nav-link ${activeTab === 'user-roles' ? 'active' : ''}`}
+                    onClick={() => handleTabChange('user-roles')}
                   >
                     <FontAwesomeIcon icon={faUserShield} className="me-2" />
                     Role Management

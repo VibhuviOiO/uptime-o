@@ -10,6 +10,7 @@ const AccountRoutes = () => (
   <div>
     <ErrorBoundaryRoutes>
       <Route path="settings" element={<Settings />} />
+      <Route path="settings/:tab" element={<Settings />} />
       <Route path="password" element={<Password />} />
     </ErrorBoundaryRoutes>
   </div>

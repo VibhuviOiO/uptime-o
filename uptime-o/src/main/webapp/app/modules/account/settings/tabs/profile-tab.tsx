@@ -124,9 +124,6 @@ export const ProfileTab = () => {
           <Button color="primary" type="submit" data-cy="submit">
             Save Changes
           </Button>
-          <Button color="secondary" type="reset" outline>
-            Cancel
-          </Button>
         </div>
       </ValidatedForm>
     </div>
