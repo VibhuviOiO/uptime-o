@@ -274,6 +274,6 @@ docke
 
 ## Create the the partition. : 
 
-CREATE TABLE IF NOT EXISTS api_heartbeats_2025_11_08
+CREATE TABLE IF NOT EXISTS api_heartbeats_2025_11_09
 PARTITION OF api_heartbeats
-FOR VALUES FROM ('2025-11-08 00:00:00') TO ('2025-11-09 00:00:00');
+FOR VALUES FROM ('2025-11-09 00:00:00') TO ('2025-11-10 00:00:00');
