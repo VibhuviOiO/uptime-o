@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Container, Row, Col, Nav } from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faLock, faUsers, faUserShield } from '@fortawesome/free-solid-svg-icons';
+import { faUser, faLock, faUsers, faUserShield, faKey } from '@fortawesome/free-solid-svg-icons';
 import { useAppSelector } from 'app/config/store';
 import { hasAnyAuthority } from 'app/shared/auth/private-route';
 import { AUTHORITIES } from 'app/config/constants';
@@ -10,9 +10,10 @@ import ProfileTab from './tabs/profile-tab';
 import SecurityTab from './tabs/security-tab';
 import UserManagementTab from './tabs/user-management-tab';
 import RoleManagementTab from './tabs/role-management-tab';
+import ApiKeyManagementTab from './tabs/api-key-management-tab';
 import './settings.scss';
 
-export type SettingsTab = 'profile' | 'security' | 'user' | 'user-roles';
+export type SettingsTab = 'profile' | 'security' | 'user' | 'user-roles' | 'api-keys';
 
 export const SettingsPage = () => {
   const { tab } = useParams<{ tab?: string }>();
@@ -22,12 +23,17 @@ export const SettingsPage = () => {
   const isAdmin = useAppSelector(state => hasAnyAuthority(state.authentication.account.authorities, [AUTHORITIES.ADMIN]));
 
   useEffect(() => {
-    if (tab && (tab === 'profile' || tab === 'security' || tab === 'user' || tab === 'user-roles')) {
+    if (tab && (tab === 'profile' || tab === 'security' || tab === 'user' || tab === 'user-roles' || tab === 'api-keys')) {
+      // Check if non-admin is trying to access admin-only tabs
+      if (!isAdmin && (tab === 'user' || tab === 'user-roles' || tab === 'api-keys')) {
+        navigate('/account/settings/profile');
+        return;
+      }
       setActiveTab(tab as SettingsTab);
     } else {
       setActiveTab('profile');
     }
-  }, [tab]);
+  }, [tab, isAdmin, navigate]);
 
   const handleTabChange = (newTab: SettingsTab) => {
     setActiveTab(newTab);
@@ -41,9 +47,11 @@ export const SettingsPage = () => {
       case 'security':
         return <SecurityTab />;
       case 'user':
-        return <UserManagementTab />;
+        return isAdmin ? <UserManagementTab /> : <ProfileTab />;
       case 'user-roles':
-        return <RoleManagementTab />;
+        return isAdmin ? <RoleManagementTab /> : <ProfileTab />;
+      case 'api-keys':
+        return isAdmin ? <ApiKeyManagementTab /> : <ProfileTab />;
       default:
         return <ProfileTab />;
     }
@@ -85,6 +93,10 @@ export const SettingsPage = () => {
                   >
                     <FontAwesomeIcon icon={faUserShield} className="me-2" />
                     Role Management
+                  </button>
+                  <button className={`nav-link ${activeTab === 'api-keys' ? 'active' : ''}`} onClick={() => handleTabChange('api-keys')}>
+                    <FontAwesomeIcon icon={faKey} className="me-2" />
+                    API Keys
                   </button>
                 </>
               )}

@@ -27,9 +27,11 @@ import uptime.observability.web.filter.SpaWebFilter;
 public class SecurityConfiguration {
 
     private final JHipsterProperties jHipsterProperties;
+    private final ApiKeyAuthenticationFilter apiKeyAuthenticationFilter;
 
-    public SecurityConfiguration(JHipsterProperties jHipsterProperties) {
+    public SecurityConfiguration(JHipsterProperties jHipsterProperties, ApiKeyAuthenticationFilter apiKeyAuthenticationFilter) {
         this.jHipsterProperties = jHipsterProperties;
+        this.apiKeyAuthenticationFilter = apiKeyAuthenticationFilter;
     }
 
     @Bean
@@ -43,6 +45,7 @@ public class SecurityConfiguration {
             .cors(withDefaults())
             .csrf(csrf -> csrf.disable())
             .addFilterAfter(new SpaWebFilter(), BasicAuthenticationFilter.class)
+            .addFilterBefore(apiKeyAuthenticationFilter, BasicAuthenticationFilter.class)
             .headers(headers ->
                 headers
                     .contentSecurityPolicy(csp -> csp.policyDirectives(jHipsterProperties.getSecurity().getContentSecurityPolicy()))
@@ -69,6 +72,7 @@ public class SecurityConfiguration {
                     .requestMatchers(mvc.pattern("/api/activate")).permitAll()
                     .requestMatchers(mvc.pattern("/api/account/reset-password/init")).permitAll()
                     .requestMatchers(mvc.pattern("/api/account/reset-password/finish")).permitAll()
+                    .requestMatchers(mvc.pattern("/api/public/heartbeats/**")).hasAnyAuthority(AuthoritiesConstants.API_AGENT, AuthoritiesConstants.USER, AuthoritiesConstants.ADMIN)
                     .requestMatchers(mvc.pattern("/api/admin/**")).hasAuthority(AuthoritiesConstants.ADMIN)
                     .requestMatchers(mvc.pattern("/api/**")).authenticated()
                     .requestMatchers(mvc.pattern("/websocket/**")).authenticated()
