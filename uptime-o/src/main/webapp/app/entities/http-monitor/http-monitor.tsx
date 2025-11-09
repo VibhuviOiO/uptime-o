@@ -22,7 +22,7 @@ import axios from 'axios';
 
 import { getEntities } from './http-monitor.reducer';
 import { IHttpMonitor } from 'app/shared/model/http-monitor.model';
-import DatacenterMonitorAssign from './datacenter-monitor-assign';
+import AgentMonitorAssign from './agent-monitor-assign';
 import { BodyViewModal } from 'app/modules/home/components/BodyViewModal';
 import { HeadersViewModal } from 'app/modules/home/components/HeadersViewModal';
 import { HttpMonitorEditModal } from 'app/modules/home/components/HttpMonitorEditModal';
@@ -49,8 +49,8 @@ export const HttpMonitor = () => {
   // Monitor selection
   const [selectedMonitor, setSelectedMonitor] = useState<IHttpMonitor | null>(null);
 
-  // Datacenter assignments mapping
-  const [datacenterAssignments, setDatacenterAssignments] = useState<{ [monitorId: number]: any[] }>({});
+  // Agent assignments mapping
+  const [agentAssignments, setAgentAssignments] = useState<{ [monitorId: number]: any[] }>({});
 
   // Redux selectors
   const httpMonitorList = useAppSelector(state => state.httpMonitor.entities);
@@ -66,13 +66,13 @@ export const HttpMonitor = () => {
         sort: `${paginationState.sort},${paginationState.order}`,
       }),
     );
-    fetchDatacenterAssignments();
+    fetchAgentAssignments();
   };
 
-  const fetchDatacenterAssignments = async () => {
+  const fetchAgentAssignments = async () => {
     try {
-      // Fetch all datacenter-monitor assignments using axios (same as assign modal)
-      const response = await axios.get<any>('/api/datacenter-monitors?size=10000');
+      // Fetch all agent-monitor assignments using axios
+      const response = await axios.get<any>('/api/agent-monitors?size=10000');
       const responseData = response.data;
 
       // Handle paginated response - axios.data contains response.data
@@ -91,20 +91,19 @@ export const HttpMonitor = () => {
       // Group by monitor ID
       const grouped: { [key: number]: any[] } = {};
       assignments.forEach((assignment: any) => {
-        const monitorId = assignment.monitor?.id;
+        const monitorId = assignment.monitorId;
         if (monitorId) {
           if (!grouped[monitorId]) {
             grouped[monitorId] = [];
           }
-          // Only add if datacenter exists
-          if (assignment.datacenter) {
-            grouped[monitorId].push(assignment.datacenter);
+          // Store agent name for display
+          if (assignment.agentName) {
+            grouped[monitorId].push({ name: assignment.agentName });
           }
         }
       });
 
-      console.warn('Grouped assignments:', grouped);
-      setDatacenterAssignments(grouped);
+      setAgentAssignments(grouped);
     } catch (error) {
       console.error('Failed to fetch datacenter assignments:', error);
     }
@@ -137,10 +136,10 @@ export const HttpMonitor = () => {
     }
   }, [pageLocation.search]);
 
-  // Fetch datacenter assignments whenever the monitor list changes
+  // Fetch agent assignments whenever the monitor list changes
   useEffect(() => {
     if (httpMonitorList && httpMonitorList.length > 0) {
-      fetchDatacenterAssignments();
+      fetchAgentAssignments();
     }
   }, [httpMonitorList]);
 
@@ -232,15 +231,15 @@ export const HttpMonitor = () => {
 
         // Update only this monitor's assignments
         const monitorAssignments = assignments.filter((a: any) => a.monitor?.id === selectedMonitor.id);
-        const datacenters = monitorAssignments.map((a: any) => a.datacenter).filter((dc: any) => dc);
+        const agents = monitorAssignments.map((a: any) => ({ name: a.agentName })).filter((ag: any) => ag.name);
 
         // Update the state with just this monitor's data
-        setDatacenterAssignments(prev => ({
+        setAgentAssignments(prev => ({
           ...prev,
-          [selectedMonitor.id]: datacenters,
+          [selectedMonitor.id]: agents,
         }));
       } catch (error) {
-        console.error('Failed to refresh datacenter assignments:', error);
+        console.error('Failed to refresh agent assignments:', error);
       }
     }
 
@@ -400,11 +399,11 @@ export const HttpMonitor = () => {
                           overflowY: 'auto',
                         }}
                       >
-                        {httpMonitor.id && datacenterAssignments[httpMonitor.id] && datacenterAssignments[httpMonitor.id].length > 0 ? (
+                        {httpMonitor.id && agentAssignments[httpMonitor.id] && agentAssignments[httpMonitor.id].length > 0 ? (
                           <>
-                            {datacenterAssignments[httpMonitor.id].map((dc: any) => (
+                            {agentAssignments[httpMonitor.id].map((agent: any, index: number) => (
                               <span
-                                key={dc.id}
+                                key={index}
                                 style={{
                                   display: 'inline-flex',
                                   alignItems: 'center',
@@ -420,13 +419,12 @@ export const HttpMonitor = () => {
                                 }}
                               >
                                 <FontAwesomeIcon icon={faBuilding} style={{ fontSize: '0.6rem' }} />
-                                <strong>{dc.name}</strong>
-                                {dc.code && <span style={{ color: '#558b2f', fontSize: '0.55rem' }}>({dc.code})</span>}
+                                <strong>{agent.name}</strong>
                               </span>
                             ))}
                             <button
                               className="action-btn btn-assign"
-                              title="Add Datacenters"
+                              title="Assign Agents"
                               onClick={() => openAssignModal(httpMonitor)}
                               style={{
                                 border: 'none',
@@ -529,7 +527,7 @@ export const HttpMonitor = () => {
       <HeadersViewModal isOpen={headersViewOpen} toggle={handleCloseHeadersModal} monitor={selectedMonitor} />
 
       {selectedMonitor && (
-        <DatacenterMonitorAssign
+        <AgentMonitorAssign
           isOpen={assignModalOpen}
           toggle={closeAssignModal}
           monitorId={selectedMonitor.id}

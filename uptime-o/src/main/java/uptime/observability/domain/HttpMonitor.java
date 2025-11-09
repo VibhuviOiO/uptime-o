@@ -56,8 +56,8 @@ public class HttpMonitor implements Serializable {
     private Set<HttpHeartbeat> apiHeartbeats = new HashSet<>();
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "monitor")
-    @JsonIgnoreProperties(value = { "datacenter", "monitor" }, allowSetters = true)
-    private Set<DatacenterMonitor> datacenterMonitors = new HashSet<>();
+    @JsonIgnoreProperties(value = { "agent", "monitor" }, allowSetters = true)
+    private Set<AgentMonitor> agentMonitors = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JsonIgnoreProperties(value = { "apiMonitors" }, allowSetters = true)
@@ -187,34 +187,34 @@ public class HttpMonitor implements Serializable {
         return this;
     }
 
-    public Set<DatacenterMonitor> getDatacenterMonitors() {
-        return this.datacenterMonitors;
+    public Set<AgentMonitor> getAgentMonitors() {
+        return this.agentMonitors;
     }
 
-    public void setDatacenterMonitors(Set<DatacenterMonitor> datacenterMonitors) {
-        if (this.datacenterMonitors != null) {
-            this.datacenterMonitors.forEach(i -> i.setMonitor(null));
+    public void setAgentMonitors(Set<AgentMonitor> agentMonitors) {
+        if (this.agentMonitors != null) {
+            this.agentMonitors.forEach(i -> i.setMonitor(null));
         }
-        if (datacenterMonitors != null) {
-            datacenterMonitors.forEach(i -> i.setMonitor(this));
+        if (agentMonitors != null) {
+            agentMonitors.forEach(i -> i.setMonitor(this));
         }
-        this.datacenterMonitors = datacenterMonitors;
+        this.agentMonitors = agentMonitors;
     }
 
-    public HttpMonitor datacenterMonitors(Set<DatacenterMonitor> datacenterMonitors) {
-        this.setDatacenterMonitors(datacenterMonitors);
+    public HttpMonitor agentMonitors(Set<AgentMonitor> agentMonitors) {
+        this.setAgentMonitors(agentMonitors);
         return this;
     }
 
-    public HttpMonitor addDatacenterMonitor(DatacenterMonitor datacenterMonitor) {
-        this.datacenterMonitors.add(datacenterMonitor);
-        datacenterMonitor.setMonitor(this);
+    public HttpMonitor addAgentMonitor(AgentMonitor agentMonitor) {
+        this.agentMonitors.add(agentMonitor);
+        agentMonitor.setMonitor(this);
         return this;
     }
 
-    public HttpMonitor removeDatacenterMonitor(DatacenterMonitor datacenterMonitor) {
-        this.datacenterMonitors.remove(datacenterMonitor);
-        datacenterMonitor.setMonitor(null);
+    public HttpMonitor removeAgentMonitor(AgentMonitor agentMonitor) {
+        this.agentMonitors.remove(agentMonitor);
+        agentMonitor.setMonitor(null);
         return this;
     }
 

@@ -12,7 +12,7 @@ import { HttpMonitorDeleteModal } from './HttpMonitorDeleteModal';
 import { HttpMonitorViewModal } from './HttpMonitorViewModal';
 import { BodyViewModal } from './BodyViewModal';
 import { HeadersViewModal } from './HeadersViewModal';
-import DatacenterMonitorAssign from 'app/entities/http-monitor/datacenter-monitor-assign';
+import AgentMonitorAssign from 'app/entities/http-monitor/agent-monitor-assign';
 
 export const MonitorsWidget = () => {
   const dispatch = useAppDispatch();
@@ -43,7 +43,7 @@ export const MonitorsWidget = () => {
 
   const fetchDatacenterAssignments = async () => {
     try {
-      const response = await axios.get<any>('/api/datacenter-monitors?size=10000');
+      const response = await axios.get<any>('/api/agent-monitors?size=10000');
       const responseData = response.data;
 
       let assignments = [];
@@ -55,20 +55,22 @@ export const MonitorsWidget = () => {
 
       const grouped: { [key: number]: any[] } = {};
       assignments.forEach((assignment: any) => {
-        const monitorId = assignment.monitor?.id;
+        const monitorId = assignment.monitorId;
         if (monitorId) {
           if (!grouped[monitorId]) {
             grouped[monitorId] = [];
           }
-          if (assignment.datacenter) {
-            grouped[monitorId].push(assignment.datacenter);
-          }
+          // Create agent object from the assignment data
+          grouped[monitorId].push({
+            id: assignment.agentId,
+            name: assignment.agentName,
+          });
         }
       });
 
       setDatacenterAssignments(grouped);
     } catch (error) {
-      console.error('Failed to fetch datacenter assignments:', error);
+      console.error('Failed to fetch agent assignments:', error);
     }
   };
 
@@ -352,9 +354,9 @@ export const MonitorsWidget = () => {
                   >
                     {monitor.id && datacenterAssignments[monitor.id] && datacenterAssignments[monitor.id].length > 0 ? (
                       <>
-                        {datacenterAssignments[monitor.id].map((dc: any) => (
+                        {datacenterAssignments[monitor.id].map((agent: any) => (
                           <span
-                            key={dc.id}
+                            key={agent.id}
                             style={{
                               display: 'inline-flex',
                               alignItems: 'center',
@@ -370,13 +372,12 @@ export const MonitorsWidget = () => {
                             }}
                           >
                             <FontAwesomeIcon icon={faBuilding} style={{ fontSize: '0.6rem' }} />
-                            <strong>{dc.name}</strong>
-                            {dc.code && <span style={{ color: '#558b2f', fontSize: '0.55rem' }}>({dc.code})</span>}
+                            <strong>{agent.name}</strong>
                           </span>
                         ))}
                         <button
                           className="action-btn btn-assign"
-                          title="Add Datacenters"
+                          title="Add Agents"
                           onClick={() => openAssignModal(monitor)}
                           style={{
                             border: 'none',
@@ -398,7 +399,7 @@ export const MonitorsWidget = () => {
                         <span className="text-muted text-small">-</span>
                         <button
                           className="action-btn btn-assign"
-                          title="Add Datacenters"
+                          title="Add Agents"
                           onClick={() => openAssignModal(monitor)}
                           style={{
                             border: 'none',
@@ -465,7 +466,7 @@ export const MonitorsWidget = () => {
       <HttpMonitorViewModal isOpen={viewModalOpen} toggle={handleCloseViewModal} monitor={selectedMonitor} />
       <BodyViewModal isOpen={bodyViewOpen} toggle={handleCloseBodyModal} monitor={selectedMonitor} />
       <HeadersViewModal isOpen={headersViewOpen} toggle={handleCloseHeadersModal} monitor={selectedMonitor} />
-      <DatacenterMonitorAssign
+      <AgentMonitorAssign
         isOpen={assignModalOpen}
         toggle={handleCloseAssignModal}
         monitorId={selectedMonitor?.id}

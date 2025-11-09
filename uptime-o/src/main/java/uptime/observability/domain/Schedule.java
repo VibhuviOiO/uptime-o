@@ -43,7 +43,7 @@ public class Schedule implements Serializable {
     private Integer thresholdsCritical;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "schedule")
-    @JsonIgnoreProperties(value = { "apiHeartbeats", "datacenterMonitors", "schedule" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "apiHeartbeats", "agentMonitors", "schedule" }, allowSetters = true)
     private Set<HttpMonitor> apiMonitors = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

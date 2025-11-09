@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Modal, ModalHeader, ModalBody, ModalFooter, Button, Form, FormGroup, Label, Input } from 'reactstrap';
-import { useAppDispatch, useAppSelector } from 'app/config/store';
-import { updateEntity, createEntity, getEntity, reset } from 'app/entities/region/region.reducer';
+import { toast } from 'react-toastify';
+import axios from 'axios';
 
 interface RegionEditModalProps {
   isOpen: boolean;
@@ -11,43 +11,35 @@ interface RegionEditModalProps {
 }
 
 export const RegionEditModal: React.FC<RegionEditModalProps> = ({ isOpen, toggle, regionId, onSave }) => {
-  const dispatch = useAppDispatch();
-  const [formData, setFormData] = useState({ name: '', regionCode: '' });
+  const [formData, setFormData] = useState({ name: '', regionCode: '', groupName: '' });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-
-  const regionEntity = useAppSelector(state => state.region.entity);
-  const updating = useAppSelector(state => state.region.updating);
-  const updateSuccess = useAppSelector(state => state.region.updateSuccess);
+  const [loading, setLoading] = useState(false);
 
   const isNew = !regionId;
 
   useEffect(() => {
     if (isOpen) {
       if (isNew) {
-        dispatch(reset());
-        setFormData({ name: '', regionCode: '' });
+        setFormData({ name: '', regionCode: '', groupName: '' });
       } else if (regionId) {
-        dispatch(getEntity(regionId));
+        loadRegion(regionId);
       }
     }
-  }, [isOpen, regionId, isNew, dispatch]);
+  }, [isOpen, regionId, isNew]);
 
-  useEffect(() => {
-    if (!isNew && regionEntity && regionEntity.id === regionId) {
+  const loadRegion = async (id: number) => {
+    try {
+      const response = await axios.get(`/api/regions/${id}`);
+      const region = response.data;
       setFormData({
-        name: regionEntity.name || '',
-        regionCode: regionEntity.regionCode || '',
+        name: region.name || '',
+        regionCode: region.regionCode || '',
+        groupName: region.groupName || '',
       });
+    } catch (error) {
+      toast.error('Failed to load region');
     }
-  }, [regionEntity, regionId, isNew]);
-
-  useEffect(() => {
-    if (updateSuccess) {
-      setFormData({ name: '', regionCode: '' });
-      toggle();
-      onSave?.();
-    }
-  }, [updateSuccess, toggle, onSave]);
+  };
 
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
@@ -83,25 +75,39 @@ export const RegionEditModal: React.FC<RegionEditModalProps> = ({ isOpen, toggle
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (validateForm()) {
+  const handleSubmit = async (e?: React.FormEvent | React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+    }
+    if (!validateForm()) {
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const data = {
+        id: regionId,
+        name: formData.name,
+        regionCode: formData.regionCode,
+        groupName: formData.groupName,
+      };
+
       if (isNew) {
-        dispatch(
-          createEntity({
-            name: formData.name,
-            regionCode: formData.regionCode,
-          }),
-        );
+        await axios.post('/api/regions', data);
+        toast.success('Region created successfully');
       } else {
-        dispatch(
-          updateEntity({
-            id: regionId,
-            name: formData.name,
-            regionCode: formData.regionCode,
-          }),
-        );
+        await axios.put(`/api/regions/${regionId}`, data);
+        toast.success('Region updated successfully');
       }
+
+      toggle();
+      if (onSave) {
+        onSave();
+      }
+    } catch (error) {
+      toast.error(`Failed to ${isNew ? 'create' : 'update'} region`);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -124,7 +130,7 @@ export const RegionEditModal: React.FC<RegionEditModalProps> = ({ isOpen, toggle
               value={formData.name}
               onChange={handleInputChange}
               invalid={!!errors.name}
-              disabled={updating}
+              disabled={loading}
             />
             {errors.name && <div style={{ color: '#dc3545', fontSize: '0.875rem', marginTop: '0.25rem' }}>{errors.name}</div>}
           </FormGroup>
@@ -139,18 +145,33 @@ export const RegionEditModal: React.FC<RegionEditModalProps> = ({ isOpen, toggle
               value={formData.regionCode}
               onChange={handleInputChange}
               invalid={!!errors.regionCode}
-              disabled={updating}
+              disabled={loading}
             />
             {errors.regionCode && <div style={{ color: '#dc3545', fontSize: '0.875rem', marginTop: '0.25rem' }}>{errors.regionCode}</div>}
+          </FormGroup>
+
+          <FormGroup>
+            <Label for="group-name">Group Name</Label>
+            <Input
+              type="text"
+              name="groupName"
+              id="group-name"
+              placeholder="Enter group name"
+              value={formData.groupName}
+              onChange={handleInputChange}
+              invalid={!!errors.groupName}
+              disabled={loading}
+            />
+            {errors.groupName && <div style={{ color: '#dc3545', fontSize: '0.875rem', marginTop: '0.25rem' }}>{errors.groupName}</div>}
           </FormGroup>
         </Form>
       </ModalBody>
       <ModalFooter style={{ borderTop: '1px solid #dee2e6', paddingTop: '1rem' }}>
-        <Button color="secondary" onClick={toggle} disabled={updating}>
+        <Button color="secondary" onClick={toggle} disabled={loading}>
           Cancel
         </Button>
-        <Button color="primary" onClick={handleSubmit} disabled={updating} style={{ cursor: updating ? 'not-allowed' : 'pointer' }}>
-          {updating ? 'Saving...' : isNew ? 'Create' : 'Save Changes'}
+        <Button color="primary" onClick={handleSubmit} disabled={loading} style={{ cursor: loading ? 'not-allowed' : 'pointer' }}>
+          {loading ? 'Saving...' : isNew ? 'Create' : 'Save Changes'}
         </Button>
       </ModalFooter>
     </Modal>

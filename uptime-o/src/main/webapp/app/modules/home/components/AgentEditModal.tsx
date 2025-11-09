@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Modal, ModalHeader, ModalBody, ModalFooter, Button, Form, FormGroup, Label, Input } from 'reactstrap';
-import { useAppDispatch, useAppSelector } from 'app/config/store';
-import { updateEntity, createEntity, getEntity, reset } from 'app/entities/agent/agent.reducer';
-import { getEntities as getDatacenters } from 'app/entities/datacenter/datacenter.reducer';
+import { toast } from 'react-toastify';
+import axios from 'axios';
 
 interface AgentEditModalProps {
   isOpen: boolean;
@@ -11,46 +10,51 @@ interface AgentEditModalProps {
   onSave?: () => void;
 }
 
+interface IDatacenter {
+  id?: number;
+  name?: string;
+}
+
 export const AgentEditModal: React.FC<AgentEditModalProps> = ({ isOpen, toggle, agentId, onSave }) => {
-  const dispatch = useAppDispatch();
   const [formData, setFormData] = useState({ name: '', datacenterId: '' });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-
-  const agentEntity = useAppSelector(state => state.agent.entity);
-  const updating = useAppSelector(state => state.agent.updating);
-  const updateSuccess = useAppSelector(state => state.agent.updateSuccess);
-  const datacenters = useAppSelector(state => state.datacenter.entities);
+  const [loading, setLoading] = useState(false);
+  const [datacenters, setDatacenters] = useState<IDatacenter[]>([]);
 
   const isNew = !agentId;
 
   useEffect(() => {
     if (isOpen) {
-      dispatch(getDatacenters({ page: 0, size: 1000, sort: 'id,desc' }));
+      loadDatacenters();
       if (isNew) {
-        dispatch(reset());
         setFormData({ name: '', datacenterId: '' });
       } else if (agentId) {
-        dispatch(getEntity(agentId));
+        loadAgent(agentId);
       }
     }
-  }, [isOpen, agentId, isNew, dispatch]);
+  }, [isOpen, agentId, isNew]);
 
-  useEffect(() => {
-    if (!isNew && agentEntity && agentEntity.id === agentId) {
+  const loadDatacenters = async () => {
+    try {
+      const response = await axios.get<IDatacenter[]>('/api/datacenters?page=0&size=1000&sort=name,asc');
+      setDatacenters(response.data);
+    } catch (error) {
+      toast.error('Failed to load datacenters');
+    }
+  };
+
+  const loadAgent = async (id: number) => {
+    try {
+      const response = await axios.get(`/api/agents/${id}`);
+      const agent = response.data;
       setFormData({
-        name: agentEntity.name || '',
-        datacenterId: agentEntity.datacenter?.id ? String(agentEntity.datacenter.id) : '',
+        name: agent.name || '',
+        datacenterId: agent.datacenter?.id ? String(agent.datacenter.id) : '',
       });
+    } catch (error) {
+      toast.error('Failed to load agent');
     }
-  }, [agentEntity, agentId, isNew]);
-
-  useEffect(() => {
-    if (updateSuccess) {
-      setFormData({ name: '', datacenterId: '' });
-      toggle();
-      onSave?.();
-    }
-  }, [updateSuccess, toggle, onSave]);
+  };
 
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
@@ -82,27 +86,41 @@ export const AgentEditModal: React.FC<AgentEditModalProps> = ({ isOpen, toggle, 
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (validateForm()) {
-      const dataToSubmit: any = {
+  const handleSubmit = async (e?: React.FormEvent | React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+    }
+    if (!validateForm()) {
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const data: any = {
+        id: agentId,
         name: formData.name,
       };
 
       if (formData.datacenterId) {
-        dataToSubmit.datacenter = { id: parseInt(formData.datacenterId, 10) };
+        data.datacenter = { id: parseInt(formData.datacenterId, 10) };
       }
 
       if (isNew) {
-        dispatch(createEntity(dataToSubmit));
+        await axios.post('/api/agents', data);
+        toast.success('Agent created successfully');
       } else {
-        dispatch(
-          updateEntity({
-            id: agentId,
-            ...dataToSubmit,
-          }),
-        );
+        await axios.put(`/api/agents/${agentId}`, data);
+        toast.success('Agent updated successfully');
       }
+
+      toggle();
+      if (onSave) {
+        onSave();
+      }
+    } catch (error) {
+      toast.error(`Failed to ${isNew ? 'create' : 'update'} agent`);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -121,7 +139,7 @@ export const AgentEditModal: React.FC<AgentEditModalProps> = ({ isOpen, toggle, 
               value={formData.name}
               onChange={handleChange}
               invalid={!!errors.name}
-              disabled={updating}
+              disabled={loading}
             />
             {errors.name && <div className="invalid-feedback d-block">{errors.name}</div>}
           </FormGroup>
@@ -133,7 +151,7 @@ export const AgentEditModal: React.FC<AgentEditModalProps> = ({ isOpen, toggle, 
               id="datacenterId"
               value={formData.datacenterId}
               onChange={handleChange}
-              disabled={updating}
+              disabled={loading}
             >
               <option value="">-- Select Datacenter --</option>
               {datacenters &&
@@ -147,10 +165,10 @@ export const AgentEditModal: React.FC<AgentEditModalProps> = ({ isOpen, toggle, 
         </Form>
       </ModalBody>
       <ModalFooter>
-        <Button color="secondary" onClick={toggle} disabled={updating}>
+        <Button color="secondary" onClick={toggle} disabled={loading}>
           Cancel
         </Button>
-        <Button color="primary" onClick={handleSubmit} disabled={updating}>
+        <Button color="primary" onClick={handleSubmit} disabled={loading}>
           {isNew ? 'Create' : 'Save'}
         </Button>
       </ModalFooter>

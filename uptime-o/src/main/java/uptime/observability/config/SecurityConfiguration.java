@@ -20,6 +20,7 @@ import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
 import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 import tech.jhipster.config.JHipsterProperties;
 import uptime.observability.security.*;
+import uptime.observability.service.ApiKeyService;
 import uptime.observability.web.filter.SpaWebFilter;
 
 @Configuration
@@ -27,11 +28,9 @@ import uptime.observability.web.filter.SpaWebFilter;
 public class SecurityConfiguration {
 
     private final JHipsterProperties jHipsterProperties;
-    private final ApiKeyAuthenticationFilter apiKeyAuthenticationFilter;
 
-    public SecurityConfiguration(JHipsterProperties jHipsterProperties, ApiKeyAuthenticationFilter apiKeyAuthenticationFilter) {
+    public SecurityConfiguration(JHipsterProperties jHipsterProperties) {
         this.jHipsterProperties = jHipsterProperties;
-        this.apiKeyAuthenticationFilter = apiKeyAuthenticationFilter;
     }
 
     @Bean
@@ -40,7 +39,12 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http, MvcRequestMatcher.Builder mvc) throws Exception {
+    public ApiKeyAuthenticationFilter apiKeyAuthenticationFilter(ApiKeyService apiKeyService) {
+        return new ApiKeyAuthenticationFilter(apiKeyService);
+    }
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http, MvcRequestMatcher.Builder mvc, ApiKeyAuthenticationFilter apiKeyAuthenticationFilter) throws Exception {
         http
             .cors(withDefaults())
             .csrf(csrf -> csrf.disable())

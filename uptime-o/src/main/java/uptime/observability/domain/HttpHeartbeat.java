@@ -90,11 +90,11 @@ public class HttpHeartbeat implements Serializable {
     private JsonNode rawResponseBody;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "apiHeartbeats", "datacenterMonitors", "schedule" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "apiHeartbeats", "agentMonitors", "schedule" }, allowSetters = true)
     private HttpMonitor monitor;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "apiHeartbeats", "datacenter" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "apiHeartbeats", "agentMonitors", "datacenter" }, allowSetters = true)
     private Agent agent;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

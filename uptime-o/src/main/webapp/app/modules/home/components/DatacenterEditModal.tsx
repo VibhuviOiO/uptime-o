@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Modal, ModalHeader, ModalBody, ModalFooter, Button, Form, FormGroup, Label, Input } from 'reactstrap';
-import { useAppDispatch, useAppSelector } from 'app/config/store';
-import { updateEntity, createEntity, getEntity, reset } from 'app/entities/datacenter/datacenter.reducer';
-import { getEntities as getRegions } from 'app/entities/region/region.reducer';
+import { toast } from 'react-toastify';
+import axios from 'axios';
 
 interface DatacenterEditModalProps {
   isOpen: boolean;
@@ -11,47 +10,52 @@ interface DatacenterEditModalProps {
   onSave?: () => void;
 }
 
+interface IRegion {
+  id?: number;
+  name?: string;
+}
+
 export const DatacenterEditModal: React.FC<DatacenterEditModalProps> = ({ isOpen, toggle, datacenterId, onSave }) => {
-  const dispatch = useAppDispatch();
   const [formData, setFormData] = useState({ code: '', name: '', regionId: '' });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-
-  const datacenterEntity = useAppSelector(state => state.datacenter.entity);
-  const updating = useAppSelector(state => state.datacenter.updating);
-  const updateSuccess = useAppSelector(state => state.datacenter.updateSuccess);
-  const regions = useAppSelector(state => state.region.entities);
+  const [loading, setLoading] = useState(false);
+  const [regions, setRegions] = useState<IRegion[]>([]);
 
   const isNew = !datacenterId;
 
   useEffect(() => {
     if (isOpen) {
-      dispatch(getRegions({ page: 0, size: 1000, sort: 'id,desc' }));
+      loadRegions();
       if (isNew) {
-        dispatch(reset());
         setFormData({ code: '', name: '', regionId: '' });
       } else if (datacenterId) {
-        dispatch(getEntity(datacenterId));
+        loadDatacenter(datacenterId);
       }
     }
-  }, [isOpen, datacenterId, isNew, dispatch]);
+  }, [isOpen, datacenterId, isNew]);
 
-  useEffect(() => {
-    if (!isNew && datacenterEntity && datacenterEntity.id === datacenterId) {
+  const loadRegions = async () => {
+    try {
+      const response = await axios.get<IRegion[]>('/api/regions?page=0&size=1000&sort=name,asc');
+      setRegions(response.data);
+    } catch (error) {
+      toast.error('Failed to load regions');
+    }
+  };
+
+  const loadDatacenter = async (id: number) => {
+    try {
+      const response = await axios.get(`/api/datacenters/${id}`);
+      const datacenter = response.data;
       setFormData({
-        code: datacenterEntity.code || '',
-        name: datacenterEntity.name || '',
-        regionId: datacenterEntity.region?.id ? String(datacenterEntity.region.id) : '',
+        code: datacenter.code || '',
+        name: datacenter.name || '',
+        regionId: datacenter.region?.id ? String(datacenter.region.id) : '',
       });
+    } catch (error) {
+      toast.error('Failed to load datacenter');
     }
-  }, [datacenterEntity, datacenterId, isNew]);
-
-  useEffect(() => {
-    if (updateSuccess) {
-      setFormData({ code: '', name: '', regionId: '' });
-      toggle();
-      onSave?.();
-    }
-  }, [updateSuccess, toggle, onSave]);
+  };
 
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
@@ -72,7 +76,8 @@ export const DatacenterEditModal: React.FC<DatacenterEditModalProps> = ({ isOpen
       newErrors.name = 'Name must be at least 1 character';
     }
 
-    return newErrors;
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -90,31 +95,42 @@ export const DatacenterEditModal: React.FC<DatacenterEditModalProps> = ({ isOpen
     }
   };
 
-  const handleSubmit = () => {
-    const newErrors = validateForm();
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
+  const handleSubmit = async (e?: React.FormEvent | React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+    }
+    if (!validateForm()) {
       return;
     }
 
-    const dataToSubmit: any = {
-      code: formData.code,
-      name: formData.name,
-    };
+    setLoading(true);
+    try {
+      const data: any = {
+        id: datacenterId,
+        code: formData.code,
+        name: formData.name,
+      };
 
-    if (formData.regionId) {
-      dataToSubmit.region = { id: parseInt(formData.regionId, 10) };
-    }
+      if (formData.regionId) {
+        data.region = { id: parseInt(formData.regionId, 10) };
+      }
 
-    if (isNew) {
-      dispatch(createEntity(dataToSubmit));
-    } else {
-      dispatch(
-        updateEntity({
-          ...datacenterEntity,
-          ...dataToSubmit,
-        }),
-      );
+      if (isNew) {
+        await axios.post('/api/datacenters', data);
+        toast.success('Datacenter created successfully');
+      } else {
+        await axios.put(`/api/datacenters/${datacenterId}`, data);
+        toast.success('Datacenter updated successfully');
+      }
+
+      toggle();
+      if (onSave) {
+        onSave();
+      }
+    } catch (error) {
+      toast.error(`Failed to ${isNew ? 'create' : 'update'} datacenter`);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -135,7 +151,7 @@ export const DatacenterEditModal: React.FC<DatacenterEditModalProps> = ({ isOpen
               value={formData.code}
               onChange={handleChange}
               invalid={!!errors.code}
-              disabled={updating}
+              disabled={loading}
               maxLength={10}
             />
             {errors.code && <div className="invalid-feedback d-block">{errors.code}</div>}
@@ -150,13 +166,13 @@ export const DatacenterEditModal: React.FC<DatacenterEditModalProps> = ({ isOpen
               value={formData.name}
               onChange={handleChange}
               invalid={!!errors.name}
-              disabled={updating}
+              disabled={loading}
             />
             {errors.name && <div className="invalid-feedback d-block">{errors.name}</div>}
           </FormGroup>
           <FormGroup>
             <Label for="regionId">Region (Optional)</Label>
-            <Input type="select" name="regionId" id="regionId" value={formData.regionId} onChange={handleChange} disabled={updating}>
+            <Input type="select" name="regionId" id="regionId" value={formData.regionId} onChange={handleChange} disabled={loading}>
               <option value="">-- Select Region --</option>
               {regions &&
                 regions.map(region => (
@@ -169,10 +185,10 @@ export const DatacenterEditModal: React.FC<DatacenterEditModalProps> = ({ isOpen
         </Form>
       </ModalBody>
       <ModalFooter>
-        <Button color="secondary" onClick={toggle} disabled={updating}>
+        <Button color="secondary" onClick={toggle} disabled={loading}>
           Cancel
         </Button>
-        <Button color="primary" onClick={handleSubmit} disabled={updating}>
+        <Button color="primary" onClick={handleSubmit} disabled={loading}>
           {isNew ? 'Create' : 'Save'}
         </Button>
       </ModalFooter>

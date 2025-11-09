@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Container, Row, Col, Nav } from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faLock, faUsers, faUserShield, faKey } from '@fortawesome/free-solid-svg-icons';
+import { faUser, faLock, faUsers, faUserShield, faKey, faGlobe, faBuilding, faClock, faRobot } from '@fortawesome/free-solid-svg-icons';
 import { useAppSelector } from 'app/config/store';
 import { hasAnyAuthority } from 'app/shared/auth/private-route';
 import { AUTHORITIES } from 'app/config/constants';
@@ -11,9 +11,13 @@ import SecurityTab from './tabs/security-tab';
 import UserManagementTab from './tabs/user-management-tab';
 import RoleManagementTab from './tabs/role-management-tab';
 import ApiKeyManagementTab from './tabs/api-key-management-tab';
+import { RegionsTab } from './regions-tab';
+import { DatacentersTab } from './datacenters-tab';
+import { SchedulesTab } from './schedules-tab';
+import { AgentsTab } from './agents-tab';
 import './settings.scss';
 
-export type SettingsTab = 'profile' | 'security' | 'user' | 'user-roles' | 'api-keys';
+export type SettingsTab = 'profile' | 'security' | 'regions' | 'datacenters' | 'schedules' | 'agents' | 'user' | 'user-roles' | 'api-keys';
 
 export const SettingsPage = () => {
   const { tab } = useParams<{ tab?: string }>();
@@ -23,9 +27,19 @@ export const SettingsPage = () => {
   const isAdmin = useAppSelector(state => hasAnyAuthority(state.authentication.account.authorities, [AUTHORITIES.ADMIN]));
 
   useEffect(() => {
-    if (tab && (tab === 'profile' || tab === 'security' || tab === 'user' || tab === 'user-roles' || tab === 'api-keys')) {
+    const validTabs = ['profile', 'security', 'regions', 'datacenters', 'schedules', 'agents', 'user', 'user-roles', 'api-keys'];
+    if (tab && validTabs.includes(tab)) {
       // Check if non-admin is trying to access admin-only tabs
-      if (!isAdmin && (tab === 'user' || tab === 'user-roles' || tab === 'api-keys')) {
+      if (
+        !isAdmin &&
+        (tab === 'user' ||
+          tab === 'user-roles' ||
+          tab === 'api-keys' ||
+          tab === 'regions' ||
+          tab === 'datacenters' ||
+          tab === 'schedules' ||
+          tab === 'agents')
+      ) {
         navigate('/account/settings/profile');
         return;
       }
@@ -46,6 +60,14 @@ export const SettingsPage = () => {
         return <ProfileTab />;
       case 'security':
         return <SecurityTab />;
+      case 'regions':
+        return isAdmin ? <RegionsTab /> : <ProfileTab />;
+      case 'datacenters':
+        return isAdmin ? <DatacentersTab /> : <ProfileTab />;
+      case 'schedules':
+        return isAdmin ? <SchedulesTab /> : <ProfileTab />;
+      case 'agents':
+        return isAdmin ? <AgentsTab /> : <ProfileTab />;
       case 'user':
         return isAdmin ? <UserManagementTab /> : <ProfileTab />;
       case 'user-roles':
@@ -77,11 +99,39 @@ export const SettingsPage = () => {
                 Security
               </button>
 
+              {/* Configuration Tabs */}
+              {isAdmin && (
+                <>
+                  <div className="nav-section-divider">
+                    <span className="text-muted small">⚙️ CONFIGURATION</span>
+                  </div>
+                  <button className={`nav-link ${activeTab === 'regions' ? 'active' : ''}`} onClick={() => handleTabChange('regions')}>
+                    <FontAwesomeIcon icon={faGlobe} className="me-2" />
+                    Regions
+                  </button>
+                  <button
+                    className={`nav-link ${activeTab === 'datacenters' ? 'active' : ''}`}
+                    onClick={() => handleTabChange('datacenters')}
+                  >
+                    <FontAwesomeIcon icon={faBuilding} className="me-2" />
+                    Datacenters
+                  </button>
+                  <button className={`nav-link ${activeTab === 'schedules' ? 'active' : ''}`} onClick={() => handleTabChange('schedules')}>
+                    <FontAwesomeIcon icon={faClock} className="me-2" />
+                    Schedules
+                  </button>
+                  <button className={`nav-link ${activeTab === 'agents' ? 'active' : ''}`} onClick={() => handleTabChange('agents')}>
+                    <FontAwesomeIcon icon={faRobot} className="me-2" />
+                    Agents
+                  </button>
+                </>
+              )}
+
               {/* Admin Only Tabs */}
               {isAdmin && (
                 <>
                   <div className="nav-section-divider">
-                    <span className="text-muted small">ADMINISTRATION</span>
+                    <span className="text-muted small">👤 ADMINISTRATION</span>
                   </div>
                   <button className={`nav-link ${activeTab === 'user' ? 'active' : ''}`} onClick={() => handleTabChange('user')}>
                     <FontAwesomeIcon icon={faUsers} className="me-2" />

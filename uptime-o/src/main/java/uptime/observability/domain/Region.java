@@ -37,7 +37,7 @@ public class Region implements Serializable {
     private String groupName;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "region")
-    @JsonIgnoreProperties(value = { "agents", "datacenterMonitors", "region" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "agents", "region" }, allowSetters = true)
     private Set<Datacenter> datacenters = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

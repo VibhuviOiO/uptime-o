@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <!--
+        Drop datacenter_monitors table and create agent_monitors table.
+        This refactoring changes the many-to-many relationship from
+        HttpMonitor <-> Datacenter to HttpMonitor <-> Agent.
+    -->
+    
+    <!-- Drop old datacenter_monitors table -->
+    <changeSet id="20251109000003-1" author="jhipster">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="datacenter_monitors"/>
+        </preConditions>
+        <dropTable tableName="datacenter_monitors" cascadeConstraints="true"/>
+    </changeSet>
+
+    <!-- Create agent_monitors table -->
+    <changeSet id="20251109000003-2" author="jhipster">
+        <createTable tableName="agent_monitors">
+            <column name="id" type="bigint">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="agent_id" type="bigint">
+                <constraints nullable="false" />
+            </column>
+            <column name="monitor_id" type="bigint">
+                <constraints nullable="false" />
+            </column>
+            <column name="active" type="boolean" defaultValueBoolean="true">
+                <constraints nullable="false" />
+            </column>
+            <column name="created_by" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="timestamp"/>
+            <column name="last_modified_by" type="varchar(50)"/>
+            <column name="last_modified_date" type="timestamp"/>
+        </createTable>
+    </changeSet>
+
+    <!-- Add foreign key constraints -->
+    <changeSet id="20251109000003-3" author="jhipster">
+        <addForeignKeyConstraint baseColumnNames="agent_id"
+                                 baseTableName="agent_monitors"
+                                 constraintName="fk_agent_monitors_agent_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="agents"/>
+        
+        <addForeignKeyConstraint baseColumnNames="monitor_id"
+                                 baseTableName="agent_monitors"
+                                 constraintName="fk_agent_monitors_monitor_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="api_monitors"/>
+    </changeSet>
+
+    <!-- Add unique constraint on agent_id + monitor_id -->
+    <changeSet id="20251109000003-4" author="jhipster">
+        <addUniqueConstraint columnNames="agent_id, monitor_id"
+                             tableName="agent_monitors"
+                             constraintName="uc_agent_monitors_agent_monitor"/>
+    </changeSet>
+
+    <!-- Add indexes for better query performance -->
+    <changeSet id="20251109000003-5" author="jhipster">
+        <createIndex indexName="idx_agent_monitors_agent_id"
+                     tableName="agent_monitors">
+            <column name="agent_id"/>
+        </createIndex>
+        
+        <createIndex indexName="idx_agent_monitors_monitor_id"
+                     tableName="agent_monitors">
+            <column name="monitor_id"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

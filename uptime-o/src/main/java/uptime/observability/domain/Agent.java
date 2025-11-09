@@ -32,8 +32,12 @@ public class Agent implements Serializable {
     @JsonIgnoreProperties(value = { "monitor", "agent" }, allowSetters = true)
     private Set<HttpHeartbeat> apiHeartbeats = new HashSet<>();
 
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "agent")
+    @JsonIgnoreProperties(value = { "agent", "monitor" }, allowSetters = true)
+    private Set<AgentMonitor> agentMonitors = new HashSet<>();
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "agents", "datacenterMonitors", "region" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "agents", "region" }, allowSetters = true)
     private Datacenter datacenter;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
@@ -105,6 +109,37 @@ public class Agent implements Serializable {
 
     public Agent datacenter(Datacenter datacenter) {
         this.setDatacenter(datacenter);
+        return this;
+    }
+
+    public Set<AgentMonitor> getAgentMonitors() {
+        return this.agentMonitors;
+    }
+
+    public void setAgentMonitors(Set<AgentMonitor> agentMonitors) {
+        if (this.agentMonitors != null) {
+            this.agentMonitors.forEach(i -> i.setAgent(null));
+        }
+        if (agentMonitors != null) {
+            agentMonitors.forEach(i -> i.setAgent(this));
+        }
+        this.agentMonitors = agentMonitors;
+    }
+
+    public Agent agentMonitors(Set<AgentMonitor> agentMonitors) {
+        this.setAgentMonitors(agentMonitors);
+        return this;
+    }
+
+    public Agent addAgentMonitor(AgentMonitor agentMonitor) {
+        this.agentMonitors.add(agentMonitor);
+        agentMonitor.setAgent(this);
+        return this;
+    }
+
+    public Agent removeAgentMonitor(AgentMonitor agentMonitor) {
+        this.agentMonitors.remove(agentMonitor);
+        agentMonitor.setAgent(null);
         return this;
     }
 

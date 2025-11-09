@@ -34,12 +34,8 @@ public class Datacenter implements Serializable {
     private String name;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "datacenter")
-    @JsonIgnoreProperties(value = { "apiHeartbeats", "datacenter" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "apiHeartbeats", "agentMonitors", "datacenter" }, allowSetters = true)
     private Set<Agent> agents = new HashSet<>();
-
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "datacenter")
-    @JsonIgnoreProperties(value = { "datacenter", "monitor" }, allowSetters = true)
-    private Set<DatacenterMonitor> datacenterMonitors = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnoreProperties(value = { "datacenters" }, allowSetters = true)
@@ -114,37 +110,6 @@ public class Datacenter implements Serializable {
     public Datacenter removeAgent(Agent agent) {
         this.agents.remove(agent);
         agent.setDatacenter(null);
-        return this;
-    }
-
-    public Set<DatacenterMonitor> getDatacenterMonitors() {
-        return this.datacenterMonitors;
-    }
-
-    public void setDatacenterMonitors(Set<DatacenterMonitor> datacenterMonitors) {
-        if (this.datacenterMonitors != null) {
-            this.datacenterMonitors.forEach(i -> i.setDatacenter(null));
-        }
-        if (datacenterMonitors != null) {
-            datacenterMonitors.forEach(i -> i.setDatacenter(this));
-        }
-        this.datacenterMonitors = datacenterMonitors;
-    }
-
-    public Datacenter datacenterMonitors(Set<DatacenterMonitor> datacenterMonitors) {
-        this.setDatacenterMonitors(datacenterMonitors);
-        return this;
-    }
-
-    public Datacenter addDatacenterMonitor(DatacenterMonitor datacenterMonitor) {
-        this.datacenterMonitors.add(datacenterMonitor);
-        datacenterMonitor.setDatacenter(this);
-        return this;
-    }
-
-    public Datacenter removeDatacenterMonitor(DatacenterMonitor datacenterMonitor) {
-        this.datacenterMonitors.remove(datacenterMonitor);
-        datacenterMonitor.setDatacenter(null);
         return this;
     }
 

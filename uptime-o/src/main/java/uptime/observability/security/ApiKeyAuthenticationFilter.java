@@ -12,15 +12,14 @@ import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import uptime.observability.service.ApiKeyService;
 
 /**
  * Filter to authenticate requests using API keys.
  * Checks for X-API-Key header and validates it against active API keys in the database.
+ * Not marked as @Component to avoid circular dependency - manually registered in SecurityConfiguration.
  */
-@Component
 public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
 
     private static final Logger LOG = LoggerFactory.getLogger(ApiKeyAuthenticationFilter.class);

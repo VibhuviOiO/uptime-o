@@ -40,14 +40,14 @@ export const HttpMonitorDetail = () => {
     try {
       setLoadingDatacenters(true);
       setError(null);
-      const response = await axios.get<any>(`/api/datacenter-monitors?size=1000&filter=monitor.id=${httpMonitorEntity.id}`);
-      const data = Array.isArray(response.data) ? response.data : response.data.content || [];
+      const response = await axios.get<any>(`/api/agent-monitors/by-monitor/${httpMonitorEntity.id}`);
+      const data = Array.isArray(response.data) ? response.data : [];
 
-      const datacenters: IDeployedDatacenter[] = data.map((dcm: any) => ({
-        id: dcm.id,
-        datacenterId: dcm.datacenter?.id,
-        datacenterName: dcm.datacenter?.name,
-        datacenterCode: dcm.datacenter?.code,
+      const datacenters: IDeployedDatacenter[] = data.map((am: any) => ({
+        id: am.id,
+        datacenterId: am.agentId,
+        datacenterName: am.agentName,
+        datacenterCode: '',
       }));
 
       setDeployedDatacenters(datacenters);
@@ -61,10 +61,10 @@ export const HttpMonitorDetail = () => {
 
   const handleRemoveDatacenter = async (assignmentId: number) => {
     try {
-      await axios.delete(`/api/datacenter-monitors/${assignmentId}`);
+      await axios.delete(`/api/agent-monitors/${assignmentId}`);
       setDeployedDatacenters(deployedDatacenters.filter(d => d.id !== assignmentId));
     } catch (err) {
-      setError('Failed to remove datacenter assignment');
+      setError('Failed to remove agent assignment');
       console.error('Error removing assignment:', err);
     }
   };
