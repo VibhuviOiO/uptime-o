@@ -128,4 +128,19 @@ jhipster:
 # https://www.jhipster.tech/common-application-properties/
 # ===================================================================
 
-# application:
+application:
+  encryption:
+    secret-key: ${APPLICATION_ENCRYPTION_SECRET_KEY:} # MUST be set via environment variable in production
+
+# Website branding configuration for production
+# Environment variables can override these defaults
+website:
+  title: ${WEBSITE_TITLE:UptimeO}
+  description: ${WEBSITE_DESCRIPTION:Uptime Monitoring and Observability Platform}
+  keywords: ${WEBSITE_KEYWORDS:uptime,monitoring,observability,http,heartbeat}
+  author: ${WEBSITE_AUTHOR:UptimeO Team}
+  faviconPath: ${WEBSITE_FAVICONPATH:/content/images/favicon.ico}
+  logoPath: ${WEBSITE_LOGOPATH:/content/images/logo-jhipster.png}
+  logoWidth: ${WEBSITE_LOGOWIDTH:200}
+  logoHeight: ${WEBSITE_LOGOHEIGHT:50}
+  footerTitle: ${WEBSITE_FOOTERTITLE:Powered by UptimeO}

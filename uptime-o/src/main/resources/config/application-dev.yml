@@ -113,3 +113,16 @@ jhipster:
 application:
   encryption:
     secret-key: Zx6YF8vKjN9pQr3TmW7nU2hV5sC1bL4eA8dG0fJ # Generated key for dev environment (DO NOT use in production!)
+
+# Website branding configuration for development
+# Environment variables can override these defaults
+website:
+  title: ${WEBSITE_TITLE:UptimeO}
+  description: ${WEBSITE_DESCRIPTION:Uptime Monitoring and Observability Platform}
+  keywords: ${WEBSITE_KEYWORDS:uptime,monitoring,observability,http,heartbeat}
+  author: ${WEBSITE_AUTHOR:UptimeO Team}
+  faviconPath: ${WEBSITE_FAVICONPATH:/content/images/favicon.ico}
+  logoPath: ${WEBSITE_LOGOPATH:/content/images/logo-jhipster.png}
+  logoWidth: ${WEBSITE_LOGOWIDTH:200}
+  logoHeight: ${WEBSITE_LOGOHEIGHT:50}
+  footerTitle: ${WEBSITE_FOOTERTITLE:Powered by UptimeO}

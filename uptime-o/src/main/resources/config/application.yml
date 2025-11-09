@@ -226,4 +226,15 @@ jhipster:
 
 application:
   encryption:
-    secret-key: # Override in application-dev.yml or application-prod.yml
+    secret-key:
+      # Override in application-dev.yml or application-prod.yml
+
+      # Website branding configuration - can be overridden via environment variables
+website:
+  title: ${WEBSITE_TITLE:UptimeO}
+  headerData: ${WEBSITE_HEADERDATA:}
+  faviconPath: ${WEBSITE_FAVICONPATH:/content/images/favicon.ico}
+  logoPath: ${WEBSITE_LOGOPATH:/content/images/logo.png}
+  logoWidth: ${WEBSITE_LOGOWIDTH:200}
+  logoHeight: ${WEBSITE_LOGOHEIGHT:50}
+  footerTitle: ${WEBSITE_FOOTERTITLE:Powered by UptimeO}

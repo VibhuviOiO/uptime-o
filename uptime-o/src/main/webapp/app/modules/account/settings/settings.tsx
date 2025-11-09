@@ -1,7 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { Container, Row, Col, Nav } from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faLock, faUsers, faUserShield, faKey, faGlobe, faBuilding, faClock, faRobot } from '@fortawesome/free-solid-svg-icons';
+import {
+  faUser,
+  faLock,
+  faUsers,
+  faUserShield,
+  faKey,
+  faGlobe,
+  faBuilding,
+  faClock,
+  faRobot,
+  faPalette,
+} from '@fortawesome/free-solid-svg-icons';
 import { useAppSelector } from 'app/config/store';
 import { hasAnyAuthority } from 'app/shared/auth/private-route';
 import { AUTHORITIES } from 'app/config/constants';
@@ -15,9 +26,20 @@ import { RegionsTab } from './regions-tab';
 import { DatacentersTab } from './datacenters-tab';
 import { SchedulesTab } from './schedules-tab';
 import { AgentsTab } from './agents-tab';
+import BrandingTab from 'app/entities/branding/branding-tab';
 import './settings.scss';
 
-export type SettingsTab = 'profile' | 'security' | 'regions' | 'datacenters' | 'schedules' | 'agents' | 'user' | 'user-roles' | 'api-keys';
+export type SettingsTab =
+  | 'profile'
+  | 'security'
+  | 'regions'
+  | 'datacenters'
+  | 'schedules'
+  | 'agents'
+  | 'branding'
+  | 'user'
+  | 'user-roles'
+  | 'api-keys';
 
 export const SettingsPage = () => {
   const { tab } = useParams<{ tab?: string }>();
@@ -27,7 +49,18 @@ export const SettingsPage = () => {
   const isAdmin = useAppSelector(state => hasAnyAuthority(state.authentication.account.authorities, [AUTHORITIES.ADMIN]));
 
   useEffect(() => {
-    const validTabs = ['profile', 'security', 'regions', 'datacenters', 'schedules', 'agents', 'user', 'user-roles', 'api-keys'];
+    const validTabs = [
+      'profile',
+      'security',
+      'regions',
+      'datacenters',
+      'schedules',
+      'agents',
+      'branding',
+      'user',
+      'user-roles',
+      'api-keys',
+    ];
     if (tab && validTabs.includes(tab)) {
       // Check if non-admin is trying to access admin-only tabs
       if (
@@ -38,7 +71,8 @@ export const SettingsPage = () => {
           tab === 'regions' ||
           tab === 'datacenters' ||
           tab === 'schedules' ||
-          tab === 'agents')
+          tab === 'agents' ||
+          tab === 'branding')
       ) {
         navigate('/account/settings/profile');
         return;
@@ -68,6 +102,8 @@ export const SettingsPage = () => {
         return isAdmin ? <SchedulesTab /> : <ProfileTab />;
       case 'agents':
         return isAdmin ? <AgentsTab /> : <ProfileTab />;
+      case 'branding':
+        return isAdmin ? <BrandingTab /> : <ProfileTab />;
       case 'user':
         return isAdmin ? <UserManagementTab /> : <ProfileTab />;
       case 'user-roles':
@@ -123,6 +159,10 @@ export const SettingsPage = () => {
                   <button className={`nav-link ${activeTab === 'agents' ? 'active' : ''}`} onClick={() => handleTabChange('agents')}>
                     <FontAwesomeIcon icon={faRobot} className="me-2" />
                     Agents
+                  </button>
+                  <button className={`nav-link ${activeTab === 'branding' ? 'active' : ''}`} onClick={() => handleTabChange('branding')}>
+                    <FontAwesomeIcon icon={faPalette} className="me-2" />
+                    Branding
                   </button>
                 </>
               )}
