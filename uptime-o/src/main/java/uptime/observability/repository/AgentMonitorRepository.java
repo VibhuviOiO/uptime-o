@@ -2,6 +2,7 @@ package uptime.observability.repository;
 
 import java.util.List;
 import org.springframework.data.jpa.repository.*;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import uptime.observability.domain.AgentMonitor;
 
@@ -44,6 +45,20 @@ public interface AgentMonitorRepository extends JpaRepository<AgentMonitor, Long
      * @return list of active agent monitors
      */
     List<AgentMonitor> findByAgentIdAndActive(Long agentId, Boolean active);
+
+    /**
+     * Find all active agent monitors by agent ID with monitor and schedule eagerly loaded.
+     * This prevents LazyInitializationException when accessing monitor.schedule outside of transaction.
+     *
+     * @param agentId the agent ID
+     * @param active the active status
+     * @return list of active agent monitors with monitors and schedules loaded
+     */
+    @Query("SELECT DISTINCT am FROM AgentMonitor am " +
+           "JOIN FETCH am.monitor m " +
+           "LEFT JOIN FETCH m.schedule " +
+           "WHERE am.agent.id = :agentId AND am.active = :active")
+    List<AgentMonitor> findByAgentIdAndActiveWithMonitorAndSchedule(@Param("agentId") Long agentId, @Param("active") Boolean active);
 
     /**
      * Check if an agent monitor exists for a specific agent and monitor combination.

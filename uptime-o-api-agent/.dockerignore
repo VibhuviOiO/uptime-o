@@ -1,0 +1,11 @@
+.git
+.gitignore
+tmp/
+tmp/pgdata/
+*.log
+*.out
+*.test
+.vscode/
+.idea/
+build/
+vendor/

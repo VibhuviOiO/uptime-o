@@ -141,6 +141,6 @@ website:
   author: ${WEBSITE_AUTHOR:UptimeO Team}
   faviconPath: ${WEBSITE_FAVICONPATH:/content/images/favicon.ico}
   logoPath: ${WEBSITE_LOGOPATH:/content/images/logo-jhipster.png}
-  logoWidth: ${WEBSITE_LOGOWIDTH:200}
-  logoHeight: ${WEBSITE_LOGOHEIGHT:50}
+  logoWidth: ${WEBSITE_LOGOWIDTH:50}
+  logoHeight: ${WEBSITE_LOGOHEIGHT:30}
   footerTitle: ${WEBSITE_FOOTERTITLE:Powered by UptimeO}

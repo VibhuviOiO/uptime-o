@@ -231,46 +231,22 @@ Then run:
 ```sh
 docker compose -f src/main/docker/app.yml up -d
 ```
+## Branding Configuration
 
-For more information refer to [Using Docker and Docker-Compose][], this page also contains information on the Docker Compose sub-generator (`jhipster docker-compose`), which is able to generate Docker configurations for one or several JHipster applications.
+```bash
+# Set environment variables in your terminal
+export WEBSITE_TITLE="Google Cloud Monitoring"
+export WEBSITE_DESCRIPTION="Enterprise-grade uptime monitoring powered by Google Cloud"
+export WEBSITE_KEYWORDS="google cloud,gcp,monitoring,uptime,observability"
+export WEBSITE_AUTHOR="Google Cloud Team"
+export WEBSITE_LOGOPATH="/content/images/logo-jhipster.png"
+export WEBSITE_LOGOWIDTH="220"
+export WEBSITE_LOGOHEIGHT="55"
+export WEBSITE_FOOTERTITLE="Powered by Google Cloud Platform"
 
-## Continuous Integration (optional)
-
-To configure CI for your project, run the ci-cd sub-generator (`jhipster ci-cd`), this will let you generate configuration files for a number of Continuous Integration systems. Consult the [Setting up Continuous Integration][] page for more information.
-
-[JHipster Homepage and latest documentation]: https://www.jhipster.tech
-[JHipster 8.11.0 archive]: https://www.jhipster.tech/documentation-archive/v8.11.0
-[Using JHipster in development]: https://www.jhipster.tech/documentation-archive/v8.11.0/development/
-[Using Docker and Docker-Compose]: https://www.jhipster.tech/documentation-archive/v8.11.0/docker-compose
-[Using JHipster in production]: https://www.jhipster.tech/documentation-archive/v8.11.0/production/
-[Running tests page]: https://www.jhipster.tech/documentation-archive/v8.11.0/running-tests/
-[Code quality page]: https://www.jhipster.tech/documentation-archive/v8.11.0/code-quality/
-[Setting up Continuous Integration]: https://www.jhipster.tech/documentation-archive/v8.11.0/setting-up-ci/
-[Node.js]: https://nodejs.org/
-[NPM]: https://www.npmjs.com/
-[OpenAPI-Generator]: https://openapi-generator.tech
-[Swagger-Editor]: https://editor.swagger.io
-[Doing API-First development]: https://www.jhipster.tech/documentation-archive/v8.11.0/doing-api-first-development/
-[Webpack]: https://webpack.github.io/
-[BrowserSync]: https://www.browsersync.io/
-[Jest]: https://jestjs.io
-[Leaflet]: https://leafletjs.com/
-[DefinitelyTyped]: https://definitelytyped.org/
-
-docke
-
-{"level":"info","msg":"Executing monitor 1 (IPfy Public IP Info)","time":"2025-11-06T20:31:12Z"}
-{"level":"error","msg":"Failed to insert heartbeat:ERROR: no partition of relation \"api_heartbeats\" found for row (SQLSTATE 23514)","time":"2025-11-06T20:31:12Z"}
-{"level":"error","msg":"Failed to save heartbeat:ERROR: no partition of relation \"api_heartbeats\" found for row (SQLSTATE 23514)","time":"2025-11-06T20:31:12Z"}
-{"level":"info","msg":"Executing monitor 4 (Realty Auto-Complete)","time":"2025-11-06T20:31:12Z"}
-{"level":"error","msg":"Failed to insert heartbeat:ERROR: no partition of relation \"api_heartbeats\" found for row (SQLSTATE 23514)","time":"2025-11-06T20:31:12Z"}
-{"level":"error","msg":"Failed to save heartbeat:ERROR: no partition of relation \"api_heartbeats\" found for row (SQLSTATE 23514)","time":"2025-11-06T20:31:12Z"}
-{"level":"info","msg":"Executing monitor 1201 (Updated Test2 Monitor)","time":"2025-11-06T20:31:13Z"}
-{"level":"info","msg":"Executing monitor 2 (Official Joke API)","time":"2025-11-06T20:31:13Z"}
-{"level":"error","msg":"Failed to insert heartbeat:ERROR: invalid input syntax for type json (SQLSTATE 22P02)","time":"2025-11-06T20:31:13Z"}
-{"level":"error","msg":"Failed to save heartbeat:ERROR: invalid input syntax for type json (SQLSTATE 22P02)","time":"2025-11-06T20:31:13Z"}
-{"level":"error","msg":"Failed to insert heartbeat:ERROR: no partition of relation \"api_heartbeats\" found for row (SQLSTATE 23514)","time":"2025-11-06T20:31:13Z"}
-{"level":"error","msg":"Failed to save heartbeat:ERROR: no partition of relation \"api_heartbeats\" found for row (SQLSTATE 23514)","time":"2025-11-06T20:31:13Z"}
+# Then start the application
+./mvnw
+```
 
 ## Create the the partition. : 
 

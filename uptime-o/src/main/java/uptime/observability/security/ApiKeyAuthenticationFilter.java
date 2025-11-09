@@ -68,7 +68,7 @@ public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(@NonNull HttpServletRequest request) {
         String path = request.getRequestURI();
-        // Only apply this filter to public heartbeat endpoints
-        return !path.startsWith("/api/public/heartbeats");
+        // Apply this filter to public API endpoints that accept API key authentication
+        return !path.startsWith("/api/public/heartbeats") && !path.startsWith("/api/public/monitors");
     }
 }
