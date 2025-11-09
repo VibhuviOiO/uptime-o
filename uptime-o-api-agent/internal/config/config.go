@@ -12,15 +12,18 @@ import (
 
 // LoadFromAPI loads configuration from the API instead of database
 func LoadFromAPI(apiClient *api.Client, agentID int, datacenterID int) (*models.Config, *models.Agent, error) {
-	logrus.Info("Loading configuration from API...")
-
 	// Fetch monitors and schedules from API
 	monitors, schedules, err := apiClient.GetMonitors(agentID)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	logrus.Infof("Loaded %d monitors and %d schedules from API", len(monitors), len(schedules))
+	// Extract monitor IDs for logging
+	monitorIDs := make([]int, len(monitors))
+	for i, m := range monitors {
+		monitorIDs[i] = m.ID
+	}
+	logrus.Infof("Loaded monitors: %v", monitorIDs)
 
 	// Create agent with fetched data
 	agent := &models.Agent{

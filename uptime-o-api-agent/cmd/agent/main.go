@@ -133,18 +133,8 @@ func main() {
 		}
 	}
 
-	if len(agent.Monitors) > 0 {
-		logrus.Infof("application found the count of monitoring: %d, generating the monitor config", len(agent.Monitors))
-	} else {
+	if len(agent.Monitors) == 0 {
 		logrus.Warn("No monitors configured yet. Agent will retry loading configuration periodically.")
-	}
-	for _, mon := range agent.Monitors {
-		schedule := findSchedule(agent.GlobalSchedules, mon.ScheduleID)
-		if schedule != nil {
-			logrus.Infof("monitor: id=%d, name=%s, method=%s, url=%s, schedule: id=%d, name=%s, interval=%ds, warning=%dms, critical=%dms", mon.ID, mon.Name, mon.Method, mon.URL, schedule.ID, schedule.Name, schedule.Interval, schedule.ThresholdsWarning, schedule.ThresholdsCritical)
-		} else {
-			logrus.Infof("monitor: id=%d, name=%s, method=%s, url=%s, scheduleId=%d", mon.ID, mon.Name, mon.Method, mon.URL, mon.ScheduleID)
-		}
 	}
 
 	// Optional: Connect to DB only for distributed locking if needed
@@ -234,22 +224,33 @@ func main() {
 			if err != nil {
 				logrus.Warnf("Failed to reload config from API: %v. Will retry later.", err)
 			} else {
-				oldMonitorCount := len(agent.Monitors)
+				oldMonitorIDs := getMonitorIDs(agent.Monitors)
+
 				cfg = newCfg
 				agent = newAgent
-				logrus.Info("Config reloaded from API")
-				logrus.Infof("Reloaded %d monitors", len(agent.Monitors))
 
 				// Adjust reload frequency based on whether we have monitors
 				newInterval := getReloadInterval()
 				configReloadTicker.Reset(newInterval)
 
-				if oldMonitorCount == 0 && len(agent.Monitors) > 0 {
-					logrus.Info("Monitors now available! Starting collector...")
-					// Restart collector with new monitors
-					cancel()
-					ctx, cancel = context.WithCancel(context.Background())
-					go collector.NewAPIHeartbeatCollector(ctx, *agent, cfg, apiClient).Start()
+				// Check if monitors changed (by comparing IDs)
+				newMonitorIDs := getMonitorIDs(agent.Monitors)
+				monitorsChanged := !monitorIDsEqual(oldMonitorIDs, newMonitorIDs)
+
+				// Restart collector if monitors changed
+				if monitorsChanged {
+					if len(agent.Monitors) > 0 {
+						logrus.Infof("Monitoring: %v", newMonitorIDs)
+						// Cancel existing collector to stop all monitor goroutines
+						cancel()
+						// Create new context and start fresh collector with updated monitors
+						ctx, cancel = context.WithCancel(context.Background())
+						go collector.NewAPIHeartbeatCollector(ctx, *agent, cfg, apiClient).Start()
+					} else {
+						logrus.Info("No monitors assigned. Stopping collector.")
+						cancel()
+						ctx, cancel = context.WithCancel(context.Background())
+					}
 				}
 			}
 		}
@@ -263,4 +264,31 @@ func findSchedule(schedules []models.Schedule, id int) *models.Schedule {
 		}
 	}
 	return nil
+}
+
+// getMonitorIDs extracts and returns sorted monitor IDs for comparison
+func getMonitorIDs(monitors []models.Monitor) []int {
+	ids := make([]int, len(monitors))
+	for i, m := range monitors {
+		ids[i] = m.ID
+	}
+	return ids
+}
+
+// monitorIDsEqual checks if two monitor ID lists are identical
+func monitorIDsEqual(a, b []int) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	// Create maps for O(1) lookup - still O(n) overall but simpler
+	aMap := make(map[int]bool, len(a))
+	for _, id := range a {
+		aMap[id] = true
+	}
+	for _, id := range b {
+		if !aMap[id] {
+			return false
+		}
+	}
+	return true
 }
