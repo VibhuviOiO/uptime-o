@@ -8,7 +8,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: uptime-o-agent
+  IMAGE_NAME: uptimeo-http-agent
 
 jobs:
   build-and-push:
@@ -59,8 +59,8 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
-          context: uptime-o-agent
-          file: uptime-o-agent/Dockerfile
+          context: uptime-o-api-agent
+          file: uptime-o-api-agent/Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
           platforms: linux/amd64
           tags: ${{ steps.meta.outputs.tags }}
