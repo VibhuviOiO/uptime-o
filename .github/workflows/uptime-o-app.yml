@@ -1,4 +1,4 @@
-name: Uptime-O App CI/CD Pipeline
+name: UptimeO App CI/CD Pipeline
 permissions:
   contents: read
   packages: write

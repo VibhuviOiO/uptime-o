@@ -1,4 +1,4 @@
-name: Uptime O Agent  CI/CD Pipeline
+name: UptimeO API Agent CI/CD Pipeline
 permissions:
   contents: read
   packages: write
