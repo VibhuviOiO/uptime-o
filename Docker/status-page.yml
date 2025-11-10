@@ -2,9 +2,6 @@ services:
   uptimeo-status:
     image: uptimeo-status:latest
     container_name: uptimeo-status
-    depends_on:
-      postgres:
-        condition: service_healthy
     environment:
       DB_CONN_STRING: "postgres://uptimeo:uptimeo@postgres:5432/uptimeo?sslmode=disable"
       VITE_API_BASE_URL: /

@@ -7,7 +7,7 @@ services:
     env_file:
     - ./.env
     environment:
-      AGENT_ID: "1151"
+      AGENT_ID: "1151" # create agent and update the values here
       API_BASE_URL: "http://uptimeo-app:8080"
       QUEUE_PATH: "/data/queue"
       CONFIG_RELOAD_INTERVAL: "1m"
@@ -20,15 +20,15 @@ services:
     networks:
     - uptimeo
 
-  agent-ny:
+  agent-sf:
     image: uptimeo-api-agent:latest
-    container_name: agent-ny
+    container_name: agent-sf
     env_file:
     - ./.env
     volumes:
-    - ./tmp/data/agent-ny:/data
+    - ./tmp/data/agent-sf:/data
     environment:
-      AGENT_ID: "2"
+      AGENT_ID: "1801" # create agent and update the values here
       API_BASE_URL: "http://uptimeo-app:8080"
       QUEUE_PATH: "/data/queue"
       CONFIG_RELOAD_INTERVAL: "1m"
