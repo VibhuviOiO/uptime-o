@@ -8,7 +8,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: uptimeo-http-agent
+  IMAGE_NAME: uptimeo-agent
 
 jobs:
   build-and-push:
