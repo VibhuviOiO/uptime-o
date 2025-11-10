@@ -1,0 +1,24 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: uptimeo
+      POSTGRES_PASSWORD: uptimeo
+      POSTGRES_DB: uptimeo
+    ports:
+    - "5432:5432"
+    volumes:
+    - ./tmp/pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U uptimeo -d uptimeo" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+    - uptimeo
+networks:
+  uptimeo:
+    name: uptimeo
+    external: true

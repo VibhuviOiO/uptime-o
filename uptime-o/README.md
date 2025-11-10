@@ -250,6 +250,6 @@ export WEBSITE_FOOTERTITLE="Powered by Google Cloud Platform"
 
 ## Create the the partition. : 
 
-CREATE TABLE IF NOT EXISTS api_heartbeats_2025_11_09
+CREATE TABLE IF NOT EXISTS api_heartbeats_2025_11_10
 PARTITION OF api_heartbeats
-FOR VALUES FROM ('2025-11-09 00:00:00') TO ('2025-11-10 00:00:00');
+FOR VALUES FROM ('2025-11-10 00:00:00') TO ('2025-11-11 00:00:00');

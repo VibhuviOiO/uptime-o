@@ -11,8 +11,8 @@ services:
       - "5432:5432"
     volumes:
       - ./tmp/pgdata:/var/lib/postgresql/data
-      - ./sql/uptimeo.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
-      - ./sql/data.sql:/docker-entrypoint-initdb.d/02-data.sql:ro
+      # - ./sql/uptimeo.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      # - ./sql/data.sql:/docker-entrypoint-initdb.d/02-data.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U uptimeo -d uptimeo"]
       interval: 5s

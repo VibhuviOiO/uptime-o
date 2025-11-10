@@ -130,38 +130,25 @@ public class ApiKeyService {
         if (plainTextKey == null || plainTextKey.isEmpty()) {
             return false;
         }
-
-        // Hash the provided key
         String lookupHash = hashApiKey(plainTextKey);
-
-        // O(1) database lookup by hash
-        Optional<ApiKey> apiKeyOpt = apiKeyRepository.findByKeyHash(lookupHash);
-
-        if (apiKeyOpt.isEmpty()) {
-            log.debug("API Key not found");
-            return false;
-        }
-
-        ApiKey apiKey = apiKeyOpt.get();
-
-        // Check if key is active
+        ApiKey apiKey = apiKeyRepository.findByKeyHash(lookupHash)
+            .orElseThrow(() -> {
+                log.debug("API Key not found");
+                return new IllegalArgumentException("Invalid API Key");
+            });
         if (!apiKey.isActive()) {
             log.debug("API Key is inactive");
             return false;
         }
-
-        // Check if key is expired
         if (apiKey.getExpiresAt() != null && apiKey.getExpiresAt().isBefore(Instant.now())) {
             log.debug("API Key has expired");
             return false;
         }
-
-        // Update last used date (async to avoid blocking)
         updateLastUsedDate(apiKey.getId());
-
         log.debug("API Key validation successful for key ID: {}", apiKey.getId());
         return true;
     }
+
 
     /**
      * Update last used date asynchronously

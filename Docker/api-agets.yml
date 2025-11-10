@@ -1,0 +1,46 @@
+services:
+  agent-va:
+    image: uptimeo-api-agent:latest
+    container_name: agent-va
+    volumes:
+    - ./tmp/data/agent-va:/data
+    env_file:
+    - ./.env
+    environment:
+      AGENT_ID: "1151"
+      API_BASE_URL: "http://uptimeo-app:8080"
+      QUEUE_PATH: "/data/queue"
+      CONFIG_RELOAD_INTERVAL: "1m"
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "pgrep agent || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+    - uptimeo
+
+  agent-ny:
+    image: uptimeo-api-agent:latest
+    container_name: agent-ny
+    env_file:
+    - ./.env
+    volumes:
+    - ./tmp/data/agent-ny:/data
+    environment:
+      AGENT_ID: "2"
+      API_BASE_URL: "http://uptimeo-app:8080"
+      QUEUE_PATH: "/data/queue"
+      CONFIG_RELOAD_INTERVAL: "1m"
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "pgrep agent || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+    - uptimeo
+networks:
+  uptimeo:
+    name: uptimeo
+    external: true

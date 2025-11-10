@@ -316,9 +316,12 @@ func (c *Client) convertHeartbeatToRequest(hb *models.Heartbeat) HeartbeatReques
 
 	// Convert string response body to json.RawMessage
 	if hb.RawResponseBody != nil {
-		// The response body is already a JSON string, so we need to parse it as raw JSON
-		rawJSON := json.RawMessage(*hb.RawResponseBody)
-		req.RawResponseBody = &rawJSON
+		// Marshal the string to ensure it's properly JSON-encoded
+		encoded, err := json.Marshal(*hb.RawResponseBody)
+		if err == nil {
+			rawJSON := json.RawMessage(encoded)
+			req.RawResponseBody = &rawJSON
+		}
 	}
 
 	return req
