@@ -19,7 +19,7 @@
     <include file="config/liquibase/changelog/20251025202840_added_entity_Agent.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20251025202841_added_entity_HttpHeartbeat.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20251025202842_added_entity_AuditLog.xml" relativeToChangelogFile="false"/>
-    <include file="config/liquibase/changelog/20251025202843_added_entity_DatacenterMonitor.xml" relativeToChangelogFile="false"/>
+
     <include file="config/liquibase/changelog/20251109000001_added_entity_ApiKey.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20251109000002_added_index_ApiKey.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20251109000003_create_agent_monitor.xml" relativeToChangelogFile="false"/>
@@ -29,7 +29,7 @@
     <include file="config/liquibase/changelog/20251025202840_added_entity_constraints_Agent.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20251025202841_added_entity_constraints_HttpHeartbeat.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20251025202842_added_entity_constraints_AuditLog.xml" relativeToChangelogFile="false"/>
-    <include file="config/liquibase/changelog/20251025202843_added_entity_constraints_DatacenterMonitor.xml" relativeToChangelogFile="false"/>
+
     <!-- jhipster-needle-liquibase-add-constraints-changelog - JHipster will add liquibase constraints changelogs here -->
     <!-- jhipster-needle-liquibase-add-incremental-changelog - JHipster will add incremental liquibase changelogs here -->
 </databaseChangeLog>
