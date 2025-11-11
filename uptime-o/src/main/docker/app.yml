@@ -4,11 +4,26 @@ services:
   app:
     image: uptimeo
     environment:
-      - _JAVA_OPTIONS=-Xmx512m -Xms256m
+      # JVM Configuration - Optimized for 500 concurrent users
+      - JAVA_OPTS=-Xms1024m -Xmx2048m -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp/heap_dump.hprof
+      
+      # Spring Profile
       - SPRING_PROFILES_ACTIVE=prod,api-docs
-      - MANAGEMENT_PROMETHEUS_METRICS_EXPORT_ENABLED=true
+      
+      # Database Configuration
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgresql:5432/uptimeO
+      - SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE=20
+      - SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE=5
       - SPRING_LIQUIBASE_URL=jdbc:postgresql://postgresql:5432/uptimeO
+      
+      # Logging Configuration
+      - LOGGING_LEVEL_ROOT=INFO
+      - LOGGING_FILE_NAME=/var/log/uptimeo/application.log
+      - LOGGING_FILE_MAX_SIZE=100MB
+      - LOGGING_FILE_MAX_HISTORY=30
+      
+      # Monitoring
+      - MANAGEMENT_PROMETHEUS_METRICS_EXPORT_ENABLED=true
     ports:
       - 127.0.0.1:8080:8080
     healthcheck:

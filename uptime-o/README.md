@@ -253,3 +253,29 @@ export WEBSITE_FOOTERTITLE="Powered by Google Cloud Platform"
 CREATE TABLE IF NOT EXISTS api_heartbeats_2025_11_10
 PARTITION OF api_heartbeats
 FOR VALUES FROM ('2025-11-10 00:00:00') TO ('2025-11-11 00:00:00');
+
+
+docker run -d \
+  --name agent-va \
+  --network host \
+  -e AGENT_ID="1151" \
+  -e API_BASE_URL="http://host.docker.internal:8080" \
+  -e QUEUE_PATH="/data/queue" \
+  -e CONFIG_RELOAD_INTERVAL="1m" \
+  -e API_KEY="uptimeo_WRoiXfzcc8XIyEnIHh4dpbtL6susRo00W4JfsmDUMEc" \
+  -v "$(pwd)/tmp/data/agent-va:/data" \
+  --restart unless-stopped \
+  ghcr.io/vibhuvioio/uptimeo-agent:latest
+
+docker run -d \
+  --name agent-sf \
+  --network host \
+  -e AGENT_ID="1651" \
+  -e API_BASE_URL="http://host.docker.internal:8080" \
+  -e QUEUE_PATH="/data/queue" \
+  -e CONFIG_RELOAD_INTERVAL="1m" \
+  -e API_KEY="uptimeo_WRoiXfzcc8XIyEnIHh4dpbtL6susRo00W4JfsmDUMEc" \
+  -v "$(pwd)/tmp/data/agent-sf:/data" \
+  --restart unless-stopped \
+  -p 8084:9090 \
+  ghcr.io/vibhuvioio/uptimeo-agent:latest

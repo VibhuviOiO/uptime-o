@@ -68,4 +68,18 @@ public interface AgentMonitorRepository extends JpaRepository<AgentMonitor, Long
      * @return true if exists, false otherwise
      */
     boolean existsByAgentIdAndMonitorId(Long agentId, Long monitorId);
+
+    /**
+     * Find all active agent monitors with monitor, agent, datacenter, and region eagerly loaded.
+     *
+     * @param active the active status
+     * @return list of active agent monitors with all relationships loaded
+     */
+    @Query("SELECT DISTINCT am FROM AgentMonitor am " +
+           "JOIN FETCH am.monitor m " +
+           "JOIN FETCH am.agent a " +
+           "LEFT JOIN FETCH a.datacenter d " +
+           "LEFT JOIN FETCH d.region r " +
+           "WHERE am.active = :active")
+    List<AgentMonitor> findByActiveWithRelationships(@Param("active") Boolean active);
 }

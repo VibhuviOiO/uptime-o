@@ -88,7 +88,6 @@ export const Brand = () => {
     <NavbarBrand tag={Link} to="/" className="brand-logo">
       <BrandIcon logoPath={settings.logoPath} logoWidth={settings.logoWidth} logoHeight={settings.logoHeight} />
       <span className="brand-title">{settings.title || 'UptimeO'}</span>
-      <span className="navbar-version">{VERSION.toLowerCase().startsWith('v') ? VERSION : `v${VERSION}`}</span>
     </NavbarBrand>
   );
 };

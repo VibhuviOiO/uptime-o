@@ -27,7 +27,9 @@ const Footer = () => {
       <hr />
       <Row>
         <Col md="12" className="text-center">
-          <p>{footerTitle}</p>
+          <p>
+            Version: {VERSION.toLowerCase().startsWith('v') ? VERSION : `v${VERSION}`} | {footerTitle}
+          </p>
         </Col>
       </Row>
     </div>
