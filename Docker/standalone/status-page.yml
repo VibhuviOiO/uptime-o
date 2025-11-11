@@ -1,16 +1,9 @@
 services:
   uptimeo-status:
-    image: ghcr.io/vibhuvioio/uptime-o-status-page:latest
+    image: ghcr.io/vibhuvioio/uptimeo-statuspage:latest
     container_name: uptimeo-status
-    depends_on:
-      postgres:
-        condition: service_healthy
-    environment:
-      DB_CONN_STRING: "postgres://uptimeo:uptimeo@postgres:5432/uptimeo?sslmode=disable"
-      VITE_API_BASE_URL: /
-      NAVBAR_TITLE: RichRelevance Status
-      STATUS_PAGE_TITLE: RichRelevance Status
-      STATUS_PAGE_SUBTITLE: Real-time monitoring dashboard for RichRelevance services
+    env_file:
+    - .env
     ports:
     - "8077:8077"
     restart: unless-stopped

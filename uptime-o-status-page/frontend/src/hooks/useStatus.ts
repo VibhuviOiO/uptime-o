@@ -1,35 +1,31 @@
 import { useState, useEffect } from 'react';
 
-export interface StatusData {
-  monitorId: number;
-  monitorName: string;
-  region_id: number;
-  region: string;
-  datacenter_id: number;
-  datacenter: string;
+export interface RegionHealth {
   status: string;
-  success: string;
-  successRate: number;
-  avgLatencyMs: number;
-  warningThresholdMs: number;
-  criticalThresholdMs: number;
+  responseTimeMs: number;
+  lastChecked: string;
 }
 
-export function useStatus(window: string = '1h', regionId?: number, datacenterId?: number) {
-  const [data, setData] = useState<StatusData[]>([]);
+export interface ApiStatus {
+  monitorId: number;
+  apiName: string;
+  regionHealth: Record<string, RegionHealth>;
+}
+
+export interface StatusResponse {
+  apis: ApiStatus[];
+  regions: string[];
+}
+
+export function useStatus() {
+  const [data, setData] = useState<StatusResponse>({ apis: [], regions: [] });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchStatus() {
-      setLoading(true);
-      setError(null);
       try {
-        const params = new URLSearchParams({ window });
-        if (regionId) params.append('regionId', regionId.toString());
-        if (datacenterId) params.append('datacenterId', datacenterId.toString());
-
-        const response = await fetch(`http://localhost:8077/status?${params}`);
+        const response = await fetch('http://localhost:8077/api/public/status');
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -43,7 +39,9 @@ export function useStatus(window: string = '1h', regionId?: number, datacenterId
     }
 
     fetchStatus();
-  }, [window, regionId, datacenterId]);
+    const interval = setInterval(fetchStatus, 30000);
+    return () => clearInterval(interval);
+  }, []);
 
   return { data, loading, error };
 }

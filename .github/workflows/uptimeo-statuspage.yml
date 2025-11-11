@@ -9,7 +9,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: uptime-o-status-page
+  IMAGE_NAME: uptimeo-statuspage
 
 jobs:
   build-and-push:

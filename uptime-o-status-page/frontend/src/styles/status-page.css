@@ -1,0 +1,318 @@
+.status-page-wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #f5f5f5;
+}
+
+.status-navbar {
+  background: white;
+  border-bottom: 1px solid #e0e0e0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.navbar-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.navbar-brand img {
+  display: block;
+}
+
+.navbar-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #202124;
+}
+
+.console-link {
+  color: #1a73e8;
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.console-link:hover {
+  background-color: #f1f3f4;
+}
+
+.support-link,
+.company-link {
+  color: #1a73e8;
+  text-decoration: underline;
+}
+
+.support-link:hover,
+.company-link:hover {
+  color: #174ea6;
+}
+
+.status-page {
+  flex: 1;
+  max-width: 1400px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 3rem 2rem;
+}
+
+.status-footer {
+  background: white;
+  border-top: 1px solid #e0e0e0;
+  box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.05);
+  margin-top: auto;
+}
+
+.footer-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 1.5rem 2rem;
+  text-align: center;
+  color: #5f6368;
+  font-size: 0.875rem;
+}
+
+.footer-content p {
+  margin: 0;
+}
+
+.status-header {
+  text-align: left;
+  margin-bottom: 2rem;
+}
+
+.status-header h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #202124;
+  margin-bottom: 0.5rem;
+}
+
+.status-header .status-subtitle {
+  font-size: 1rem;
+  color: #5f6368;
+  margin-bottom: 1rem;
+}
+
+.status-header .status-description {
+  font-size: 0.875rem;
+  color: #5f6368;
+  line-height: 1.6;
+}
+
+
+
+.status-legend-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.status-legend {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.last-update-text {
+  font-size: 0.875rem;
+  color: #5f6368;
+  white-space: nowrap;
+}
+
+.status-legend .legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: #5f6368;
+}
+
+.status-legend .legend-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+}
+
+.status-legend .legend-icon svg {
+  display: block;
+}
+
+.status-legend .no-data-icon {
+  font-size: 1.25rem;
+  color: #9aa0a6;
+  line-height: 1;
+}
+
+.status-legend span {
+  white-space: nowrap;
+}
+
+.status-page-loading,
+.status-page-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 4rem 2rem;
+  color: #5f6368;
+}
+
+.status-page-empty h2 {
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #202124;
+}
+
+.status-page-empty p {
+  font-size: 1rem;
+  color: #5f6368;
+}
+
+.status-table-container {
+  overflow-x: auto;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e0e0e0;
+}
+
+.status-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.status-table thead {
+  background: #fafafa;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.status-table thead th {
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: #5f6368;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-table thead th:first-child {
+  border-top-left-radius: 8px;
+}
+
+.status-table thead th:last-child {
+  border-top-right-radius: 8px;
+}
+
+.status-table thead th.api-column {
+  min-width: 250px;
+}
+
+.status-table thead th.region-column {
+  text-align: center;
+  min-width: 150px;
+}
+
+.status-table tbody tr {
+  border-bottom: 1px solid #e8eaed;
+  transition: background-color 0.2s;
+}
+
+.status-table tbody tr:hover {
+  background: #f8f9fa;
+}
+
+.status-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.status-table tbody td {
+  padding: 1.25rem 1rem;
+}
+
+.status-table tbody td.api-name {
+  font-weight: 600;
+  color: #202124;
+  font-size: 1rem;
+}
+
+.status-table tbody td.region-status {
+  text-align: center;
+}
+
+.status-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: default;
+}
+
+.status-indicator .status-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+}
+
+.status-indicator .status-icon svg {
+  display: block;
+}
+
+.status-indicator .response-time {
+  font-size: 0.75rem;
+  color: #5f6368;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.status-indicator .error-text {
+  color: #ea4335;
+  font-weight: 500;
+}
+
+.status-indicator.unknown {
+  color: #9aa0a6;
+}
+
+.status-indicator.unknown .no-data {
+  font-size: 1.25rem;
+  color: #9aa0a6;
+}
+
+.status-indicator:hover .status-icon-up svg circle {
+  fill: #2d8e47;
+}
+
+.status-indicator:hover .status-icon-warning svg circle {
+  fill: #f9ab00;
+}
+
+.status-indicator:hover .status-icon-critical svg circle {
+  fill: #e65100;
+}
+
+.status-indicator:hover .status-icon-down svg circle {
+  fill: #d33b2c;
+}

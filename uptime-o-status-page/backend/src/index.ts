@@ -8,6 +8,8 @@ import regionsRoutes from './routes/regionsRoutes.js';
 import statusRoutes from './routes/statusRoutes.js';
 import heartbeatHistoryRoutes from './routes/heartbeatHistoryRoutes.js';
 import configRoutes from './routes/configRoutes.js';
+import publicStatusRoutes from './routes/publicStatusRoutes.js';
+import brandingRoutes from './routes/brandingRoutes.js';
 import path from 'path';
 import { errorHandler } from './middleware/errorHandler.js';
 
@@ -57,18 +59,19 @@ app.get('/health', async () => {
 app.get('/health', (req, res) => {
   res.json({ status: 'ok' });
 });
+app.use('/api/public/status', publicStatusRoutes);
+app.use('/api/public/branding', brandingRoutes);
 app.use('/datacenters', datacentersRoutes);
 app.use('/regions', regionsRoutes);
 app.use('/status', statusRoutes);
 app.use('/monitors', heartbeatHistoryRoutes);
 app.use('/config', configRoutes);
 
+app.use(errorHandler);
 
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../public/index.html'));
 });
-
-app.use(errorHandler);
 
 
 app.listen(PORT, async () => {

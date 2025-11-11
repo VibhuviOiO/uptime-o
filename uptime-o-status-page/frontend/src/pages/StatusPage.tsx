@@ -1,249 +1,304 @@
-import React, { useState, useMemo } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
-import { useStatus } from "@/hooks/useStatus";
-import { useRegions, Region } from "@/hooks/useRegions";
-import { useDatacenters, Datacenter } from "@/hooks/useDatacenters";
-import { useConfig } from "@/hooks/useConfig";
-import { Sparkline } from "@/components/status/Sparkline";
-import SkeletonTiles from "@/components/SkeletonTiles";
+import React, { useEffect, useState } from 'react';
+import { useStatus } from '@/hooks/useStatus';
+import { useConfig } from '@/hooks/useConfig';
+import '../styles/status-page.css';
 
-const getStatusBadge = (status: string) => {
-  const baseClasses = "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border shadow-sm";
+const formatTimeAgo = (date: Date): string => {
+  const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
+  if (seconds < 10) return 'just now';
+  if (seconds < 60) return `${seconds}s ago`;
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  return `${hours}h ago`;
+};
 
-  // Handle string status values
+const getStatusTitle = (status: string): string => {
   switch (status) {
-    case "UP":
-      return (
-        <span className={`${baseClasses} bg-gradient-to-r from-green-50 to-emerald-50 text-green-700 border-green-200 shadow-green-100/50`}>
-          <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-          Healthy
-        </span>
-      );
-    case "DOWN":
-      return (
-        <span className={`${baseClasses} bg-gradient-to-r from-red-50 to-rose-50 text-red-700 border-red-200 shadow-red-100/50`}>
-          <div className="w-2 h-2 rounded-full bg-red-500"></div>
-          DOWN
-        </span>
-      );
-    case "operational":
-      return (
-        <span className={`${baseClasses} bg-gradient-to-r from-green-50 to-emerald-50 text-green-700 border-green-200 shadow-green-100/50`}>
-          <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-          Operational
-        </span>
-      );
-    case "healthy":
-      return (
-        <span className={`${baseClasses} bg-gradient-to-r from-green-50 to-emerald-50 text-green-700 border-green-200 shadow-green-100/50`}>
-          <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-          Healthy
-        </span>
-      );
-    case "degraded-orange":
-      return (
-        <span className={`${baseClasses} bg-gradient-to-r from-yellow-50 to-orange-50 text-yellow-700 border-yellow-200 shadow-yellow-100/50`}>
-          <div className="w-2 h-2 rounded-full bg-yellow-500"></div>
-          Degraded
-        </span>
-      );
-    case "degraded-red":
-      return (
-        <span className={`${baseClasses} bg-gradient-to-r from-orange-50 to-red-50 text-orange-700 border-orange-200 shadow-orange-100/50`}>
-          <div className="w-2 h-2 rounded-full bg-orange-500"></div>
-          Degraded
-        </span>
-      );
-    case "UNKNOWN":
-      return (
-        <span className={`${baseClasses} bg-gradient-to-r from-gray-50 to-slate-50 text-gray-700 border-gray-200 shadow-gray-100/50`}>
-          <div className="w-2 h-2 rounded-full bg-gray-500"></div>
-          Unknown
-        </span>
-      );
-    case "down":
-      return (
-        <span className={`${baseClasses} bg-gradient-to-r from-red-50 to-rose-50 text-red-700 border-red-200 shadow-red-100/50`}>
-          <div className="w-2 h-2 rounded-full bg-red-500"></div>
-          DOWN
-        </span>
-      );
+    case 'UP':
+      return 'Available - Normal latency';
+    case 'WARNING':
+      return 'Available - Elevated latency';
+    case 'CRITICAL':
+      return 'Available - High latency';
+    case 'DOWN':
+      return 'Service disruption';
     default:
-      return (
-        <span className={`${baseClasses} bg-gradient-to-r from-gray-50 to-slate-50 text-gray-700 border-gray-200 shadow-gray-100/50`}>
-          <div className="w-2 h-2 rounded-full bg-gray-500"></div>
-          Unknown
-        </span>
-      );
+      return 'Unknown status';
   }
 };
 
 export const StatusPage = () => {
-  const [window, setWindow] = useState("1h");
-  const [selectedRegion, setSelectedRegion] = useState<number | undefined>();
-  const [selectedDatacenter, setSelectedDatacenter] = useState<number | undefined>();
+  const { data: statusData, loading } = useStatus();
+  const { data: config } = useConfig();
+  const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
 
-  const statusParams = useMemo(() => ({
-    window,
-    regionId: selectedRegion,
-    datacenterId: selectedDatacenter
-  }), [window, selectedRegion, selectedDatacenter]);
+  useEffect(() => {
+    if (!loading && statusData) {
+      setLastUpdate(new Date());
+    }
+  }, [statusData, loading]);
 
-  const { data: statusData, loading: statusLoading } = useStatus(statusParams);
-  const { data: regions, loading: regionsLoading } = useRegions();
-  const { data: datacenters, loading: datacentersLoading } = useDatacenters();
-  const { data: config, loading: configLoading } = useConfig();
+  useEffect(() => {
+    if (config) {
+      document.title = config.pageTitle;
+      
+      const favicon = document.querySelector("link[rel='icon']") as HTMLLinkElement;
+      if (favicon) favicon.href = config.faviconUrl;
+      
+      let metaDescription = document.querySelector('meta[name="description"]');
+      if (!metaDescription) {
+        metaDescription = document.createElement('meta');
+        metaDescription.setAttribute('name', 'description');
+        document.head.appendChild(metaDescription);
+      }
+      metaDescription.setAttribute('content', config.metaDescription);
+      
+      let metaKeywords = document.querySelector('meta[name="keywords"]');
+      if (!metaKeywords) {
+        metaKeywords = document.createElement('meta');
+        metaKeywords.setAttribute('name', 'keywords');
+        document.head.appendChild(metaKeywords);
+      }
+      metaKeywords.setAttribute('content', config.metaKeywords);
+      
+      if (config.metaAuthor) {
+        let metaAuthor = document.querySelector('meta[name="author"]');
+        if (!metaAuthor) {
+          metaAuthor = document.createElement('meta');
+          metaAuthor.setAttribute('name', 'author');
+          document.head.appendChild(metaAuthor);
+        }
+        metaAuthor.setAttribute('content', config.metaAuthor);
+      }
+    }
+  }, [config]);
 
-  if (configLoading) return <div>Loading configuration...</div>;
+  if (loading) {
+    return (
+      <div className="status-page-wrapper">
+        <nav className="status-navbar">
+          <div className="navbar-content">
+            <div className="navbar-brand">
+              {config.logoUrl ? (
+                <img src={config.logoUrl} alt={config.navbarTitle} width={config.logoWidth} height={config.logoHeight} />
+              ) : (
+                <span className="navbar-title">{config.navbarTitle}</span>
+              )}
+            </div>
+            {config.navbarLinkText && config.navbarLinkUrl && (
+              <a href={config.navbarLinkUrl} target="_blank" rel="noopener noreferrer" className="console-link">
+                {config.navbarLinkText}
+              </a>
+            )}
+          </div>
+        </nav>
+        <div className="status-page-loading">Loading status...</div>
+      </div>
+    );
+  }
+
+  if (!statusData || statusData.apis.length === 0) {
+    return (
+      <div className="status-page-wrapper">
+        <nav className="status-navbar">
+          <div className="navbar-content">
+            <div className="navbar-brand">
+              {config.logoUrl ? (
+                <img src={config.logoUrl} alt={config.navbarTitle} width={config.logoWidth} height={config.logoHeight} />
+              ) : (
+                <span className="navbar-title">{config.navbarTitle}</span>
+              )}
+            </div>
+            {config.navbarLinkText && config.navbarLinkUrl && (
+              <a href={config.navbarLinkUrl} target="_blank" rel="noopener noreferrer" className="console-link">
+                {config.navbarLinkText}
+              </a>
+            )}
+          </div>
+        </nav>
+        <div className="status-page-empty">
+          <h2>No monitoring data available</h2>
+          <p>Start monitoring your APIs to see their status here</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <DashboardLayout>
-      <div className="min-h-screen">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-10">
-          <div className="flex flex-col items-center text-center gap-4 mb-8">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg">
-              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-              </svg>
+    <div className="status-page-wrapper">
+      <nav className="status-navbar">
+        <div className="navbar-content">
+          <div className="navbar-brand">
+            {config.logoUrl ? (
+              <img src={config.logoUrl} alt={config.navbarTitle} width={config.logoWidth} height={config.logoHeight} />
+            ) : (
+              <span className="navbar-title">{config.navbarTitle}</span>
+            )}
+          </div>
+          {config.navbarLinkText && config.navbarLinkUrl && (
+            <a href={config.navbarLinkUrl} target="_blank" rel="noopener noreferrer" className="console-link">
+              {config.navbarLinkText}
+            </a>
+          )}
+        </div>
+      </nav>
+      
+      <div className="status-page">
+        <div className="status-header">
+          <h1>{config.pageTitle}</h1>
+          <p className="status-subtitle">{config.pageSubtitle}</p>
+          <p className="status-description">
+            This page provides status information on the services that are part of <a href={config.companyWebsite} target="_blank" rel="noopener noreferrer" className="company-link">{config.companyName || 'our platform'}</a>. 
+            Check back here to view the current status of the services listed below. 
+            If you are experiencing an issue not listed here, please <a href={`mailto:${config.supportEmail}`} className="support-link">contact support</a>.
+          </p>
+        </div>
+
+        <div className="status-legend-container">
+          <div className="status-legend">
+            <div className="legend-item">
+              <div className="legend-icon">
+                <svg width="16" height="16" viewBox="0 0 16 16">
+                  <circle cx="8" cy="8" r="8" fill="#34a853" />
+                  <path d="M6 8l2 2 4-4" stroke="white" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </div>
+              <span>Available</span>
             </div>
-            <div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-slate-900 via-slate-800 to-slate-700 bg-clip-text text-transparent">{config.statusPageTitle}</h1>
-              <p className="text-slate-600 mt-1">{config.statusPageSubtitle}</p>
+            <div className="legend-item">
+              <div className="legend-icon">
+                <svg width="16" height="16" viewBox="0 0 16 16">
+                  <circle cx="8" cy="8" r="8" fill="#fbbc04" />
+                  <path d="M8 4v5M8 11v1" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+                </svg>
+              </div>
+              <span>Elevated latency</span>
+            </div>
+            <div className="legend-item">
+              <div className="legend-icon">
+                <svg width="16" height="16" viewBox="0 0 16 16">
+                  <circle cx="8" cy="8" r="8" fill="#ff6d00" />
+                  <path d="M8 4v5M8 11v1" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+                </svg>
+              </div>
+              <span>High latency</span>
+            </div>
+            <div className="legend-item">
+              <div className="legend-icon">
+                <svg width="16" height="16" viewBox="0 0 16 16">
+                  <circle cx="8" cy="8" r="8" fill="#ea4335" />
+                  <path d="M5 5l6 6M11 5l-6 6" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+                </svg>
+              </div>
+              <span>Service disruption</span>
+            </div>
+            <div className="legend-item">
+              <div className="legend-icon">
+                <span className="no-data-icon">—</span>
+              </div>
+              <span>No data</span>
             </div>
           </div>
+          {lastUpdate && (
+            <div className="last-update-text">
+              Updated {formatTimeAgo(lastUpdate)}
+            </div>
+          )}
+        </div>
 
-          <hr className="border-slate-200 mb-8" />
-
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center gap-6">
-              <div className="flex items-center gap-3">
-                <svg className="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span className="text-sm font-medium text-slate-700">Time Window</span>
-              </div>
-              <select
-                value={window}
-                onChange={(e) => setWindow(e.target.value)}
-                className="bg-white border border-slate-300 rounded-lg px-4 py-2 text-sm font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm hover:border-slate-400 transition-colors"
-              >
-                <option value="5m">Last 5 minutes</option>
-                <option value="15m">Last 15 minutes</option>
-                <option value="30m">Last 30 minutes</option>
-                <option value="1h">Last hour</option>
-                <option value="4h">Last 4 hours</option>
-                <option value="24h">Last 24 hours</option>
-              </select>
-
-              <div className="flex items-center gap-3">
-                <svg className="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064" />
-                </svg>
-                <span className="text-sm font-medium text-slate-700">Region</span>
-              </div>
-              <select
-                value={selectedRegion || ""}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  setSelectedRegion(value ? parseInt(value) : undefined);
-                  setSelectedDatacenter(undefined); // Reset datacenter when region changes
-                }}
-                className="bg-white border border-slate-300 rounded-lg px-4 py-2 text-sm font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm hover:border-slate-400 transition-colors"
-              >
-                <option value="">All Regions</option>
-                {regions.map((region) => (
-                  <option key={region.id} value={region.id}>
-                    {region.name}
-                  </option>
+        <div className="status-table-container">
+          <table className="status-table">
+            <thead>
+              <tr>
+                <th className="api-column">Service</th>
+                {statusData.regions.map(region => (
+                  <th key={region} className="region-column">
+                    {region}
+                  </th>
                 ))}
-              </select>
-
-              <div className="flex items-center gap-3">
-                <svg className="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                </svg>
-                <span className="text-sm font-medium text-slate-700">Datacenter</span>
-              </div>
-              <select
-                value={selectedDatacenter || ""}
-                onChange={(e) => setSelectedDatacenter(e.target.value ? parseInt(e.target.value) : undefined)}
-                className="bg-white border border-slate-300 rounded-lg px-4 py-2 text-sm font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm hover:border-slate-400 transition-colors"
-              >
-                <option value="">All Datacenters</option>
-                {datacenters
-                  .filter((dc) => !selectedRegion || dc.regionId === selectedRegion)
-                  .map((datacenter) => (
-                    <option key={datacenter.id} value={datacenter.id}>
-                      {datacenter.name} ({datacenter.code})
-                    </option>
-                  ))}
-              </select>
-            </div>
-          </div>
-        </div>
-
-            <div className="grid grid-cols-1 gap-5">
-        {statusLoading ? (
-          <SkeletonTiles />
-        ) : (
-          statusData.map((row) => (
-          <Card key={`${row.monitorId}-${row.datacenter_id}`} className="group hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-300 border-0 bg-gradient-to-br from-white to-white shadow-lg shadow-slate-100/50">
-            <CardContent className="p-6">
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className="w-3 h-3 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 shadow-sm"></div>
-                    <h3 className="font-bold text-xl text-slate-900 leading-tight truncate group-hover:text-slate-800 transition-colors">{row.monitorName}</h3>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm text-slate-600">
-                    <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                    <span>{row.region} • {row.datacenter}</span>
-                  </div>
-                </div>
-                <div className="flex items-center gap-4 ml-6">
-                  <div className="text-right">
-                    <div className="text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">{row.successRate}%</div>
-                    <div className="text-xs text-slate-500 uppercase tracking-wider font-medium">uptime</div>
-                  </div>
-                  <div className="flex-shrink-0">
-                    {getStatusBadge(row.status)}
-                  </div>
-                  <div className="flex-shrink-0">
-                    {getStatusBadge(row.success)}
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                <div className="flex items-center justify-between text-sm text-slate-600">
-                  <div className="flex items-center gap-2">
-                    <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                    </svg>
-                    <span className="font-medium">Response Status</span>
-                  </div>
-                  <div className="flex items-center gap-1 text-xs text-slate-500">
-                    <svg className="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <span>Last {window}</span>
-                  </div>
-                </div>
-                <Sparkline monitorId={row.monitorId} datacenterId={row.datacenter_id} window={window} />
-              </div>
-            </CardContent>
-          </Card>
-        )))}
-      </div>
+              </tr>
+            </thead>
+            <tbody>
+              {statusData.apis.map(api => (
+                <tr key={api.monitorId}>
+                  <td className="api-name">{api.apiName}</td>
+                  {statusData.regions.map(region => {
+                    const health = api.regionHealth[region];
+                    return (
+                      <td key={region} className="region-status">
+                        {health ? (
+                          <div className={`status-indicator ${health.status.toLowerCase()}`} title={getStatusTitle(health.status)}>
+                            {health.status === 'UP' ? (
+                              <>
+                                <div className="status-icon status-icon-up">
+                                  <svg width="16" height="16" viewBox="0 0 16 16">
+                                    <circle cx="8" cy="8" r="8" fill="#34a853" />
+                                    <path
+                                      d="M6 8l2 2 4-4"
+                                      stroke="white"
+                                      strokeWidth="1.5"
+                                      fill="none"
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                    />
+                                  </svg>
+                                </div>
+                                <span className="response-time">{health.responseTimeMs}ms</span>
+                              </>
+                            ) : health.status === 'WARNING' ? (
+                              <>
+                                <div className="status-icon status-icon-warning">
+                                  <svg width="16" height="16" viewBox="0 0 16 16">
+                                    <circle cx="8" cy="8" r="8" fill="#fbbc04" />
+                                    <path d="M8 4v5M8 11v1" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+                                  </svg>
+                                </div>
+                                <span className="response-time">{health.responseTimeMs}ms</span>
+                              </>
+                            ) : health.status === 'CRITICAL' ? (
+                              <>
+                                <div className="status-icon status-icon-critical">
+                                  <svg width="16" height="16" viewBox="0 0 16 16">
+                                    <circle cx="8" cy="8" r="8" fill="#ff6d00" />
+                                    <path d="M8 4v5M8 11v1" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+                                  </svg>
+                                </div>
+                                <span className="response-time">{health.responseTimeMs}ms</span>
+                              </>
+                            ) : (
+                              <>
+                                <div className="status-icon status-icon-down">
+                                  <svg width="16" height="16" viewBox="0 0 16 16">
+                                    <circle cx="8" cy="8" r="8" fill="#ea4335" />
+                                    <path d="M5 5l6 6M11 5l-6 6" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+                                  </svg>
+                                </div>
+                                <span className="response-time error-text">Error</span>
+                              </>
+                            )}
+                          </div>
+                        ) : (
+                          <div className="status-indicator unknown" title="No recent data">
+                            <span className="no-data">—</span>
+                          </div>
+                        )}
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
-    </DashboardLayout>
+
+      <footer className="status-footer">
+        <div className="footer-content">
+          <p>©{new Date().getFullYear()} {config.pageTitle} • {config.footerText} • Last updated: {new Date().toLocaleString()}</p>
+        </div>
+      </footer>
+    </div>
   );
 };
 
