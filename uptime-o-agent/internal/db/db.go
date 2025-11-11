@@ -31,13 +31,13 @@ func InsertHeartbeat(ctx context.Context, pool *pgxpool.Pool, hb *models.Heartbe
 	return err
 }
 
-func AcquireLock(ctx context.Context, pool *pgxpool.Pool, datacenterID int) (bool, error) {
+func AcquireLock(ctx context.Context, pool *pgxpool.Pool, agentID int) (bool, error) {
 	var acquired bool
-	err := pool.QueryRow(ctx, "SELECT pg_try_advisory_lock($1)", datacenterID).Scan(&acquired)
+	err := pool.QueryRow(ctx, "SELECT pg_try_advisory_lock($1)", agentID).Scan(&acquired)
 	return acquired, err
 }
 
-func ReleaseLock(ctx context.Context, pool *pgxpool.Pool, datacenterID int) error {
-	_, err := pool.Exec(ctx, "SELECT pg_advisory_unlock($1)", datacenterID)
+func ReleaseLock(ctx context.Context, pool *pgxpool.Pool, agentID int) error {
+	_, err := pool.Exec(ctx, "SELECT pg_advisory_unlock($1)", agentID)
 	return err
 }

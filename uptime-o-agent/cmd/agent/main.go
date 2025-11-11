@@ -6,7 +6,6 @@ import (
 	"UptimeOAgent/internal/db"
 	"UptimeOAgent/internal/models"
 	"context"
-	"math/rand"
 	"net/http"
 	"os"
 	"os/signal"
@@ -17,13 +16,15 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func startHealthServer() {
+func startHealthServer(port string) {
 	http.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("ok"))
 	})
 	go func() {
-		if err := http.ListenAndServe(":8080", nil); err != nil {
+		addr := ":" + port
+		logrus.Infof("Starting health server on %s", addr)
+		if err := http.ListenAndServe(addr, nil); err != nil {
 			logrus.Error("Health server error: ", err)
 		}
 	}()
@@ -40,6 +41,21 @@ func main() {
 		logrus.Fatal("DB_CONN_STRING not set")
 	}
 
+	healthPort := os.Getenv("HEALTH_PORT")
+	if healthPort == "" {
+		healthPort = "8080"
+	}
+
+	configReloadInterval := 24 * time.Hour
+	if reloadIntervalStr := os.Getenv("CONFIG_RELOAD_INTERVAL"); reloadIntervalStr != "" {
+		if parsedInterval, err := time.ParseDuration(reloadIntervalStr); err == nil {
+			configReloadInterval = parsedInterval
+			logrus.Infof("CONFIG_RELOAD_INTERVAL set to: %v", configReloadInterval)
+		} else {
+			logrus.Warnf("Invalid CONFIG_RELOAD_INTERVAL '%s': %v. Using default: 24h", reloadIntervalStr, err)
+		}
+	}
+
 	dbConn, err := db.Connect(connString)
 	if err != nil {
 		logrus.WithError(err).Fatal("Failed to connect to DB")
@@ -52,64 +68,73 @@ func main() {
 		logrus.Fatal("Failed to load config:", err)
 	}
 
-	datacenterIDStr := os.Getenv("DATACENTER_ID")
-	if datacenterIDStr == "" {
-		logrus.Fatal("DATACENTER_ID not set")
+	agentIDStr := os.Getenv("AGENT_ID")
+	if agentIDStr == "" {
+		logrus.Fatal("AGENT_ID not set")
 	}
-	datacenterID, err := strconv.Atoi(datacenterIDStr)
+	agentID, err := strconv.Atoi(agentIDStr)
 	if err != nil {
-		logrus.Fatal("Invalid DATACENTER_ID:", err)
+		logrus.Fatal("Invalid AGENT_ID:", err)
 	}
-	logrus.Infof("application found the datacenterId: %d", datacenterID)
 
-	var agents []models.Agent
+	var agent *models.Agent
 	for _, a := range cfg.Agents {
-		if a.Datacenter.ID == datacenterID {
-			agents = append(agents, a)
+		if a.ID == agentID {
+			agent = &a
 			break
 		}
 	}
-	if len(agents) == 0 {
-		logrus.Fatal("No agents found for DATACENTER_ID:", datacenterID)
+	if agent == nil {
+		logrus.Fatal("No agent found for AGENT_ID:", agentID)
 	}
-	agent := agents[0]
+	logrus.Infof("application configuration: agentId=%d, agentName=%s, datacenter=%s", agent.ID, agent.Name, agent.Datacenter.Name)
 
-	logrus.Infof("application found the count of monitoring: %d, generating the monitor config", len(agent.Monitors))
-	for _, mon := range agent.Monitors {
-		schedule := findSchedule(agent.GlobalSchedules, mon.ScheduleID)
-		if schedule != nil {
-			logrus.Infof("monitor: id=%d, name=%s, method=%s, url=%s, schedule: id=%d, name=%s, interval=%ds, warning=%dms, critical=%dms", mon.ID, mon.Name, mon.Method, mon.URL, schedule.ID, schedule.Name, schedule.Interval, schedule.ThresholdsWarning, schedule.ThresholdsCritical)
-		} else {
-			logrus.Infof("monitor: id=%d, name=%s, method=%s, url=%s, scheduleId=%d", mon.ID, mon.Name, mon.Method, mon.URL, mon.ScheduleID)
+	if len(agent.Monitors) == 0 {
+		logrus.Warn("No monitors configured yet. Agent will retry loading configuration periodically.")
+	} else {
+		logrus.Infof("application found the count of monitoring: %d, generating the monitor config", len(agent.Monitors))
+		for _, mon := range agent.Monitors {
+			schedule := findSchedule(agent.GlobalSchedules, mon.ScheduleID)
+			if schedule != nil {
+				logrus.Infof("monitor: id=%d, name=%s, method=%s, url=%s, schedule: id=%d, name=%s, interval=%ds, warning=%dms, critical=%dms", mon.ID, mon.Name, mon.Method, mon.URL, schedule.ID, schedule.Name, schedule.Interval, schedule.ThresholdsWarning, schedule.ThresholdsCritical)
+			} else {
+				logrus.Infof("monitor: id=%d, name=%s, method=%s, url=%s, scheduleId=%d", mon.ID, mon.Name, mon.Method, mon.URL, mon.ScheduleID)
+			}
 		}
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
+	startHealthServer(healthPort)
+
+	// Start leader election loop
 	go func() {
-		rand.Seed(time.Now().UnixNano())
 		for {
 			select {
 			case <-ctx.Done():
 				return
 			default:
-				acquired, err := db.AcquireLock(ctx, dbConn, datacenterID)
+				acquired, err := db.AcquireLock(ctx, dbConn, agentID)
 				if err != nil {
-					logrus.Error("Failed to acquire lock:", err)
+					logrus.Errorf("Failed to acquire lock: %v", err)
 					time.Sleep(10 * time.Second)
 					continue
 				}
 				if acquired {
-					logrus.Info("Acquired lock for datacenter:", datacenterID)
-					collector.NewAPIHeartbeatCollector(ctx, agent, cfg, dbConn).Start()
-					if err := db.ReleaseLock(ctx, dbConn, datacenterID); err != nil {
-						logrus.Error("Failed to release lock:", err)
+					logrus.Infof("Acquired leadership lock for agent %d", agentID)
+					if len(agent.Monitors) > 0 {
+						collector.NewAPIHeartbeatCollector(ctx, *agent, cfg, dbConn).Start()
+					} else {
+						<-ctx.Done()
 					}
-					logrus.Info("Released lock for datacenter:", datacenterID)
+					if err := db.ReleaseLock(ctx, dbConn, agentID); err != nil {
+						logrus.Errorf("Failed to release lock: %v", err)
+					}
+					logrus.Infof("Released leadership lock for agent %d", agentID)
 				} else {
-					jitter := time.Duration(rand.Intn(10)) * time.Second
-					time.Sleep(60*time.Second + jitter)
+					logrus.Infof("Another instance is active. Waiting...")
+					time.Sleep(30 * time.Second)
 				}
 			}
 		}
@@ -118,7 +143,14 @@ func main() {
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
 
-	configReloadTicker := time.NewTicker(24 * time.Hour)
+	getReloadInterval := func() time.Duration {
+		if len(agent.Monitors) == 0 {
+			return 5 * time.Minute
+		}
+		return configReloadInterval
+	}
+
+	configReloadTicker := time.NewTicker(getReloadInterval())
 	defer configReloadTicker.Stop()
 
 	for {
@@ -132,16 +164,30 @@ func main() {
 		case <-configReloadTicker.C:
 			newCfg, err := config.Load(dbConn)
 			if err != nil {
-				logrus.Error("Failed to reload config:", err)
+				logrus.Warnf("Failed to reload config: %v. Will retry later.", err)
 			} else {
+				oldMonitorIDs := getMonitorIDs(agent.Monitors)
 				cfg = newCfg
-				logrus.Info("Config reloaded")
 				for _, a := range cfg.Agents {
-					if a.Datacenter.ID == datacenterID {
-						agent = a
+					if a.ID == agentID {
+						agent = &a
 						break
 					}
 				}
+				newMonitorIDs := getMonitorIDs(agent.Monitors)
+				if !monitorIDsEqual(oldMonitorIDs, newMonitorIDs) {
+					if len(newMonitorIDs) > 0 {
+						logrus.Infof("Monitors changed. Restarting collector. Monitoring: %v", newMonitorIDs)
+					} else {
+						logrus.Info("No monitors assigned. Stopping collector.")
+					}
+					cancel()
+					ctx, cancel = context.WithCancel(context.Background())
+					if len(newMonitorIDs) > 0 {
+						go collector.NewAPIHeartbeatCollector(ctx, *agent, cfg, dbConn).Start()
+					}
+				}
+				configReloadTicker.Reset(getReloadInterval())
 			}
 		}
 	}
@@ -154,4 +200,28 @@ func findSchedule(schedules []models.Schedule, id int) *models.Schedule {
 		}
 	}
 	return nil
+}
+
+func getMonitorIDs(monitors []models.Monitor) []int {
+	ids := make([]int, len(monitors))
+	for i, m := range monitors {
+		ids[i] = m.ID
+	}
+	return ids
+}
+
+func monitorIDsEqual(a, b []int) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	aMap := make(map[int]bool, len(a))
+	for _, id := range a {
+		aMap[id] = true
+	}
+	for _, id := range b {
+		if !aMap[id] {
+			return false
+		}
+	}
+	return true
 }

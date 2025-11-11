@@ -129,8 +129,10 @@ func main() {
 	// Start health server
 	startHealthServer(healthPort)
 
-	// Start collector
-	go collector.NewAPIHeartbeatCollector(ctx, *agent, cfg, apiClient).Start()
+	// Start collector only if monitors exist
+	if len(agent.Monitors) > 0 {
+		go collector.NewAPIHeartbeatCollector(ctx, *agent, cfg, apiClient).Start()
+	}
 
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)

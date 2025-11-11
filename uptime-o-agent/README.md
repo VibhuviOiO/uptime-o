@@ -1,182 +1,244 @@
-# UptimeOAgent
+# Uptime Agent (Standalone Mode)
 
-UptimeOAgent is a Go-based monitoring agent that performs HTTP requests based on configured monitors and schedules, collecting detailed metrics and saving heartbeats to PostgreSQL. It supports extensibility for TCP and Ping monitors.
+Monitors HTTP endpoints and stores heartbeats directly in PostgreSQL.
 
-## Features
+## Quick Start
 
-- HTTP monitoring with detailed timing metrics (DNS, TCP, TLS, TTFB)
-- Configurable schedules and thresholds
-- PostgreSQL storage for heartbeats
-- Logging with structured JSON
-- Extensible monitor interface
-- Docker support for easy deployment
-- High availability with distributed locking for failover
-
-## Prerequisites
-
-- Go 1.21+
-- PostgreSQL 17+
-- Docker and Docker Compose (for containerized runs)
-
-## Development Setup
-
-1. **Clone and Setup Project**:
-   ```bash
-   git clone <repo> uptime-o-agent
-   cd uptime-o-agent
-   go mod tidy
-   ```
-
-2. **Setup PostgreSQL**:
-   - Install PostgreSQL locally or use Docker: `docker run -d --name postgres -e POSTGRES_USER=uptimeo -e POSTGRES_PASSWORD=uptimeo -e POSTGRES_DB=uptimeo -p 5432:5432 postgres:17`
-   - Execute SQL: `psql -h localhost -U uptimeo -d uptimeo -f ../plan/sql/uptimeo.sql` and `psql -h localhost -U uptimeo -d uptimeo -f ../plan/sql/data.sql`
-
-3. **Run the Agent**:
-   ```bash
-   export DB_CONN_STRING="postgres://uptimeo:uptimeo@localhost:5432/uptimeo?sslmode=disable"
-   export DATACENTER_ID=5
-   go run cmd/agent/main.go
-   ```
-
-### Configuration
-
-Configuration is loaded from PostgreSQL tables: schedules, api_monitors, regions, datacenters, agents.
-
-- Environment variables:
-  - `DATACENTER_ID`: ID of the datacenter to run the agent for.
-  - `DB_CONN_STRING`: PostgreSQL connection string.
-
-## Building
+### Run as Developer
 
 ```bash
-go build -o agent ./cmd/agent
+# 1. Start PostgreSQL with data
+cd docker/standalone
+docker compose -f postgres.yml up -d
+
+# 2. Set environment variables
+export DB_CONN_STRING="postgres://uptimeo:uptimeo@localhost:5432/uptimeo?sslmode=disable"
+export AGENT_ID=1
+export CONFIG_RELOAD_INTERVAL=1m
+export HEALTH_PORT=8071
+export QUEUE_PATH=./data/queue
+
+# 3. Run agent
+cd ../../uptime-o-agent
+go run cmd/agent/main.go
 ```
 
-## Running Locally
+## Build
 
-1. Ensure PostgreSQL is running and populated.
-2. Set environment variables: `export DB_CONN_STRING="postgres://uptimeo:uptimeo@localhost:5432/uptimeo?sslmode=disable"` and `DATACENTER_ID=1`
-3. Run: `./agent`
+```bash
+# Build binary
+go build -o agent cmd/agent/main.go
 
-## Docker
+# Build Docker image
+docker build -t uptimeo-agent .
+```
 
-### Build and Run with Docker Compose
+### Run as Container
 
-1. Ensure PostgreSQL is populated with data.
-2. Run: `docker-compose up --build`
+```bash
+# 1. Start PostgreSQL
+cd docker/standalone
+docker compose -f postgres.yml up -d
 
-This starts PostgreSQL and agent containers for each datacenter (VA, NY, RDN, CHI, SF, LON, DAM, STO, SYD). Each container attempts to acquire a distributed lock; only one instance per datacenter runs monitors, ensuring high availability and failover.
+# 2. Start agents (with HA)
+docker compose -f agents.yml up -d
 
-## Operations
+# 3. Check logs
+docker logs agent-va-1
+```
 
-- Logs are output in JSON format to stdout.
-- Monitor the agent via logs or query PostgreSQL for heartbeats.
-- For production, consider using a process manager like systemd or Kubernetes.
-- Ensure database is securely managed.
+## Database Initialization
 
-## Extending Monitors
+### Automatic (Recommended)
+PostgreSQL auto-initializes on first start:
+```bash
+docker compose -f postgres.yml up -d
+```
 
-Implement the `MonitorInterface` for new monitor types (e.g., TCP, Ping) in `internal/monitor/`.
+Loads:
+- Schema: `sql/uptimeo.sql`
+- Data: `sql/data.sql` (9 agents, 4 monitors)
 
-## Operations Guide
+### Manual
+```bash
+psql -h localhost -U uptimeo -d uptimeo -f sql/uptimeo.sql
+psql -h localhost -U uptimeo -d uptimeo -f sql/data.sql
+```
 
-### Running in Production
+## Configuration
 
-- Use Docker Compose or Kubernetes to run one agent per datacenter.
-- Ensure only one agent instance per datacenter acquires the lock at a time (scale for HA).
-- Set environment variables:
-  - `DB_CONN_STRING` (Postgres connection string)
-  - `DATACENTER_ID` (datacenter to run agent for)
+### Environment Variables
 
-### Monitoring
+```bash
+# Required
+DB_CONN_STRING="postgres://uptimeo:uptimeo@localhost:5432/uptimeo?sslmode=disable"
+AGENT_ID=1
 
-- Check logs for:
-  - `"Acquired lock for datacenter:X"` (agent is active)
-  - `"Heartbeat inserted for monitor X (name)"` (successful monitor execution)
-  - `"Monitor execution failed"` or `"Failed to save heartbeat"` (errors)
-- Query heartbeats:
-  ```sql
-  SELECT * FROM api_heartbeats ORDER BY executed_at DESC LIMIT 10;
-  ```
-- Use monitoring tools (Prometheus, Grafana) for container health and resource usage.
+# Optional (with defaults)
+HEALTH_PORT=8080                    # Default: 8080
+CONFIG_RELOAD_INTERVAL=1m           # Default: 24h (supports: 30s, 1m, 5m, 1h, 24h)
+QUEUE_PATH=./data/queue             # Default: ./data/queue
+```
 
-### Troubleshooting
+### CONFIG_RELOAD_INTERVAL Examples
 
-- If heartbeats are missing:
-  - Check logs for errors (network, DB, lock issues).
-  - Ensure Postgres sequence is correct:
-    ```sql
-    SELECT setval('api_heartbeats_id_seq', (SELECT COALESCE(MAX(id), 0) + 1 FROM api_heartbeats));
-    ```
-  - Verify agent connectivity to monitored endpoints.
-- If agents do not shut down on Ctrl+C:
-  - Use `docker stop <container>` or `kill <pid>`.
+```bash
+# Check for config changes every 30 seconds
+export CONFIG_RELOAD_INTERVAL=30s
 
-### Maintenance
+# Check every 1 minute (recommended for development)
+export CONFIG_RELOAD_INTERVAL=1m
 
-- Periodically vacuum/analyze the heartbeats table for performance.
-- Rotate logs and monitor disk usage.
-- Update agent images and dependencies as needed.
-- For config changes, update DB tables and restart agents (or wait for periodic reload).
+# Check every 5 minutes
+export CONFIG_RELOAD_INTERVAL=5m
 
-### Security
+# Check every hour
+export CONFIG_RELOAD_INTERVAL=1h
 
-- Restrict DB access to trusted agents.
-- Use secrets management for DB credentials.
-- Monitor for unauthorized access or unusual heartbeat patterns.
+# Check once per day (default)
+export CONFIG_RELOAD_INTERVAL=24h
 
-## Partition Management for api_heartbeats
+# Or don't set it (uses default 24h)
+# unset CONFIG_RELOAD_INTERVAL
+```
 
-The `api_heartbeats` table is partitioned by `executed_at` (daily ranges) to handle high-volume time-series data efficiently.
+**Note:** When agent has zero monitors, it automatically checks every 5 minutes regardless of this setting.
 
-### Advantages of Partitioning
-- **Performance**: Faster queries, inserts, and deletes on date ranges (e.g., last 24 hours).
-- **Maintenance**: Easy to archive/drop old partitions (e.g., delete data older than 90 days).doc
-- **Scalability**: Reduces index size and improves vacuum/analyze operations on large tables.
-- **Storage**: Better for time-series data like heartbeats, avoiding full table scans.
+## Partition Management
 
-### One-Time Setup vs. Daily Management
-- **One-Time**: Create the `create_partition_for_date` function once in PostgreSQL.
-- **Daily/Automated**: Partitions are created as needed (e.g., by the agent on startup). Manual creation is only for troubleshooting.
+### Auto-Partitioning
+✅ **Enabled by default** - Daily partitions created automatically
 
-### Checking Partitions in PostgreSQL
+The `api_heartbeats` table is partitioned by date for performance.
 
-Run in `psql`:
+### How It Works
+- Partition created on first heartbeat of the day
+- Function: `create_daily_partition()` in schema
+- No manual intervention needed
+
+### Check Partitions
 ```sql
--- List partitions
-\d+ api_heartbeats
-
--- Check if partition exists for a date (e.g., today)
-SELECT tablename FROM pg_tables WHERE tablename LIKE 'api_heartbeats_%' AND tablename ~ ('api_heartbeats_' || to_char(CURRENT_DATE, 'YYYY_MM_DD'));
-
--- View partition ranges
-SELECT * FROM pg_partitioned_table WHERE partrelid = 'api_heartbeats'::regclass;
+-- List all partitions
+SELECT child.relname 
+FROM pg_inherits
+JOIN pg_class parent ON pg_inherits.inhparent = parent.oid
+JOIN pg_class child ON pg_inherits.inhrelid = child.oid
+WHERE parent.relname = 'api_heartbeats'
+ORDER BY child.relname;
 ```
 
-### Creating Partitions Dynamically
+### Manual Partition (if needed)
+```sql
+SELECT create_daily_partition();
+```
 
-1. **Create the Function Once** (one-time in DB):
-   ```sql
-   CREATE OR REPLACE FUNCTION create_partition_for_date(target_date DATE) RETURNS void AS $$
-   DECLARE
-       partition_name TEXT := 'api_heartbeats_' || to_char(target_date, 'YYYY_MM_DD');
-   BEGIN
-       EXECUTE format(
-           'CREATE TABLE IF NOT EXISTS %I PARTITION OF api_heartbeats FOR VALUES FROM (%L) TO (%L)',
-           partition_name, target_date, target_date + INTERVAL '1 day'
-       );
-   END;
-   $$ LANGUAGE plpgsql;
-   ```
+## Data Retention
 
-2. **Call the Function** (automated or manual):
-   - Automated: Update the Go agent to execute `SELECT create_partition_for_date(CURRENT_DATE)` on startup.
-   - Manual: `SELECT create_partition_for_date(CURRENT_DATE);` for today, or `SELECT create_partition_for_date(CURRENT_DATE + INTERVAL '1 day');` for tomorrow.
+### Automatic Cleanup
+Old data is automatically deleted based on `RETENTION_DAYS` (default: 30 days).
 
-For production, automate with a cron job or app hook. If partitioning causes issues, drop it and use a regular table with indexes.
+### Configure Retention
+Edit `docker/standalone/sql/cleanup-30-days.sql` and change the interval:
 
-### Default Handling in Application
+```sql
+-- Change from 30 days to 90 days
+INTERVAL '90 days'
 
-- On agent startup: Create partition for today and tomorrow.
-- Before insert: Check/create partition for the `executed_at` date.
-- This ensures the app handles partitions by default without manual intervention.
+-- Or 7 days
+INTERVAL '7 days'
+```
+
+Then reload:
+```bash
+psql -h localhost -U uptimeo -d uptimeo -f sql/cleanup-30-days.sql
+```
+
+### Manual Cleanup
+```sql
+-- Delete data older than 30 days
+DELETE FROM api_heartbeats 
+WHERE executed_at < NOW() - INTERVAL '30 days';
+
+-- Drop old partitions
+DROP TABLE IF EXISTS api_heartbeats_2025_10_01;
+```
+
+### Setup pg_cron (Optional)
+For automatic cleanup:
+```bash
+psql -h localhost -U uptimeo -d uptimeo -f sql/cleanup-30-days.sql
+```
+
+This schedules:
+- Hourly: Delete old rows
+- Daily: Drop old partitions
+
+## High Availability
+
+Run multiple replicas with same AGENT_ID:
+```bash
+docker compose -f agents.yml up -d
+```
+
+- Only one instance monitors (leader)
+- Others wait as standby
+- Automatic failover if leader crashes
+- ~30 seconds recovery time
+
+## Verify Setup
+
+```bash
+# Check agents
+docker exec -it postgres psql -U uptimeo -d uptimeo -c "SELECT * FROM agents;"
+
+# Check monitors
+docker exec -it postgres psql -U uptimeo -d uptimeo -c "SELECT * FROM http_monitors;"
+
+# Check heartbeats
+docker exec -it postgres psql -U uptimeo -d uptimeo -c "SELECT COUNT(*) FROM api_heartbeats;"
+
+# Check partitions
+docker exec -it postgres psql -U uptimeo -d uptimeo -c "SELECT tablename FROM pg_tables WHERE tablename LIKE 'api_heartbeats_%';"
+```
+
+## Add New Monitor
+
+```sql
+-- Add monitor
+INSERT INTO http_monitors (name, method, type, url, schedule_id) 
+VALUES ('Google', 'GET', 'HTTPS', 'https://www.google.com', 1);
+
+-- Assign to agent
+INSERT INTO agent_monitors (agent_id, monitor_id, active, created_by, created_date)
+VALUES (1, 5, TRUE, 'admin', CURRENT_TIMESTAMP);
+```
+
+Agent picks up changes within 1 minute (or configured interval).
+
+## Troubleshooting
+
+### No heartbeats
+```bash
+# Check agent logs
+docker logs agent-va-1
+
+# Check if agent acquired lock
+docker logs agent-va-1 | grep "Acquired leadership"
+
+# Check database connection
+docker exec agent-va-1 wget -q --spider postgres:5432 || echo "Cannot reach DB"
+```
+
+### Partition missing
+```sql
+-- Create today's partition
+SELECT create_daily_partition();
+```
+
+### Reset everything
+```bash
+docker compose -f postgres.yml down -v
+docker compose -f postgres.yml up -d
+```
+
+

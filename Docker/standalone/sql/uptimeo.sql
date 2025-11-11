@@ -9,7 +9,7 @@ CREATE TABLE schedules (
     thresholds_critical INT
 );
 
-CREATE TABLE api_monitors (
+CREATE TABLE http_monitors (
     id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     method VARCHAR(10) NOT NULL,
@@ -34,35 +34,41 @@ CREATE TABLE datacenters (
     region_id INT REFERENCES regions(id)
 );
 
-CREATE TABLE datacenter_monitors (
-    datacenter_id INT REFERENCES datacenters(id) ON DELETE CASCADE,
-    monitor_id INT REFERENCES api_monitors(id) ON DELETE CASCADE,
-    PRIMARY KEY (datacenter_id, monitor_id)
-);
-
 CREATE TABLE agents (
     id SERIAL PRIMARY KEY,
     name VARCHAR(50) NOT NULL,
     datacenter_id INT REFERENCES datacenters(id)
 );
 
+CREATE TABLE agent_monitors (
+    id SERIAL PRIMARY KEY,
+    agent_id INT NOT NULL REFERENCES agents(id) ON DELETE CASCADE,
+    monitor_id INT NOT NULL REFERENCES http_monitors(id) ON DELETE CASCADE,
+    active BOOLEAN DEFAULT TRUE NOT NULL,
+    created_by VARCHAR(50) DEFAULT 'system' NOT NULL,
+    created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    last_modified_by VARCHAR(50),
+    last_modified_date TIMESTAMP,
+    UNIQUE (agent_id, monitor_id)
+);
+
 -- ✅ Partitioned heartbeat table
 CREATE TABLE api_heartbeats (
     id BIGSERIAL,
-    monitor_id INT REFERENCES api_monitors(id),
+    monitor_id INT REFERENCES http_monitors(id),
     agent_id INT REFERENCES agents(id),
     executed_at TIMESTAMP NOT NULL,
     success BOOLEAN,
-    response_time_ms INT,
+    response_time_ms BIGINT,
     response_size_bytes INT,
     response_status_code INT,
     response_content_type VARCHAR(50),
     response_server VARCHAR(50),
     response_cache_status VARCHAR(50),
-    dns_lookup_ms INT,
-    tcp_connect_ms INT,
-    tls_handshake_ms INT,
-    time_to_first_byte_ms INT,
+    dns_lookup_ms BIGINT,
+    tcp_connect_ms BIGINT,
+    tls_handshake_ms BIGINT,
+    time_to_first_byte_ms BIGINT,
     warning_threshold_ms INT,
     critical_threshold_ms INT,
     error_type VARCHAR(50),
@@ -73,12 +79,10 @@ CREATE TABLE api_heartbeats (
     PRIMARY KEY (id, executed_at)
 ) PARTITION BY RANGE (executed_at);
 
-
 -- ✅ Today Partition (boot-strap)
 CREATE TABLE IF NOT EXISTS api_heartbeats_today
 PARTITION OF api_heartbeats
 FOR VALUES FROM (CURRENT_DATE) TO (CURRENT_DATE + INTERVAL '1 day');
-
 
 -- ✅ Auto-Create Daily Partitions
 CREATE OR REPLACE FUNCTION create_daily_partition()
@@ -95,17 +99,14 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-
--- ✅ Indexes (parent only → applied to all partitions)
+-- ✅ Indexes
 CREATE EXTENSION IF NOT EXISTS pg_trgm;
 
 CREATE INDEX idx_agents_datacenter_id ON agents (datacenter_id);
 CREATE INDEX idx_datacenters_region_id ON datacenters (region_id);
-CREATE INDEX idx_api_monitors_name_trgm ON api_monitors USING GIN (name gin_trgm_ops);
-CREATE INDEX idx_api_monitors_schedule_id ON api_monitors (schedule_id);
-CREATE INDEX idx_datacenter_monitors_monitor_id
-    ON datacenter_monitors (monitor_id, datacenter_id);
-
--- ✅ Recency index (query booster)
+CREATE INDEX idx_http_monitors_name_trgm ON http_monitors USING GIN (name gin_trgm_ops);
+CREATE INDEX idx_http_monitors_schedule_id ON http_monitors (schedule_id);
+CREATE INDEX idx_agent_monitors_agent_id ON agent_monitors (agent_id);
+CREATE INDEX idx_agent_monitors_monitor_id ON agent_monitors (monitor_id);
 CREATE INDEX idx_hb_recent_exec ON api_heartbeats (executed_at DESC);
 CREATE INDEX idx_api_heartbeats_monitor_id_executed_at ON api_heartbeats (monitor_id, executed_at);

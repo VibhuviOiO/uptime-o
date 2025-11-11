@@ -60,7 +60,7 @@ func findSchedule(schedules []models.Schedule, id int) *models.Schedule {
 
 func ExecuteHttpMonitor(agent models.Agent, mon models.Monitor, schedule models.Schedule) (*models.Heartbeat, error) {
 	executedAt := time.Now()
-	var dnsStart, tcpStart, tlsStart, ttfbStart time.Time
+	var dnsStart, tcpStart, tlsStart, requestStart time.Time
 	var dnsLookupMs, tcpConnectMs, tlsHandshakeMs, timeToFirstByteMs int64
 
 	req, err := http.NewRequest(mon.Method, mon.URL, strings.NewReader(mon.Body))
@@ -87,14 +87,19 @@ func ExecuteHttpMonitor(agent models.Agent, mon models.Monitor, schedule models.
 				tlsHandshakeMs = time.Since(tlsStart).Milliseconds()
 			}
 		},
-		GotFirstResponseByte: func() { timeToFirstByteMs = time.Since(ttfbStart).Milliseconds() },
+		GotFirstResponseByte: func() { timeToFirstByteMs = time.Since(requestStart).Milliseconds() },
 	}
 	req = req.WithContext(httptrace.WithClientTrace(context.Background(), trace))
 
-	client := &http.Client{Timeout: time.Duration(schedule.Interval) * time.Second}
-	ttfbStart = time.Now()
+	client := &http.Client{
+		Timeout: time.Duration(schedule.Interval) * time.Second,
+		Transport: &http.Transport{
+			DisableKeepAlives: true,
+		},
+	}
+	requestStart = time.Now()
 	resp, err := client.Do(req)
-	responseTimeMs := time.Since(ttfbStart).Milliseconds()
+	responseTimeMs := time.Since(requestStart).Milliseconds()
 
 	hb := &models.Heartbeat{
 		MonitorID:           mon.ID,
@@ -107,7 +112,7 @@ func ExecuteHttpMonitor(agent models.Agent, mon models.Monitor, schedule models.
 		Interval:            schedule.Interval,
 		ThresholdsWarning:   schedule.ThresholdsWarning,
 		ThresholdsCritical:  schedule.ThresholdsCritical,
-		AgentID:             agent.Datacenter.ID,
+		AgentID:             agent.ID,
 		AgentName:           agent.Name,
 		DatacenterID:        agent.Datacenter.ID,
 		DatacenterName:      agent.Datacenter.Name,

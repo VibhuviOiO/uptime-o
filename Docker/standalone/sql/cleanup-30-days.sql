@@ -2,6 +2,8 @@
 CREATE EXTENSION IF NOT EXISTS pg_cron;
 
 -- 🧹 Delete old heartbeat rows (runs every hour)
+-- Default: 30 days retention
+-- To change: Update the interval below (e.g., '90 days', '7 days')
 SELECT cron.schedule(
     'heartbeat_cleanup',
     '0 * * * *', -- hourly
@@ -10,6 +12,8 @@ SELECT cron.schedule(
 );
 
 -- 💣 Drop expired partitions (runs daily @ 01:00)
+-- Default: 30 days retention
+-- To change: Update the interval below (e.g., '90 days', '7 days')
 SELECT cron.schedule(
     'drop_old_partitions',
     '0 1 * * *',
@@ -32,3 +36,10 @@ SELECT cron.schedule(
     $$;
     $cron$
 );
+
+-- 📋 View scheduled jobs
+-- SELECT * FROM cron.job;
+
+-- 🗑️ Remove jobs (if needed)
+-- SELECT cron.unschedule('heartbeat_cleanup');
+-- SELECT cron.unschedule('drop_old_partitions');

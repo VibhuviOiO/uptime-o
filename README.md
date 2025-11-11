@@ -1,26 +1,38 @@
 # Uptime Observability
 
-- APP, for managing the agents related configurations
-- Agent, to run on any remote machines to configure to monitors to get the info into the postgres
-- Status page, what we cna show to the client. 
+Monitoring platform with two deployment modes: standalone and managed.
 
-## Running the application
+## Architecture
 
-- current backend
+### Standalone Mode
+Direct database monitoring without backend management.
 
-# Create the Partition per day:
+| Component | Folder | Dependencies |
+|-----------|--------|--------------|
+| Agent | `uptime-o-agent` | PostgreSQL |
+| Status Page | `uptime-o-status-page` | PostgreSQL |
 
-it means there is no partition for today's date in the `api_heartbeats` table.
+**Use case:** Simple monitoring with manual configuration.
 
-### How to Fix
+### Managed Mode
+Centralized platform for managing agents and monitors.
 
-**Manual SQL (run in psql):**
-For today's date (2025-10-31), use:
+| Component | Folder | Dependencies |
+|-----------|--------|--------------|
+| Backend API | `uptime-o` | PostgreSQL |
+| Agent | `uptime-o-api-agent` | Backend API |
+| Status Page | `uptime-o-status-page` | PostgreSQL |
+
+**Use case:** Dynamic monitor assignment with remote configuration.
+
+## Troubleshooting
+
+### Partition Table Creation
+
+Create daily partitions for heartbeat tables:
 
 ```sql
 CREATE TABLE IF NOT EXISTS api_heartbeats_2025_11_01
 PARTITION OF api_heartbeats
 FOR VALUES FROM ('2025-11-01 00:00:00') TO ('2025-11-02 00:00:00');
 ```
-
-Replace the date with the current day as needed.

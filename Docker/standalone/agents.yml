@@ -1,0 +1,85 @@
+services:
+  agent-va-1:
+    image: uptimeo-agent:latest
+    container_name: agent-va-1
+    volumes:
+    - ./tmp/data/agent-va-1:/data
+    environment:
+      DB_CONN_STRING: "postgres://uptimeo:uptimeo@postgres:5432/uptimeo?sslmode=disable"
+      AGENT_ID: "1"
+      HEALTH_PORT: "8081"
+      CONFIG_RELOAD_INTERVAL: "1m"
+      QUEUE_PATH: "/data/queue"
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "wget -q --spider http://localhost:8081/healthz || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+    - uptimeo
+
+  agent-va-2:
+    image: uptimeo-agent:latest
+    container_name: agent-va-2
+    volumes:
+    - ./tmp/data/agent-va-2:/data
+    environment:
+      DB_CONN_STRING: "postgres://uptimeo:uptimeo@postgres:5432/uptimeo?sslmode=disable"
+      AGENT_ID: "1"
+      HEALTH_PORT: "8082"
+      CONFIG_RELOAD_INTERVAL: "1m"
+      QUEUE_PATH: "/data/queue"
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "wget -q --spider http://localhost:8082/healthz || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+    - uptimeo
+
+  agent-ny-1:
+    image: uptimeo-agent:latest
+    container_name: agent-ny-1
+    volumes:
+    - ./tmp/data/agent-ny-1:/data
+    environment:
+      DB_CONN_STRING: "postgres://uptimeo:uptimeo@postgres:5432/uptimeo?sslmode=disable"
+      AGENT_ID: "2"
+      HEALTH_PORT: "8083"
+      CONFIG_RELOAD_INTERVAL: "1m"
+      QUEUE_PATH: "/data/queue"
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "wget -q --spider http://localhost:8083/healthz || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+    - uptimeo
+
+  agent-ny-2:
+    image: uptimeo-agent:latest
+    container_name: agent-ny-2
+    volumes:
+    - ./tmp/data/agent-ny-2:/data
+    environment:
+      DB_CONN_STRING: "postgres://uptimeo:uptimeo@postgres:5432/uptimeo?sslmode=disable"
+      AGENT_ID: "2"
+      HEALTH_PORT: "8084"
+      CONFIG_RELOAD_INTERVAL: "1m"
+      QUEUE_PATH: "/data/queue"
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "wget -q --spider http://localhost:8084/healthz || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+    - uptimeo
+
+networks:
+  uptimeo:
+    name: uptimeo
+    external: true

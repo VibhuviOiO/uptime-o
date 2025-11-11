@@ -97,9 +97,9 @@ func Load(pool *pgxpool.Pool) (*models.Config, error) {
 		cfg.Agents = append(cfg.Agents, a)
 	}
 
-	// Load monitors for each agent (assuming all monitors per agent as per datacenter_monitors)
+	// Load monitors for each agent
 	for i := range cfg.Agents {
-		rows, err := pool.Query(context.Background(), "SELECT m.id, m.name, m.method, m.type, m.url, m.schedule_id, m.headers, m.body FROM api_monitors m JOIN datacenter_monitors dm ON m.id = dm.monitor_id WHERE dm.datacenter_id = $1", cfg.Agents[i].Datacenter.ID)
+		rows, err := pool.Query(context.Background(), "SELECT m.id, m.name, m.method, m.type, m.url, m.schedule_id, m.headers, m.body FROM http_monitors m JOIN agent_monitors am ON m.id = am.monitor_id WHERE am.agent_id = $1", cfg.Agents[i].ID)
 		if err != nil {
 			return nil, err
 		}
