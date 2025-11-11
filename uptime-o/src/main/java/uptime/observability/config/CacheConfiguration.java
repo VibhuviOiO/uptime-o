@@ -56,6 +56,7 @@ public class CacheConfiguration {
             createCache(cm, uptime.observability.domain.HttpHeartbeat.class.getName());
             createCache(cm, uptime.observability.domain.AuditLog.class.getName());
             createCache(cm, uptime.observability.domain.AgentMonitor.class.getName());
+            createCache(cm, "statusPage");
             // jhipster-needle-ehcache-add-entry
         };
     }

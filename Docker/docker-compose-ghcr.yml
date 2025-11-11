@@ -28,7 +28,7 @@ services:
     - ./.env
     environment:
       AGENT_ID: "1151" # create agent and update the values here
-      API_BASE_URL: "http://uptimeo-app:8080"
+      API_BASE_URL: "http://localhost:8080"
       QUEUE_PATH: "/data/queue"
       CONFIG_RELOAD_INTERVAL: "1m"
     restart: unless-stopped
@@ -37,6 +37,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+    - host
   uptimeo-status:
     image: ghcr.io/vibhuvioio/uptime-o-status-page:latest
     container_name: uptimeo-status

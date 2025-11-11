@@ -15,6 +15,7 @@ import java.util.List;
 @Repository
 public interface HttpHeartbeatRepository extends JpaRepository<HttpHeartbeat, Long> {
     
+    @Query("SELECT DISTINCT h FROM HttpHeartbeat h LEFT JOIN FETCH h.monitor m LEFT JOIN FETCH h.agent a LEFT JOIN FETCH a.datacenter d LEFT JOIN FETCH d.region WHERE h.executedAt > :from")
     List<HttpHeartbeat> findByExecutedAtAfter(Instant from);
 
     List<HttpHeartbeat> findByExecutedAtBetween(Instant from, Instant to);

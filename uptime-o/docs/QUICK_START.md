@@ -33,7 +33,7 @@ cd uptime-o
 ### 3. Run the Application
 
 ```bash
-./mvnw spring-boot:run
+./mvnw 
 ```
 
 Application will be available at: **http://localhost:8080**
