@@ -128,25 +128,38 @@ public class ApiKeyService {
     @Transactional(readOnly = true)
     public boolean validateApiKey(String plainTextKey) {
         if (plainTextKey == null || plainTextKey.isEmpty()) {
+            log.debug("Empty API Key provided");
             return false;
         }
-        String lookupHash = hashApiKey(plainTextKey);
-        ApiKey apiKey = apiKeyRepository.findByKeyHash(lookupHash)
-            .orElseThrow(() -> {
-                log.debug("API Key not found");
-                return new IllegalArgumentException("Invalid API Key");
-            });
-        if (!apiKey.isActive()) {
-            log.debug("API Key is inactive");
+        
+        try {
+            String lookupHash = hashApiKey(plainTextKey);
+            Optional<ApiKey> apiKeyOpt = apiKeyRepository.findByKeyHash(lookupHash);
+            
+            if (apiKeyOpt.isEmpty()) {
+                log.debug("API Key not found in database");
+                return false;
+            }
+            
+            ApiKey apiKey = apiKeyOpt.get();
+            
+            if (!apiKey.isActive()) {
+                log.debug("API Key {} is inactive", apiKey.getId());
+                return false;
+            }
+            
+            if (apiKey.getExpiresAt() != null && apiKey.getExpiresAt().isBefore(Instant.now())) {
+                log.debug("API Key {} has expired", apiKey.getId());
+                return false;
+            }
+            
+            updateLastUsedDate(apiKey.getId());
+            log.debug("API Key validation successful for key ID: {}", apiKey.getId());
+            return true;
+        } catch (Exception e) {
+            log.warn("Error validating API Key: {}", e.getMessage());
             return false;
         }
-        if (apiKey.getExpiresAt() != null && apiKey.getExpiresAt().isBefore(Instant.now())) {
-            log.debug("API Key has expired");
-            return false;
-        }
-        updateLastUsedDate(apiKey.getId());
-        log.debug("API Key validation successful for key ID: {}", apiKey.getId());
-        return true;
     }
 
 

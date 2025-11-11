@@ -26,6 +26,9 @@ The API key is validated by the `ApiKeyAuthenticationFilter` which:
 curl -X GET "http://localhost:8080/api/public/monitors?agentId=2" \
   -H "X-API-Key: uptimeo_k2oXaUuhtxjZopopcSSFvnsQlI4avy2dSWe1o5Z30WA"
 
+
+agent-syd
+
 # 2. Execute monitors based on schedule intervals
 
 # 3. Submit heartbeats (can batch multiple):

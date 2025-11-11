@@ -40,24 +40,27 @@ public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
         String apiKey = request.getHeader(API_KEY_HEADER);
 
         if (apiKey != null && !apiKey.isEmpty()) {
-            LOG.debug("API Key found in request header, attempting authentication");
-
-            if (apiKeyService.validateApiKey(apiKey)) {
-                LOG.debug("API Key is valid, setting authentication context");
-
-                // Create authentication token with ROLE_API_AGENT authority
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                    "api-agent",
-                    null,
-                    List.of(new SimpleGrantedAuthority(AuthoritiesConstants.API_AGENT))
-                );
-
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-                LOG.debug("API Key authentication successful");
-            } else {
-                LOG.warn("Invalid API Key provided");
+            try {
+                if (apiKeyService.validateApiKey(apiKey)) {
+                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                        "api-agent",
+                        null,
+                        List.of(new SimpleGrantedAuthority(AuthoritiesConstants.API_AGENT))
+                    );
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                    LOG.debug("API Key authentication successful");
+                } else {
+                    LOG.warn("Invalid or expired API Key for {}", request.getRequestURI());
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.setContentType("application/json");
+                    response.getWriter().write("{\"error\":\"Invalid or expired API Key\"}");
+                    return;
+                }
+            } catch (Exception e) {
+                LOG.warn("API Key validation failed for {}: {}", request.getRequestURI(), e.getMessage());
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.getWriter().write("Invalid API Key");
+                response.setContentType("application/json");
+                response.getWriter().write("{\"error\":\"Invalid API Key\"}");
                 return;
             }
         }
