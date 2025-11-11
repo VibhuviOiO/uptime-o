@@ -240,6 +240,58 @@ func (c *Client) SubmitHeartbeat(hb *models.Heartbeat) error {
 	return c.retryWithBackoff(operation, 3, fmt.Sprintf("SubmitHeartbeat (monitor %d)", hb.MonitorID))
 }
 
+// AcquireLock tries to acquire leadership lock via API
+func (c *Client) AcquireLock(agentID int) (bool, error) {
+	url := fmt.Sprintf("%s/api/public/agents/%d/lock", c.BaseURL, agentID)
+
+	req, err := http.NewRequest("POST", url, nil)
+	if err != nil {
+		return false, err
+	}
+
+	req.Header.Set("X-API-Key", c.APIKey)
+
+	resp, err := c.client.Do(req)
+	if err != nil {
+		return false, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode == http.StatusOK {
+		return true, nil // Lock acquired
+	} else if resp.StatusCode == http.StatusConflict {
+		return false, nil // Lock held by another instance
+	}
+
+	body, _ := io.ReadAll(resp.Body)
+	return false, fmt.Errorf("lock request failed with status %d: %s", resp.StatusCode, string(body))
+}
+
+// ReleaseLock releases the leadership lock via API
+func (c *Client) ReleaseLock(agentID int) error {
+	url := fmt.Sprintf("%s/api/public/agents/%d/lock", c.BaseURL, agentID)
+
+	req, err := http.NewRequest("DELETE", url, nil)
+	if err != nil {
+		return err
+	}
+
+	req.Header.Set("X-API-Key", c.APIKey)
+
+	resp, err := c.client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusNoContent {
+		body, _ := io.ReadAll(resp.Body)
+		return fmt.Errorf("unlock request failed with status %d: %s", resp.StatusCode, string(body))
+	}
+
+	return nil
+}
+
 // SubmitHeartbeatBatch submits multiple heartbeats in a single request with retry logic
 func (c *Client) SubmitHeartbeatBatch(heartbeats []*models.Heartbeat) error {
 	if len(heartbeats) == 0 {

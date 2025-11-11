@@ -10,12 +10,27 @@ services:
       HEALTH_PORT: "8081"
       CONFIG_RELOAD_INTERVAL: "1m"
       QUEUE_PATH: "/data/queue"
+      LOG_LEVEL: "INFO"
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+        reservations:
+          cpus: '0.1'
+          memory: 64M
     healthcheck:
       test: [ "CMD-SHELL", "wget -q --spider http://localhost:8081/healthz || exit 1" ]
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 10s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
     networks:
     - uptimeo
 
@@ -30,12 +45,27 @@ services:
       HEALTH_PORT: "8082"
       CONFIG_RELOAD_INTERVAL: "1m"
       QUEUE_PATH: "/data/queue"
+      LOG_LEVEL: "INFO"
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+        reservations:
+          cpus: '0.1'
+          memory: 64M
     healthcheck:
       test: [ "CMD-SHELL", "wget -q --spider http://localhost:8082/healthz || exit 1" ]
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 10s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
     networks:
     - uptimeo
 
@@ -50,12 +80,27 @@ services:
       HEALTH_PORT: "8083"
       CONFIG_RELOAD_INTERVAL: "1m"
       QUEUE_PATH: "/data/queue"
+      LOG_LEVEL: "INFO"
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+        reservations:
+          cpus: '0.1'
+          memory: 64M
     healthcheck:
       test: [ "CMD-SHELL", "wget -q --spider http://localhost:8083/healthz || exit 1" ]
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 10s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
     networks:
     - uptimeo
 
@@ -70,12 +115,27 @@ services:
       HEALTH_PORT: "8084"
       CONFIG_RELOAD_INTERVAL: "1m"
       QUEUE_PATH: "/data/queue"
+      LOG_LEVEL: "INFO"
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+        reservations:
+          cpus: '0.1'
+          memory: 64M
     healthcheck:
       test: [ "CMD-SHELL", "wget -q --spider http://localhost:8084/healthz || exit 1" ]
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 10s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
     networks:
     - uptimeo
 

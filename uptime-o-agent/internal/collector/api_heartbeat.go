@@ -76,6 +76,11 @@ func (c *APIHeartbeatCollector) Start() {
 			continue
 		}
 		go func(mon models.Monitor, schedule models.Schedule) {
+			defer func() {
+				if r := recover(); r != nil {
+					logrus.Errorf("Panic in monitor %d (%s): %v", mon.ID, mon.Name, r)
+				}
+			}()
 			ticker := time.NewTicker(time.Duration(schedule.Interval) * time.Second)
 			defer ticker.Stop()
 			for {
@@ -155,6 +160,11 @@ func (c *APIHeartbeatCollector) saveQueueToDisk() {
 }
 
 func (c *APIHeartbeatCollector) queueFlusher() {
+	defer func() {
+		if r := recover(); r != nil {
+			logrus.Errorf("Panic in queue flusher: %v", r)
+		}
+	}()
 	ticker := time.NewTicker(30 * time.Second)
 	defer ticker.Stop()
 

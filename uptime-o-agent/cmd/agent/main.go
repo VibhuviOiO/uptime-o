@@ -16,11 +16,22 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func startHealthServer(port string) {
+func startHealthServer(port string, pool *pgxpool.Pool) {
 	http.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("ok"))
 	})
+	
+	http.HandleFunc("/readyz", func(w http.ResponseWriter, r *http.Request) {
+		if err := pool.Ping(context.Background()); err != nil {
+			w.WriteHeader(http.StatusServiceUnavailable)
+			w.Write([]byte("database unavailable"))
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("ready"))
+	})
+	
 	go func() {
 		addr := ":" + port
 		logrus.Infof("Starting health server on %s", addr)
@@ -32,9 +43,23 @@ func startHealthServer(port string) {
 
 func main() {
 	logrus.SetFormatter(&logrus.JSONFormatter{})
-	logrus.SetLevel(logrus.InfoLevel)
+	
+	// Set log level from environment variable
+	logLevel := os.Getenv("LOG_LEVEL")
+	switch logLevel {
+	case "DEBUG":
+		logrus.SetLevel(logrus.DebugLevel)
+	case "WARN":
+		logrus.SetLevel(logrus.WarnLevel)
+	case "ERROR":
+		logrus.SetLevel(logrus.ErrorLevel)
+	default:
+		logrus.SetLevel(logrus.InfoLevel)
+		logLevel = "INFO"
+	}
+	
 	logrus.Info("application started")
-	logrus.Info("application logging level: info")
+	logrus.Infof("application logging level: %s", logLevel)
 
 	connString := os.Getenv("DB_CONN_STRING")
 	if connString == "" {
@@ -106,10 +131,15 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	startHealthServer(healthPort)
+	startHealthServer(healthPort, dbConn)
 
 	// Start leader election loop
 	go func() {
+		defer func() {
+			if r := recover(); r != nil {
+				logrus.Errorf("Panic in leader election: %v", r)
+			}
+		}()
 		for {
 			select {
 			case <-ctx.Done():

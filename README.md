@@ -25,6 +25,19 @@ Centralized platform for managing agents and monitors.
 
 **Use case:** Dynamic monitor assignment with remote configuration.
 
+## Agent Features
+
+- ✅ **Graceful Shutdown** - Handles SIGTERM/SIGINT properly
+- ✅ **High Availability** - Leader election via PostgreSQL locks (standalone) or API locks (managed)
+- ✅ **Persistent Queue** - Survives database outages and restarts
+- ✅ **Auto Config Reload** - Detects monitor changes dynamically
+- ✅ **Health Checks** - `/healthz` (liveness) and `/readyz` (readiness) endpoints
+- ✅ **Panic Recovery** - Prevents crashes from unexpected errors
+- ✅ **Structured Logging** - JSON format with context
+- ✅ **Connection Pooling** - Efficient database connections
+- ✅ **Resource Limits** - CPU and memory constraints
+- ✅ **Auto Partitioning** - Daily partitions for heartbeat data
+
 ## Troubleshooting
 
 ### Partition Table Creation

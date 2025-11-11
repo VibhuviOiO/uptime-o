@@ -16,11 +16,23 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func startHealthServer(port string) {
+func startHealthServer(port string, apiClient *api.Client, agentID int) {
 	http.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("ok"))
 	})
+	
+	http.HandleFunc("/readyz", func(w http.ResponseWriter, r *http.Request) {
+		_, _, err := config.LoadFromAPI(apiClient, agentID)
+		if err != nil {
+			w.WriteHeader(http.StatusServiceUnavailable)
+			w.Write([]byte("api unavailable"))
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("ready"))
+	})
+	
 	go func() {
 		addr := ":" + port
 		logrus.Infof("Starting health server on %s", addr)
@@ -32,9 +44,23 @@ func startHealthServer(port string) {
 
 func main() {
 	logrus.SetFormatter(&logrus.JSONFormatter{})
-	logrus.SetLevel(logrus.InfoLevel)
+	
+	// Set log level from environment variable
+	logLevel := os.Getenv("LOG_LEVEL")
+	switch logLevel {
+	case "DEBUG":
+		logrus.SetLevel(logrus.DebugLevel)
+	case "WARN":
+		logrus.SetLevel(logrus.WarnLevel)
+	case "ERROR":
+		logrus.SetLevel(logrus.ErrorLevel)
+	default:
+		logrus.SetLevel(logrus.InfoLevel)
+		logLevel = "INFO"
+	}
+	
 	logrus.Info("application started")
-	logrus.Info("application logging level: info")
+	logrus.Infof("application logging level: %s", logLevel)
 
 	// Get required environment variables for API mode
 	apiBaseURL := os.Getenv("API_BASE_URL")
@@ -46,6 +72,8 @@ func main() {
 	if apiKey == "" {
 		logrus.Fatal("API_KEY not set")
 	}
+
+
 
 	agentIDStr := os.Getenv("AGENT_ID")
 	if agentIDStr == "" {
@@ -127,12 +155,44 @@ func main() {
 	defer cancel()
 
 	// Start health server
-	startHealthServer(healthPort)
+	startHealthServer(healthPort, apiClient, agentID)
 
-	// Start collector only if monitors exist
-	if len(agent.Monitors) > 0 {
-		go collector.NewAPIHeartbeatCollector(ctx, *agent, cfg, apiClient).Start()
-	}
+	// Start collector with HA via API-based locking
+	go func() {
+		defer func() {
+			if r := recover(); r != nil {
+				logrus.Errorf("Panic in leader election: %v", r)
+			}
+		}()
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			default:
+				acquired, err := apiClient.AcquireLock(agentID)
+				if err != nil {
+					logrus.Warnf("Failed to acquire lock: %v. Retrying...", err)
+					time.Sleep(10 * time.Second)
+					continue
+				}
+				if acquired {
+					logrus.Infof("Acquired leadership lock for agent %d", agentID)
+					if len(agent.Monitors) > 0 {
+						collector.NewAPIHeartbeatCollector(ctx, *agent, cfg, apiClient).Start()
+					} else {
+						<-ctx.Done()
+					}
+					if err := apiClient.ReleaseLock(agentID); err != nil {
+						logrus.Warnf("Failed to release lock: %v", err)
+					}
+					logrus.Infof("Released leadership lock for agent %d", agentID)
+				} else {
+					logrus.Info("Another instance is active. Waiting...")
+					time.Sleep(30 * time.Second)
+				}
+			}
+		}
+	}()
 
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
@@ -182,7 +242,14 @@ func main() {
 						cancel()
 						// Create new context and start fresh collector with updated monitors
 						ctx, cancel = context.WithCancel(context.Background())
-						go collector.NewAPIHeartbeatCollector(ctx, *agent, cfg, apiClient).Start()
+						go func() {
+							defer func() {
+								if r := recover(); r != nil {
+									logrus.Errorf("Panic in collector: %v", r)
+								}
+							}()
+							collector.NewAPIHeartbeatCollector(ctx, *agent, cfg, apiClient).Start()
+						}()
 					} else {
 						logrus.Info("No monitors assigned. Stopping collector.")
 						cancel()
