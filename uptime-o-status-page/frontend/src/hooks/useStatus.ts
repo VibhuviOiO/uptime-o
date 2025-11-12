@@ -48,7 +48,7 @@ export function useStatus() {
   useEffect(() => {
     async function fetchStatus() {
       try {
-        const response = await fetch('http://localhost:8077/api/public/status');
+        const response = await fetch('/api/public/status');
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }

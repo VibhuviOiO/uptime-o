@@ -52,7 +52,7 @@ export function useConfig() {
   useEffect(() => {
     async function fetchConfig() {
       try {
-        const response = await fetch('http://localhost:8077/api/public/branding');
+        const response = await fetch('/api/public/branding');
         if (response.ok) {
           const configData = await response.json();
           setData(configData);
