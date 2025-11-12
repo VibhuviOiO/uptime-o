@@ -11,7 +11,7 @@ router.get('/', async (req, res) => {
           h.monitor_id,
           d.region_id,
           h.success,
-          (COALESCE(h.dns_lookup_ms, 0) + COALESCE(h.tcp_connect_ms, 0) + COALESCE(h.tls_handshake_ms, 0)) AS total_latency_ms,
+          (COALESCE(h.response_time_ms, 0) + COALESCE(h.dns_lookup_ms, 0) + COALESCE(h.tcp_connect_ms, 0) + COALESCE(h.tls_handshake_ms, 0)) AS total_latency_ms,
           h.warning_threshold_ms,
           h.critical_threshold_ms,
           h.executed_at
