@@ -29,7 +29,7 @@ router.get('/', async (req, res) => {
         lh.warning_threshold_ms,
         lh.critical_threshold_ms,
         lh.executed_at
-      FROM http_monitors m
+      FROM api_monitors m
       CROSS JOIN regions r
       LEFT JOIN datacenters d ON d.region_id = r.id
       LEFT JOIN latest_heartbeats lh ON lh.monitor_id = m.id AND lh.datacenter_id = d.id
