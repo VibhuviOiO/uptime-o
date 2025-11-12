@@ -50,8 +50,16 @@ export const StatusPage = () => {
       document.documentElement.style.setProperty('--footer-text', config.footerTextColor);
       document.documentElement.style.setProperty('--page-bg', config.pageBgColor);
       
-      const favicon = document.querySelector("link[rel='icon']") as HTMLLinkElement;
-      if (favicon) favicon.href = config.faviconUrl;
+      // Update favicon
+      let favicon = document.querySelector("link[rel='icon']") as HTMLLinkElement;
+      if (!favicon) {
+        favicon = document.createElement('link');
+        favicon.rel = 'icon';
+        document.head.appendChild(favicon);
+      }
+      if (config.faviconUrl) {
+        favicon.href = config.faviconUrl;
+      }
       
       let metaDescription = document.querySelector('meta[name="description"]');
       if (!metaDescription) {
