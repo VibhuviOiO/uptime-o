@@ -5,8 +5,7 @@ export interface AppConfig {
   pageTitle: string;
   pageSubtitle: string;
   logoUrl: string;
-  logoWidth: number;
-  logoHeight: number;
+  logoDisplayMode: string;
   footerText: string;
   faviconUrl: string;
   metaDescription: string;
@@ -17,6 +16,11 @@ export interface AppConfig {
   companyName: string;
   companyWebsite: string;
   supportEmail: string;
+  navbarBgColor: string;
+  navbarTextColor: string;
+  footerBgColor: string;
+  footerTextColor: string;
+  pageBgColor: string;
 }
 
 export function useConfig() {
@@ -25,8 +29,7 @@ export function useConfig() {
     pageTitle: 'Service Status',
     pageSubtitle: 'Real-time monitoring dashboard',
     logoUrl: '',
-    logoWidth: 220,
-    logoHeight: 55,
+    logoDisplayMode: 'both',
     footerText: 'Powered by UptimeO',
     faviconUrl: '/favicon.ico',
     metaDescription: 'Real-time service status monitoring',
@@ -36,7 +39,12 @@ export function useConfig() {
     navbarLinkUrl: '',
     companyName: '',
     companyWebsite: '',
-    supportEmail: ''
+    supportEmail: '',
+    navbarBgColor: '#ffffff',
+    navbarTextColor: '#202124',
+    footerBgColor: '#ffffff',
+    footerTextColor: '#5f6368',
+    pageBgColor: '#f5f5f5'
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

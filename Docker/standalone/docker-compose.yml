@@ -1,0 +1,82 @@
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:17
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: uptimeo
+      POSTGRES_PASSWORD: uptimeo
+      POSTGRES_DB: uptimeo
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./tmp/pgdata:/var/lib/postgresql/data
+      - ./sql/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - ./sql/data.minimal.sql:/docker-entrypoint-initdb.d/02-data.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U uptimeo -d uptimeo"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - uptimeo
+
+  # Agent 1: US East
+  agent-us-east:
+    image: uptimeo-agent:latest
+    container_name: agent-us-east
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./tmp/data/agent-us-east:/data
+    environment:
+      DB_CONN_STRING: "postgres://uptimeo:uptimeo@postgres:5432/uptimeo?sslmode=disable"
+      AGENT_ID: "1"
+      HEALTH_PORT: "8081"
+      CONFIG_RELOAD_INTERVAL: "1m"
+      QUEUE_PATH: "/data/queue"
+      LOG_LEVEL: "INFO"
+    restart: unless-stopped
+    networks:
+      - uptimeo
+
+  # Agent 2: US West
+  agent-us-west:
+    image: uptimeo-agent:latest
+    container_name: agent-us-west
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./tmp/data/agent-us-west:/data
+    environment:
+      DB_CONN_STRING: "postgres://uptimeo:uptimeo@postgres:5432/uptimeo?sslmode=disable"
+      AGENT_ID: "2"
+      HEALTH_PORT: "8082"
+      CONFIG_RELOAD_INTERVAL: "1m"
+      QUEUE_PATH: "/data/queue"
+      LOG_LEVEL: "INFO"
+    restart: unless-stopped
+    networks:
+      - uptimeo
+
+  # Status Page
+  status-page:
+    image: ghcr.io/vibhuvioio/uptimeo-statuspage:latest
+    container_name: status-page
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file:
+      - .env
+    ports:
+      - "8077:8077"
+    restart: unless-stopped
+    networks:
+      - uptimeo
+
+networks:
+  uptimeo:
+    name: uptimeo

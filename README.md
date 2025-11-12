@@ -38,6 +38,23 @@ Centralized platform for managing agents and monitors.
 - ✅ **Resource Limits** - CPU and memory constraints
 - ✅ **Auto Partitioning** - Daily partitions for heartbeat data
 
+## Architecture
+
+```
+┌─────────────┐     ┌─────────────┐
+│ agent-va-1  │     │ agent-va-2  │
+│ (Leader)    │     │ (Standby)   │
+└──────┬──────┘     └──────┬──────┘
+       │                   │
+       │  Advisory Lock    │
+       └────────┬──────────┘
+                │
+         ┌──────▼──────┐
+         │  PostgreSQL │
+         │             │
+         │  Lock: 1    │ ← Only one can hold
+         └─────────────┘
+```
 ## Troubleshooting
 
 ### Partition Table Creation

@@ -27,7 +27,7 @@ export async function getHeartbeatsInWindow(timeWindow: string, limit: number): 
         h.monitor_id,
         m.name AS monitor_name,
         m.type AS monitor_type,
-        m.url AS target_url, -- Used instead of separate host/port/path
+        m.url AS target_url,
         r.name AS agent_region,
         h.executed_at,
         h.success,
@@ -36,7 +36,9 @@ export async function getHeartbeatsInWindow(timeWindow: string, limit: number): 
         h.error_message
     FROM api_heartbeats h
     JOIN api_monitors m ON h.monitor_id = m.id
-    JOIN regions r ON h.region_id = r.id -- Using denormalized region_id for fast join
+    JOIN agents a ON h.agent_id = a.id
+    JOIN datacenters d ON a.datacenter_id = d.id
+    JOIN regions r ON d.region_id = r.id
     WHERE h.executed_at >= NOW() - INTERVAL $1
     ORDER BY h.executed_at DESC
     LIMIT $2;

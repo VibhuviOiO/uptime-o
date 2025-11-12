@@ -7,33 +7,41 @@ router.get('/', async (req, res) => {
   try {
     const sql = `
       WITH latest_heartbeats AS (
-        SELECT DISTINCT ON (monitor_id, datacenter_id)
-          monitor_id,
-          datacenter_id,
-          success,
-          response_time_ms,
-          warning_threshold_ms,
-          critical_threshold_ms,
-          executed_at
-        FROM api_heartbeats
-        JOIN agents ON api_heartbeats.agent_id = agents.id
-        WHERE executed_at >= NOW() - INTERVAL '1 hour'
-        ORDER BY monitor_id, datacenter_id, executed_at DESC
+        SELECT DISTINCT ON (h.monitor_id, d.region_id)
+          h.monitor_id,
+          d.region_id,
+          h.success,
+          (COALESCE(h.dns_lookup_ms, 0) + COALESCE(h.tcp_connect_ms, 0) + COALESCE(h.tls_handshake_ms, 0)) AS total_latency_ms,
+          h.warning_threshold_ms,
+          h.critical_threshold_ms,
+          h.executed_at
+        FROM api_heartbeats h
+        JOIN agents a ON h.agent_id = a.id
+        JOIN datacenters d ON a.datacenter_id = d.id
+        WHERE h.executed_at >= NOW() - INTERVAL '1 hour'
+        ORDER BY h.monitor_id, d.region_id, h.executed_at DESC
+      ),
+      active_regions AS (
+        SELECT DISTINCT r.id, r.name
+        FROM regions r
+        JOIN datacenters d ON d.region_id = r.id
+        JOIN agents a ON a.datacenter_id = d.id
+        JOIN api_heartbeats h ON h.agent_id = a.id
+        WHERE h.executed_at >= NOW() - INTERVAL '1 hour'
       )
       SELECT
         m.id AS monitor_id,
         m.name AS api_name,
-        r.name AS region,
+        ar.name AS region,
         lh.success,
-        lh.response_time_ms,
+        lh.total_latency_ms,
         lh.warning_threshold_ms,
         lh.critical_threshold_ms,
         lh.executed_at
       FROM api_monitors m
-      CROSS JOIN regions r
-      LEFT JOIN datacenters d ON d.region_id = r.id
-      LEFT JOIN latest_heartbeats lh ON lh.monitor_id = m.id AND lh.datacenter_id = d.id
-      ORDER BY m.id, r.name
+      CROSS JOIN active_regions ar
+      LEFT JOIN latest_heartbeats lh ON lh.monitor_id = m.id AND lh.region_id = ar.id
+      ORDER BY m.id, ar.name
     `;
 
     const { rows } = await pool.query(sql);
@@ -58,15 +66,15 @@ router.get('/', async (req, res) => {
         let status = 'UP';
         if (!row.success) {
           status = 'DOWN';
-        } else if (row.response_time_ms > row.critical_threshold_ms) {
+        } else if (row.total_latency_ms > row.critical_threshold_ms) {
           status = 'CRITICAL';
-        } else if (row.response_time_ms > row.warning_threshold_ms) {
+        } else if (row.total_latency_ms > row.warning_threshold_ms) {
           status = 'WARNING';
         }
 
         api.regionHealth[row.region] = {
           status,
-          responseTimeMs: Math.round(row.response_time_ms),
+          responseTimeMs: Math.round(row.total_latency_ms),
           lastChecked: row.executed_at
         };
       }

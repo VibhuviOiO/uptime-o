@@ -2,11 +2,9 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: #f5f5f5;
 }
 
 .status-navbar {
-  background: white;
   border-bottom: 1px solid #e0e0e0;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   position: sticky;
@@ -17,20 +15,30 @@
 .navbar-content {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 1rem 2rem;
+  padding: 0.75rem 2rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  height: 40px;
+}
+
 .navbar-brand img {
   display: block;
+  max-height: 40px;
+  width: auto;
+  object-fit: contain;
 }
 
 .navbar-title {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #202124;
+  font-size: 1.125rem;
+  font-weight: 600;
+  white-space: nowrap;
 }
 
 .console-link {
@@ -67,7 +75,6 @@
 }
 
 .status-footer {
-  background: white;
   border-top: 1px solid #e0e0e0;
   box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.05);
   margin-top: auto;
@@ -76,9 +83,8 @@
 .footer-content {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 1.5rem 2rem;
+  padding: 1.25rem 2rem;
   text-align: center;
-  color: #5f6368;
   font-size: 0.875rem;
 }
 
@@ -215,14 +221,17 @@
   font-size: 0.875rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  position: sticky;
+  top: 0;
+  background: #fafafa;
+  z-index: 2;
 }
 
 .status-table thead th:first-child {
   border-top-left-radius: 8px;
-}
-
-.status-table thead th:last-child {
-  border-top-right-radius: 8px;
+  position: sticky;
+  left: 0;
+  z-index: 3;
 }
 
 .status-table thead th.api-column {
@@ -255,6 +264,14 @@
   font-weight: 600;
   color: #202124;
   font-size: 1rem;
+  position: sticky;
+  left: 0;
+  background: white;
+  z-index: 1;
+}
+
+.status-table tbody tr:hover td.api-name {
+  background: #f8f9fa;
 }
 
 .status-table tbody td.region-status {

@@ -29,7 +29,7 @@ const getStatusTitle = (status: string): string => {
 };
 
 export const StatusPage = () => {
-  const { data: statusData, loading } = useStatus();
+  const { data: statusData, loading, refreshDisplay } = useStatus();
   const { data: config } = useConfig();
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
 
@@ -42,6 +42,13 @@ export const StatusPage = () => {
   useEffect(() => {
     if (config) {
       document.title = config.pageTitle;
+      
+      // Apply theme colors
+      document.documentElement.style.setProperty('--navbar-bg', config.navbarBgColor);
+      document.documentElement.style.setProperty('--navbar-text', config.navbarTextColor);
+      document.documentElement.style.setProperty('--footer-bg', config.footerBgColor);
+      document.documentElement.style.setProperty('--footer-text', config.footerTextColor);
+      document.documentElement.style.setProperty('--page-bg', config.pageBgColor);
       
       const favicon = document.querySelector("link[rel='icon']") as HTMLLinkElement;
       if (favicon) favicon.href = config.faviconUrl;
@@ -74,18 +81,29 @@ export const StatusPage = () => {
     }
   }, [config]);
 
+  const renderNavbarBrand = () => {
+    const mode = config.logoDisplayMode || 'both';
+    if (mode === 'logo_only' && config.logoUrl) {
+      return <img src={config.logoUrl} alt={config.navbarTitle} />;
+    } else if (mode === 'title_only') {
+      return <span className="navbar-title">{config.navbarTitle}</span>;
+    } else if (mode === 'both' && config.logoUrl) {
+      return (
+        <>
+          <img src={config.logoUrl} alt={config.navbarTitle} />
+          <span className="navbar-title">{config.navbarTitle}</span>
+        </>
+      );
+    }
+    return <span className="navbar-title">{config.navbarTitle}</span>;
+  };
+
   if (loading) {
     return (
-      <div className="status-page-wrapper">
+      <div className="status-page-wrapper" style={{ background: config.pageBgColor || '#f5f5f5' }}>
         <nav className="status-navbar">
           <div className="navbar-content">
-            <div className="navbar-brand">
-              {config.logoUrl ? (
-                <img src={config.logoUrl} alt={config.navbarTitle} width={config.logoWidth} height={config.logoHeight} />
-              ) : (
-                <span className="navbar-title">{config.navbarTitle}</span>
-              )}
-            </div>
+            <div className="navbar-brand">{renderNavbarBrand()}</div>
             {config.navbarLinkText && config.navbarLinkUrl && (
               <a href={config.navbarLinkUrl} target="_blank" rel="noopener noreferrer" className="console-link">
                 {config.navbarLinkText}
@@ -100,16 +118,10 @@ export const StatusPage = () => {
 
   if (!statusData || statusData.apis.length === 0) {
     return (
-      <div className="status-page-wrapper">
+      <div className="status-page-wrapper" style={{ background: config.pageBgColor || '#f5f5f5' }}>
         <nav className="status-navbar">
           <div className="navbar-content">
-            <div className="navbar-brand">
-              {config.logoUrl ? (
-                <img src={config.logoUrl} alt={config.navbarTitle} width={config.logoWidth} height={config.logoHeight} />
-              ) : (
-                <span className="navbar-title">{config.navbarTitle}</span>
-              )}
-            </div>
+            <div className="navbar-brand">{renderNavbarBrand()}</div>
             {config.navbarLinkText && config.navbarLinkUrl && (
               <a href={config.navbarLinkUrl} target="_blank" rel="noopener noreferrer" className="console-link">
                 {config.navbarLinkText}
@@ -126,16 +138,10 @@ export const StatusPage = () => {
   }
 
   return (
-    <div className="status-page-wrapper">
-      <nav className="status-navbar">
+    <div className="status-page-wrapper" style={{ background: config.pageBgColor || '#f5f5f5' }}>
+      <nav className="status-navbar" style={{ background: config.navbarBgColor || '#ffffff', color: config.navbarTextColor || '#202124' }}>
         <div className="navbar-content">
-          <div className="navbar-brand">
-            {config.logoUrl ? (
-              <img src={config.logoUrl} alt={config.navbarTitle} width={config.logoWidth} height={config.logoHeight} />
-            ) : (
-              <span className="navbar-title">{config.navbarTitle}</span>
-            )}
-          </div>
+          <div className="navbar-brand">{renderNavbarBrand()}</div>
           {config.navbarLinkText && config.navbarLinkUrl && (
             <a href={config.navbarLinkUrl} target="_blank" rel="noopener noreferrer" className="console-link">
               {config.navbarLinkText}
@@ -193,16 +199,11 @@ export const StatusPage = () => {
               </div>
               <span>Service disruption</span>
             </div>
-            <div className="legend-item">
-              <div className="legend-icon">
-                <span className="no-data-icon">—</span>
-              </div>
-              <span>No data</span>
-            </div>
+
           </div>
           {lastUpdate && (
             <div className="last-update-text">
-              Updated {formatTimeAgo(lastUpdate)}
+              Refreshes every {refreshDisplay} • Updated {formatTimeAgo(lastUpdate)}
             </div>
           )}
         </div>
@@ -278,11 +279,7 @@ export const StatusPage = () => {
                               </>
                             )}
                           </div>
-                        ) : (
-                          <div className="status-indicator unknown" title="No recent data">
-                            <span className="no-data">—</span>
-                          </div>
-                        )}
+                        ) : null}
                       </td>
                     );
                   })}
@@ -293,9 +290,9 @@ export const StatusPage = () => {
         </div>
       </div>
 
-      <footer className="status-footer">
-        <div className="footer-content">
-          <p>©{new Date().getFullYear()} {config.pageTitle} • {config.footerText} • Last updated: {new Date().toLocaleString()}</p>
+      <footer className="status-footer" style={{ background: config.footerBgColor || '#ffffff' }}>
+        <div className="footer-content" style={{ color: config.footerTextColor || '#5f6368' }}>
+          <p>©{new Date().getFullYear()} {config.pageTitle} • {config.footerText}</p>
         </div>
       </footer>
     </div>

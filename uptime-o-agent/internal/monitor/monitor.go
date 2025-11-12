@@ -125,8 +125,8 @@ func ExecuteHttpMonitor(agent models.Agent, mon models.Monitor, schedule models.
 		TCPConnectMs:        tcpConnectMs,
 		TLSHandshakeMs:      tlsHandshakeMs,
 		TimeToFirstByteMs:   timeToFirstByteMs,
-		WarningThresholdMs:  agent.GlobalThresholds.Warning,
-		CriticalThresholdMs: agent.GlobalThresholds.Critical,
+		WarningThresholdMs:  schedule.ThresholdsWarning,
+		CriticalThresholdMs: schedule.ThresholdsCritical,
 		RawRequestHeaders:   map[string]string{"User-Agent": "CustomMonitor/1.0"},
 	}
 

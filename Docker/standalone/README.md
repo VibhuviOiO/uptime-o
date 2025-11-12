@@ -1,206 +1,108 @@
-# Standalone Mode Setup
+# UptimeO Standalone Deployment
 
-## Overview
-Standalone mode runs agents that connect directly to PostgreSQL without the backend API.
+Clean, minimal setup for running UptimeO in standalone mode.
 
-## Quick Start
+## Quick Start (Minimal - 2 Agents)
 
-### 1. Create Docker Network
 ```bash
-docker network create uptimeo
+# Clean slate
+rm -rf tmp/pgdata tmp/data
+
+# Start everything
+docker compose up -d
+
+# View logs
+docker compose logs -f
+
+# Stop everything
+docker compose down
 ```
 
-### 2. Start PostgreSQL
+## Extended Demo (14 Agents, 10 Regions)
+
 ```bash
-cd docker/standalone
-docker compose -f postgres.yml up -d
+# Clean slate
+rm -rf tmp/pgdata tmp/data
+
+# Start with extended setup
+docker compose -f docker-compose.extended.yml up -d
+
+# View logs
+docker compose -f docker-compose.extended.yml logs -f
+
+# Stop everything
+docker compose -f docker-compose.extended.yml down
 ```
 
-This will:
-- Create PostgreSQL container
-- Initialize schema from `sql/uptimeo.sql`
-- Load sample data from `sql/data.sql`
-- Create 9 agents (VA, NY, RDN, CHI, SF, LON, DAM, STO, SYD)
-- Assign 4 monitors to each agent
+## File Structure
 
-### 3. Verify Database
-```bash
-docker exec -it postgres psql -U uptimeo -d uptimeo
+```
+docker/standalone/
+├── docker-compose.yml          # Minimal: postgres + 2 agents + status page
+├── docker-compose.extended.yml # Extended: postgres + 14 agents + status page
+├── .env                        # Status page configuration
+├── sql/
+│   ├── schema.sql             # Database schema (tables, indexes, partitions)
+│   ├── data.minimal.sql       # Minimal data: 2 agents, 2 regions
+│   └── data.extended.sql      # Extended data: 14 agents, 10 regions
+└── tmp/                       # Auto-created (gitignored)
+    ├── pgdata/               # PostgreSQL data
+    └── data/                 # Agent queue data
 ```
 
-Check data:
-```sql
--- Check agents
-SELECT id, name, datacenter_id FROM agents;
+## Configuration
 
--- Check monitors
-SELECT id, name, method, url FROM http_monitors;
+Edit `.env` to customize branding and theme:
 
--- Check agent-monitor assignments
-SELECT a.name as agent, m.name as monitor 
-FROM agent_monitors am
-JOIN agents a ON am.agent_id = a.id
-JOIN http_monitors m ON am.monitor_id = m.id
-WHERE am.active = TRUE
-ORDER BY a.id, m.id;
+```env
+# Branding
+NAVBAR_TITLE=Your Company
+STATUS_PAGE_TITLE=Service Status
+LOGO_URL=https://example.com/logo.png
+LOGO_DISPLAY_MODE=both  # logo_only, title_only, both
 
--- Check schedules
-SELECT * FROM schedules;
+# Theme Colors
+NAVBAR_BG_COLOR=#ffffff
+NAVBAR_TEXT_COLOR=#202124
+FOOTER_BG_COLOR=#ffffff
+FOOTER_TEXT_COLOR=#5f6368
+PAGE_BG_COLOR=#f5f5f5
 ```
 
-### 4. Start Agent
-```bash
-# Edit agents.yml to set AGENT_ID (1-9)
-docker compose -f agents.yml up -d
-```
+## Access
 
-### 5. Start Status Page
-```bash
-docker compose -f status-page.yml up -d
-```
+- **Status Page**: http://localhost:8077
+- **PostgreSQL**: localhost:5432 (uptimeo/uptimeo)
+- **Agent Health**: http://localhost:8081/healthz (agent 1), 8082 (agent 2), etc.
 
-Access at: http://localhost:8077
+## What Gets Monitored
 
-## Database Schema
-
-### Core Tables
-- `schedules` - Monitor execution schedules
-- `http_monitors` - HTTP/HTTPS monitors
-- `regions` - Geographic regions
-- `datacenters` - Datacenter locations
-- `agents` - Agent instances
-- `agent_monitors` - Agent-to-monitor assignments
-- `api_heartbeats` - Partitioned heartbeat results
-
-### Sample Data
-
-**Agents (9 total)**
-| ID | Name | Datacenter |
-|----|------|------------|
-| 1 | VA Agent | Virginia |
-| 2 | NY Agent | New York |
-| 3 | RDN Agent | Richardson |
-| 4 | CHI Agent | Chicago |
-| 5 | SF Agent | San Francisco |
-| 6 | LON Agent | London |
-| 7 | DAM Agent | Amsterdam |
-| 8 | STO Agent | Stockholm |
-| 9 | SYD Agent | Sydney |
-
-**Monitors (4 total)**
-| ID | Name | Method | URL |
-|----|------|--------|-----|
-| 1 | IPfy Public IP Info | GET | https://api.ipify.org?format=json |
-| 2 | Official Joke API | GET | https://official-joke-api.appspot.com/random_joke |
-| 3 | Realty US Search | POST | https://realty-in-us.p.rapidapi.com/... |
-| 4 | Realty Auto-Complete | GET | https://realty-in-us.p.rapidapi.com/... |
-
-All monitors are assigned to all agents by default.
-
-## Adding New Monitors
-
-### Option 1: Direct SQL
-```sql
--- Add monitor
-INSERT INTO http_monitors (name, method, type, url, schedule_id) 
-VALUES ('My Monitor', 'GET', 'HTTPS', 'https://example.com', 1);
-
--- Assign to agent
-INSERT INTO agent_monitors (agent_id, monitor_id, active, created_by, created_date)
-VALUES (1, 5, TRUE, 'admin', CURRENT_TIMESTAMP);
-```
-
-### Option 2: Using psql
-```bash
-docker exec -it postgres psql -U uptimeo -d uptimeo -c "
-INSERT INTO http_monitors (name, method, type, url, schedule_id) 
-VALUES ('Google', 'GET', 'HTTPS', 'https://www.google.com', 1) 
-RETURNING id;
-"
-
-# Use returned ID to assign to agent
-docker exec -it postgres psql -U uptimeo -d uptimeo -c "
-INSERT INTO agent_monitors (agent_id, monitor_id, active, created_by, created_date)
-VALUES (1, 5, TRUE, 'admin', CURRENT_TIMESTAMP);
-"
-```
-
-Agent will pick up new monitors within 5 minutes (or configured `CONFIG_RELOAD_INTERVAL`).
-
-## Partition Management
-
-### Create Today's Partition
-```sql
-SELECT create_daily_partition();
-```
-
-### Manual Partition Creation
-```sql
-CREATE TABLE IF NOT EXISTS api_heartbeats_2025_11_15
-PARTITION OF api_heartbeats
-FOR VALUES FROM ('2025-11-15 00:00:00') TO ('2025-11-16 00:00:00');
-```
-
-### View Partitions
-```sql
-SELECT child.relname as partition_name
-FROM pg_inherits
-JOIN pg_class parent ON pg_inherits.inhparent = parent.oid
-JOIN pg_class child ON pg_inherits.inhrelid = child.oid
-WHERE parent.relname = 'api_heartbeats'
-ORDER BY child.relname;
-```
+8 public APIs monitored globally:
+1. ISRO Spacecrafts
+2. ISRO Launchers
+3. ISRO Customer Satellites
+4. Aviation Weather METAR
+5. NHTSA Vehicle API
+6. Squiggle AFL Teams
+7. NVD Schema
+8. JSONPlaceholder Posts
 
 ## Troubleshooting
 
-### Agent Not Picking Up Monitors
-```sql
--- Check agent exists
-SELECT * FROM agents WHERE id = 1;
-
--- Check monitor assignments
-SELECT * FROM agent_monitors WHERE agent_id = 1 AND active = TRUE;
-
--- Check monitors exist
-SELECT * FROM http_monitors WHERE id IN (
-  SELECT monitor_id FROM agent_monitors WHERE agent_id = 1
-);
-```
-
-### No Heartbeats
-```sql
--- Check recent heartbeats
-SELECT monitor_id, agent_id, executed_at, success, response_time_ms
-FROM api_heartbeats
-ORDER BY executed_at DESC
-LIMIT 10;
-
--- Check partition exists
-SELECT create_daily_partition();
-```
-
-### Reset Data
 ```bash
-docker compose -f postgres.yml down -v
-docker compose -f postgres.yml up -d
-```
+# Check if containers are running
+docker compose ps
 
-## Environment Variables
+# View specific container logs
+docker compose logs postgres
+docker compose logs agent-us-east
+docker compose logs status-page
 
-### Agent Configuration
-```bash
-DB_CONN_STRING=postgres://uptimeo:uptimeo@postgres:5432/uptimeo?sslmode=disable
-AGENT_ID=1                    # Agent ID (1-9)
-HEALTH_PORT=8080              # Health check port
-CONFIG_RELOAD_INTERVAL=1m     # How often to check for config changes
-QUEUE_PATH=./data/queue       # Queue file location for resilience
-```
+# Restart a specific service
+docker compose restart agent-us-east
 
-### Status Page Configuration
-```bash
-DB_CONN_STRING=postgres://uptimeo:uptimeo@postgres:5432/uptimeo?sslmode=disable
-VITE_API_BASE_URL=/
-NAVBAR_TITLE=Uptime Status
-STATUS_PAGE_TITLE=Uptime Status
-STATUS_PAGE_SUBTITLE=Real-time monitoring dashboard
+# Clean everything and start fresh
+docker compose down
+rm -rf tmp/pgdata tmp/data
+docker compose up -d
 ```

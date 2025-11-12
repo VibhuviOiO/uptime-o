@@ -9,7 +9,7 @@ CREATE TABLE schedules (
     thresholds_critical INT
 );
 
-CREATE TABLE http_monitors (
+CREATE TABLE api_monitors (
     id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     method VARCHAR(10) NOT NULL,
@@ -43,7 +43,7 @@ CREATE TABLE agents (
 CREATE TABLE agent_monitors (
     id SERIAL PRIMARY KEY,
     agent_id INT NOT NULL REFERENCES agents(id) ON DELETE CASCADE,
-    monitor_id INT NOT NULL REFERENCES http_monitors(id) ON DELETE CASCADE,
+    monitor_id INT NOT NULL REFERENCES api_monitors(id) ON DELETE CASCADE,
     active BOOLEAN DEFAULT TRUE NOT NULL,
     created_by VARCHAR(50) DEFAULT 'system' NOT NULL,
     created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -55,7 +55,7 @@ CREATE TABLE agent_monitors (
 -- ✅ Partitioned heartbeat table
 CREATE TABLE api_heartbeats (
     id BIGSERIAL,
-    monitor_id INT REFERENCES http_monitors(id),
+    monitor_id INT REFERENCES api_monitors(id),
     agent_id INT REFERENCES agents(id),
     executed_at TIMESTAMP NOT NULL,
     success BOOLEAN,
@@ -104,8 +104,8 @@ CREATE EXTENSION IF NOT EXISTS pg_trgm;
 
 CREATE INDEX idx_agents_datacenter_id ON agents (datacenter_id);
 CREATE INDEX idx_datacenters_region_id ON datacenters (region_id);
-CREATE INDEX idx_http_monitors_name_trgm ON http_monitors USING GIN (name gin_trgm_ops);
-CREATE INDEX idx_http_monitors_schedule_id ON http_monitors (schedule_id);
+CREATE INDEX idx_api_monitors_name_trgm ON api_monitors USING GIN (name gin_trgm_ops);
+CREATE INDEX idx_api_monitors_schedule_id ON api_monitors (schedule_id);
 CREATE INDEX idx_agent_monitors_agent_id ON agent_monitors (agent_id);
 CREATE INDEX idx_agent_monitors_monitor_id ON agent_monitors (monitor_id);
 CREATE INDEX idx_hb_recent_exec ON api_heartbeats (executed_at DESC);
