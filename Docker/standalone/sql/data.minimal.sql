@@ -2,7 +2,7 @@
 
 -- schedules
 INSERT INTO schedules (id, name, interval, include_response_body, thresholds_warning, thresholds_critical) VALUES
-(1, '60s GET', 60, TRUE, 300, 800);
+(1, '60s GET', 60, TRUE, 500, 1000);
 
 -- api_monitors
 INSERT INTO api_monitors (id, name, method, type, url, schedule_id, headers, body) VALUES

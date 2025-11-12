@@ -1,6 +1,6 @@
 -- schedules
 INSERT INTO schedules (id, name, interval, include_response_body, thresholds_warning, thresholds_critical) VALUES
-(1, '60s GET', 60, TRUE, 300, 800),
+(1, '60s GET', 60, TRUE, 500, 1000),
 (2, '120s GET', 120, TRUE, 500, 1000),
 (3, '200s POST', 200, TRUE, 700, 1500);
 
