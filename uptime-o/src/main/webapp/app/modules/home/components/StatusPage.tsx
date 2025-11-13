@@ -19,8 +19,33 @@ interface StatusPageData {
   regions: string[];
 }
 
-const REFRESH_INTERVAL = 300000; // 5 minutes
+const REFRESH_INTERVAL = 30000; // 30 seconds
 const RETRY_DELAY = 5000; // 5 seconds on error
+
+const formatTimeAgo = (date: Date): string => {
+  const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
+  if (seconds < 10) return 'just now';
+  if (seconds < 60) return `${seconds}s ago`;
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  return `${hours}h ago`;
+};
+
+const getStatusTitle = (status: string): string => {
+  switch (status) {
+    case 'UP':
+      return 'Available - Normal latency';
+    case 'WARNING':
+      return 'Available - Elevated latency';
+    case 'CRITICAL':
+      return 'Available - High latency';
+    case 'DOWN':
+      return 'Service disruption';
+    default:
+      return 'Unknown status';
+  }
+};
 
 export const StatusPage = () => {
   const [statusData, setStatusData] = useState<StatusPageData | null>(null);
@@ -95,55 +120,59 @@ export const StatusPage = () => {
     <div className="status-page">
       <div className="status-header">
         <h1>Service Status</h1>
-        <p className="status-subtitle">
-          Real-time monitoring across all regions
-          {lastUpdate && <span className="last-update">{' • Updated ' + formatTimeAgo(lastUpdate) + ' • Refreshes every 5 minutes'}</span>}
+        <p className="status-subtitle">Real-time monitoring across all regions</p>
+        <p className="status-description">
+          This page provides status information on the services that are part of our platform. Check back here to view the current status of
+          the services listed below.
         </p>
       </div>
 
-      <div className="status-legend">
-        <div className="legend-item">
-          <div className="legend-icon">
-            <svg width="16" height="16" viewBox="0 0 16 16">
-              <circle cx="8" cy="8" r="8" fill="#34a853" />
-              <path d="M6 8l2 2 4-4" stroke="white" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+      <div className="status-legend-container">
+        <div className="status-legend">
+          <div className="legend-item">
+            <div className="legend-icon">
+              <svg width="16" height="16" viewBox="0 0 16 16">
+                <circle cx="8" cy="8" r="8" fill="#34a853" />
+                <path d="M6 8l2 2 4-4" stroke="white" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
+            <span>Available</span>
           </div>
-          <span>Available</span>
-        </div>
-        <div className="legend-item">
-          <div className="legend-icon">
-            <svg width="16" height="16" viewBox="0 0 16 16">
-              <circle cx="8" cy="8" r="8" fill="#fbbc04" />
-              <path d="M8 4v5M8 11v1" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
-            </svg>
+          <div className="legend-item">
+            <div className="legend-icon">
+              <svg width="16" height="16" viewBox="0 0 16 16">
+                <circle cx="8" cy="8" r="8" fill="#fbbc04" />
+                <path d="M8 4v5M8 11v1" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+              </svg>
+            </div>
+            <span>Elevated latency</span>
           </div>
-          <span>Elevated latency</span>
-        </div>
-        <div className="legend-item">
-          <div className="legend-icon">
-            <svg width="16" height="16" viewBox="0 0 16 16">
-              <circle cx="8" cy="8" r="8" fill="#ff6d00" />
-              <path d="M8 4v5M8 11v1" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
-            </svg>
+          <div className="legend-item">
+            <div className="legend-icon">
+              <svg width="16" height="16" viewBox="0 0 16 16">
+                <circle cx="8" cy="8" r="8" fill="#ff6d00" />
+                <path d="M8 4v5M8 11v1" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+              </svg>
+            </div>
+            <span>High latency</span>
           </div>
-          <span>High latency</span>
-        </div>
-        <div className="legend-item">
-          <div className="legend-icon">
-            <svg width="16" height="16" viewBox="0 0 16 16">
-              <circle cx="8" cy="8" r="8" fill="#ea4335" />
-              <path d="M5 5l6 6M11 5l-6 6" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
-            </svg>
+          <div className="legend-item">
+            <div className="legend-icon">
+              <svg width="16" height="16" viewBox="0 0 16 16">
+                <circle cx="8" cy="8" r="8" fill="#ea4335" />
+                <path d="M5 5l6 6M11 5l-6 6" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+              </svg>
+            </div>
+            <span>Service disruption</span>
           </div>
-          <span>Service disruption</span>
-        </div>
-        <div className="legend-item">
-          <div className="legend-icon">
-            <span className="no-data-icon">—</span>
+          <div className="legend-item">
+            <div className="legend-icon">
+              <span className="no-data-icon">—</span>
+            </div>
+            <span>No data</span>
           </div>
-          <span>No data</span>
         </div>
+        {lastUpdate && <div className="last-update-text">Refreshes every 30s • Updated {formatTimeAgo(lastUpdate)}</div>}
       </div>
 
       <div className="status-table-container">
@@ -232,34 +261,6 @@ export const StatusPage = () => {
       </div>
     </div>
   );
-};
-
-const formatTimeAgo = (date: Date): string => {
-  const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
-
-  if (seconds < 10) return 'just now';
-  if (seconds < 60) return `${seconds}s ago`;
-
-  const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes}m ago`;
-
-  const hours = Math.floor(minutes / 60);
-  return `${hours}h ago`;
-};
-
-const getStatusTitle = (status: string): string => {
-  switch (status) {
-    case 'UP':
-      return 'Available - Normal latency';
-    case 'WARNING':
-      return 'Available - Elevated latency';
-    case 'CRITICAL':
-      return 'Available - High latency';
-    case 'DOWN':
-      return 'Service disruption';
-    default:
-      return 'Unknown status';
-  }
 };
 
 export default StatusPage;
