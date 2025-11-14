@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Modal, ModalHeader, ModalBody, ModalFooter, Button } from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBan, faTrash } from '@fortawesome/free-solid-svg-icons';
-import { useAppDispatch, useAppSelector } from 'app/config/store';
-import { deleteEntity, reset } from 'app/entities/http-monitor/http-monitor.reducer';
 import { IHttpMonitor } from 'app/shared/model/http-monitor.model';
+import axios from 'axios';
+import { toast } from 'react-toastify';
 
 interface HttpMonitorDeleteModalProps {
   isOpen: boolean;
@@ -14,31 +14,21 @@ interface HttpMonitorDeleteModalProps {
 }
 
 export const HttpMonitorDeleteModal: React.FC<HttpMonitorDeleteModalProps> = ({ isOpen, toggle, monitor, onDelete }) => {
-  const dispatch = useAppDispatch();
-  const [loadModal, setLoadModal] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
-  const updating = useAppSelector(state => state.httpMonitor.updating);
-  const updateSuccess = useAppSelector(state => state.httpMonitor.updateSuccess);
-
-  useEffect(() => {
-    if (isOpen && monitor) {
-      setLoadModal(true);
-    } else if (isOpen) {
-      dispatch(reset());
-    }
-  }, [isOpen, monitor, dispatch]);
-
-  useEffect(() => {
-    if (updateSuccess && loadModal) {
-      setLoadModal(false);
-      toggle();
-      onDelete?.();
-    }
-  }, [updateSuccess, loadModal, toggle, onDelete]);
-
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = async () => {
     if (monitor && monitor.id) {
-      dispatch(deleteEntity(monitor.id));
+      setDeleting(true);
+      try {
+        await axios.delete(`/api/http-monitors/${monitor.id}`);
+        toast.success('Monitor deleted successfully');
+        toggle();
+        onDelete?.();
+      } catch (error) {
+        toast.error('Failed to delete monitor');
+      } finally {
+        setDeleting(false);
+      }
     }
   };
 
@@ -51,7 +41,7 @@ export const HttpMonitorDeleteModal: React.FC<HttpMonitorDeleteModalProps> = ({ 
         Are you sure you want to delete Monitor <strong>{monitor?.name || monitor?.id}</strong>?
       </ModalBody>
       <ModalFooter>
-        <Button color="secondary" onClick={toggle} disabled={updating}>
+        <Button color="secondary" onClick={toggle} disabled={deleting}>
           <FontAwesomeIcon icon={faBan} />
           &nbsp; Cancel
         </Button>
@@ -60,7 +50,7 @@ export const HttpMonitorDeleteModal: React.FC<HttpMonitorDeleteModalProps> = ({ 
           data-cy="entityConfirmDeleteButton"
           color="danger"
           onClick={handleConfirmDelete}
-          disabled={updating}
+          disabled={deleting}
         >
           <FontAwesomeIcon icon={faTrash} />
           &nbsp; Delete

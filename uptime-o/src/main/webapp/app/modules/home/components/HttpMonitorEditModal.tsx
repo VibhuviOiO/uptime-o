@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Modal, ModalHeader, ModalBody, ModalFooter, Button, Form, FormGroup, Label, Input } from 'reactstrap';
-import { useAppDispatch, useAppSelector } from 'app/config/store';
-import { updateEntity, createEntity, reset } from 'app/entities/http-monitor/http-monitor.reducer';
 import { IHttpMonitor } from 'app/shared/model/http-monitor.model';
-import { getEntities as getSchedules } from 'app/entities/schedule/schedule.reducer';
+import axios from 'axios';
+import { toast } from 'react-toastify';
 
 interface HttpMonitorEditModalProps {
   isOpen: boolean;
@@ -13,7 +12,6 @@ interface HttpMonitorEditModalProps {
 }
 
 export const HttpMonitorEditModal: React.FC<HttpMonitorEditModalProps> = ({ isOpen, toggle, monitor, onSave }) => {
-  const dispatch = useAppDispatch();
   const [formData, setFormData] = useState({
     name: '',
     method: 'GET',
@@ -24,18 +22,15 @@ export const HttpMonitorEditModal: React.FC<HttpMonitorEditModalProps> = ({ isOp
     scheduleId: '',
   });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-
-  const updating = useAppSelector(state => state.httpMonitor.updating);
-  const updateSuccess = useAppSelector(state => state.httpMonitor.updateSuccess);
-  const schedules = useAppSelector(state => state.schedule.entities);
+  const [updating, setUpdating] = useState(false);
+  const [schedules, setSchedules] = useState<any[]>([]);
 
   const isNew = !monitor || !monitor.id;
 
   useEffect(() => {
     if (isOpen) {
-      dispatch(getSchedules({ page: 0, size: 1000, sort: 'id,desc' }));
+      loadSchedules();
       if (isNew) {
-        dispatch(reset());
         setFormData({ name: '', method: 'GET', type: '', url: '', headers: '', body: '', scheduleId: '' });
       } else if (monitor) {
         setFormData({
@@ -49,15 +44,16 @@ export const HttpMonitorEditModal: React.FC<HttpMonitorEditModalProps> = ({ isOp
         });
       }
     }
-  }, [isOpen, monitor, isNew, dispatch]);
+  }, [isOpen, monitor, isNew]);
 
-  useEffect(() => {
-    if (updateSuccess) {
-      setFormData({ name: '', method: 'GET', type: '', url: '', headers: '', body: '', scheduleId: '' });
-      toggle();
-      onSave?.();
+  const loadSchedules = async () => {
+    try {
+      const response = await axios.get('/api/schedules?page=0&size=1000&sort=id,desc');
+      setSchedules(response.data);
+    } catch (error) {
+      console.error('Failed to load schedules:', error);
     }
-  }, [updateSuccess, toggle, onSave]);
+  };
 
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
@@ -102,45 +98,53 @@ export const HttpMonitorEditModal: React.FC<HttpMonitorEditModalProps> = ({ isOp
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (validateForm()) {
-      const dataToSubmit: any = {
-        name: formData.name,
-        method: formData.method,
-        type: formData.type,
-        url: formData.url,
-      };
+      setUpdating(true);
+      try {
+        const dataToSubmit: any = {
+          name: formData.name,
+          method: formData.method,
+          type: formData.type,
+          url: formData.url,
+        };
 
-      if (formData.headers) {
-        try {
-          dataToSubmit.headers = JSON.parse(formData.headers);
-        } catch {
-          dataToSubmit.headers = formData.headers;
+        if (formData.headers) {
+          try {
+            dataToSubmit.headers = JSON.parse(formData.headers);
+          } catch {
+            dataToSubmit.headers = formData.headers;
+          }
         }
-      }
 
-      if (formData.body) {
-        try {
-          dataToSubmit.body = JSON.parse(formData.body);
-        } catch {
-          dataToSubmit.body = formData.body;
+        if (formData.body) {
+          try {
+            dataToSubmit.body = JSON.parse(formData.body);
+          } catch {
+            dataToSubmit.body = formData.body;
+          }
         }
-      }
 
-      if (formData.scheduleId) {
-        dataToSubmit.schedule = { id: parseInt(formData.scheduleId, 10) };
-      }
+        if (formData.scheduleId) {
+          dataToSubmit.schedule = { id: parseInt(formData.scheduleId, 10) };
+        }
 
-      if (isNew) {
-        dispatch(createEntity(dataToSubmit));
-      } else if (monitor?.id) {
-        dispatch(
-          updateEntity({
-            id: monitor.id,
-            ...dataToSubmit,
-          }),
-        );
+        if (isNew) {
+          await axios.post('/api/http-monitors', dataToSubmit);
+          toast.success('Monitor created successfully');
+        } else if (monitor?.id) {
+          await axios.put(`/api/http-monitors/${monitor.id}`, { id: monitor.id, ...dataToSubmit });
+          toast.success('Monitor updated successfully');
+        }
+
+        setFormData({ name: '', method: 'GET', type: '', url: '', headers: '', body: '', scheduleId: '' });
+        toggle();
+        onSave?.();
+      } catch (error) {
+        toast.error(`Failed to ${isNew ? 'create' : 'update'} monitor`);
+      } finally {
+        setUpdating(false);
       }
     }
   };
