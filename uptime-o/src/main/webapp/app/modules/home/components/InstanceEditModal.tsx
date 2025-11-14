@@ -311,6 +311,11 @@ export const InstanceEditModal: React.FC<InstanceEditModalProps> = ({ isOpen, to
                   <option value="SELF_HOSTED">Self Hosted</option>
                   <option value="AGENT_MONITORED">Agent Monitored</option>
                 </Input>
+                <small className="form-text text-muted">
+                  {formData.monitoringType === 'SELF_HOSTED'
+                    ? '✓ Ping monitoring only (network connectivity checks)'
+                    : '✓ Ping + Hardware monitoring (CPU, memory, disk via agent)'}
+                </small>
               </FormGroup>
             </div>
           </div>
@@ -419,6 +424,13 @@ export const InstanceEditModal: React.FC<InstanceEditModalProps> = ({ isOpen, to
 
           <hr className="my-4" />
           <h6 className="mb-3">Ping Monitoring</h6>
+          <div className="alert alert-info py-2 mb-3">
+            <small>
+              <strong>✓ Available for both Self Hosted and Agent Monitored</strong>
+              <br />
+              Checks network connectivity, response time, and packet loss via ICMP/TCP ping.
+            </small>
+          </div>
           <FormGroup check className="mb-3">
             <Label check>
               <Input type="checkbox" name="pingEnabled" checked={formData.pingEnabled} onChange={handleChange} disabled={loading} /> Enable
@@ -474,6 +486,24 @@ export const InstanceEditModal: React.FC<InstanceEditModalProps> = ({ isOpen, to
 
           <hr className="my-4" />
           <h6 className="mb-3">Hardware Monitoring</h6>
+          {formData.monitoringType === 'SELF_HOSTED' ? (
+            <div className="alert alert-warning py-2 mb-3">
+              <small>
+                <strong>⚠ Not available for Self Hosted</strong>
+                <br />
+                Hardware monitoring requires an agent with local system access. Switch to &quot;Agent Monitored&quot; to enable this
+                feature.
+              </small>
+            </div>
+          ) : (
+            <div className="alert alert-success py-2 mb-3">
+              <small>
+                <strong>✓ Available for Agent Monitored</strong>
+                <br />
+                Agent will collect CPU, memory, disk usage, and system metrics from the instance.
+              </small>
+            </div>
+          )}
           <FormGroup check className="mb-3">
             <Label check>
               <Input
@@ -481,9 +511,10 @@ export const InstanceEditModal: React.FC<InstanceEditModalProps> = ({ isOpen, to
                 name="hardwareMonitoringEnabled"
                 checked={formData.hardwareMonitoringEnabled}
                 onChange={handleChange}
-                disabled={loading}
+                disabled={loading || formData.monitoringType === 'SELF_HOSTED'}
               />{' '}
               Enable Hardware Monitoring
+              {formData.monitoringType === 'SELF_HOSTED' && <small className="text-muted"> (requires Agent Monitored)</small>}
             </Label>
           </FormGroup>
           {formData.hardwareMonitoringEnabled && (
