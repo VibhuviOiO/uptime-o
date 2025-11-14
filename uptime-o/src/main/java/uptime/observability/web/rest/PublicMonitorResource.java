@@ -11,7 +11,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import uptime.observability.domain.AgentMonitor;
 import uptime.observability.domain.HttpMonitor;
-import uptime.observability.domain.Schedule;
+
 import uptime.observability.repository.AgentMonitorRepository;
 
 /**
@@ -54,7 +54,6 @@ public class PublicMonitorResource {
             .stream()
             .map(am -> {
                 HttpMonitor monitor = am.getMonitor();
-                Schedule schedule = monitor.getSchedule();
 
                 MonitorResponse response = new MonitorResponse();
                 response.setId(monitor.getId());
@@ -64,17 +63,10 @@ public class PublicMonitorResource {
                 response.setUrl(monitor.getUrl());
                 response.setHeaders(monitor.getHeaders());
                 response.setBody(monitor.getBody());
-
-                if (schedule != null) {
-                    ScheduleResponse scheduleResponse = new ScheduleResponse();
-                    scheduleResponse.setId(schedule.getId());
-                    scheduleResponse.setName(schedule.getName());
-                    scheduleResponse.setInterval(schedule.getInterval());
-                    scheduleResponse.setIncludeResponseBody(schedule.getIncludeResponseBody());
-                    scheduleResponse.setThresholdsWarning(schedule.getThresholdsWarning());
-                    scheduleResponse.setThresholdsCritical(schedule.getThresholdsCritical());
-                    response.setSchedule(scheduleResponse);
-                }
+                response.setIntervalSeconds(monitor.getIntervalSeconds());
+                response.setTimeoutSeconds(monitor.getTimeoutSeconds());
+                response.setRetryCount(monitor.getRetryCount());
+                response.setRetryDelaySeconds(monitor.getRetryDelaySeconds());
 
                 return response;
             })
@@ -89,13 +81,16 @@ public class PublicMonitorResource {
     public static class MonitorResponse {
 
         private Long id;
+        private String type;
         private String name;
         private String method;
-        private String type;
         private String url;
         private JsonNode headers;
         private JsonNode body;
-        private ScheduleResponse schedule;
+        private Integer intervalSeconds;
+        private Integer timeoutSeconds;
+        private Integer retryCount;
+        private Integer retryDelaySeconds;
 
         // Getters and setters
         public Long getId() {
@@ -114,20 +109,20 @@ public class PublicMonitorResource {
             this.name = name;
         }
 
-        public String getMethod() {
-            return method;
-        }
-
-        public void setMethod(String method) {
-            this.method = method;
-        }
-
         public String getType() {
             return type;
         }
 
         public void setType(String type) {
             this.type = type;
+        }
+
+        public String getMethod() {
+            return method;
+        }
+
+        public void setMethod(String method) {
+            this.method = method;
         }
 
         public String getUrl() {
@@ -154,71 +149,38 @@ public class PublicMonitorResource {
             this.body = body;
         }
 
-        public ScheduleResponse getSchedule() {
-            return schedule;
+        public Integer getIntervalSeconds() {
+            return intervalSeconds;
         }
 
-        public void setSchedule(ScheduleResponse schedule) {
-            this.schedule = schedule;
-        }
-    }
-
-    public static class ScheduleResponse {
-
-        private Long id;
-        private String name;
-        private Integer interval;
-        private Boolean includeResponseBody;
-        private Integer thresholdsWarning;
-        private Integer thresholdsCritical;
-
-        // Getters and setters
-        public Long getId() {
-            return id;
+        public void setIntervalSeconds(Integer intervalSeconds) {
+            this.intervalSeconds = intervalSeconds;
         }
 
-        public void setId(Long id) {
-            this.id = id;
+        public Integer getTimeoutSeconds() {
+            return timeoutSeconds;
         }
 
-        public String getName() {
-            return name;
+        public void setTimeoutSeconds(Integer timeoutSeconds) {
+            this.timeoutSeconds = timeoutSeconds;
         }
 
-        public void setName(String name) {
-            this.name = name;
+        public Integer getRetryCount() {
+            return retryCount;
         }
 
-        public Integer getInterval() {
-            return interval;
+        public void setRetryCount(Integer retryCount) {
+            this.retryCount = retryCount;
         }
 
-        public void setInterval(Integer interval) {
-            this.interval = interval;
+        public Integer getRetryDelaySeconds() {
+            return retryDelaySeconds;
         }
 
-        public Boolean getIncludeResponseBody() {
-            return includeResponseBody;
-        }
-
-        public void setIncludeResponseBody(Boolean includeResponseBody) {
-            this.includeResponseBody = includeResponseBody;
-        }
-
-        public Integer getThresholdsWarning() {
-            return thresholdsWarning;
-        }
-
-        public void setThresholdsWarning(Integer thresholdsWarning) {
-            this.thresholdsWarning = thresholdsWarning;
-        }
-
-        public Integer getThresholdsCritical() {
-            return thresholdsCritical;
-        }
-
-        public void setThresholdsCritical(Integer thresholdsCritical) {
-            this.thresholdsCritical = thresholdsCritical;
+        public void setRetryDelaySeconds(Integer retryDelaySeconds) {
+            this.retryDelaySeconds = retryDelaySeconds;
         }
     }
+
+
 }

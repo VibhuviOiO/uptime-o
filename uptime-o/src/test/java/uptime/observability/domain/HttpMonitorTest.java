@@ -48,15 +48,5 @@ class HttpMonitorTest {
         assertThat(apiHeartbeatBack.getMonitor()).isNull();
     }
 
-    @Test
-    void scheduleTest() {
-        HttpMonitor apiMonitor = getHttpMonitorRandomSampleGenerator();
-        Schedule scheduleBack = getScheduleRandomSampleGenerator();
 
-        apiMonitor.setSchedule(scheduleBack);
-        assertThat(apiMonitor.getSchedule()).isEqualTo(scheduleBack);
-
-        apiMonitor.schedule(null);
-        assertThat(apiMonitor.getSchedule()).isNull();
-    }
 }

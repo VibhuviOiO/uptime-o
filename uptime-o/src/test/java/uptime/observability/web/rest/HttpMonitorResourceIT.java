@@ -53,6 +53,30 @@ class HttpMonitorResourceIT {
     private static final JsonNode DEFAULT_BODY;
     private static final JsonNode UPDATED_BODY;
 
+    private static final Integer DEFAULT_INTERVAL_SECONDS = 60;
+    private static final Integer UPDATED_INTERVAL_SECONDS = 120;
+
+    private static final Integer DEFAULT_TIMEOUT_SECONDS = 30;
+    private static final Integer UPDATED_TIMEOUT_SECONDS = 60;
+
+    private static final Integer DEFAULT_RETRY_COUNT = 2;
+    private static final Integer UPDATED_RETRY_COUNT = 3;
+
+    private static final Integer DEFAULT_RETRY_DELAY_SECONDS = 5;
+    private static final Integer UPDATED_RETRY_DELAY_SECONDS = 10;
+
+    private static final Integer DEFAULT_RESPONSE_TIME_WARNING_MS = 1000;
+    private static final Integer UPDATED_RESPONSE_TIME_WARNING_MS = 1500;
+
+    private static final Integer DEFAULT_RESPONSE_TIME_CRITICAL_MS = 3000;
+    private static final Integer UPDATED_RESPONSE_TIME_CRITICAL_MS = 5000;
+
+    private static final Float DEFAULT_UPTIME_WARNING_PERCENT = 99.0F;
+    private static final Float UPDATED_UPTIME_WARNING_PERCENT = 98.0F;
+
+    private static final Float DEFAULT_UPTIME_CRITICAL_PERCENT = 95.0F;
+    private static final Float UPDATED_UPTIME_CRITICAL_PERCENT = 90.0F;
+
     static {
         ObjectMapper mapper = new ObjectMapper();
         try {
@@ -103,7 +127,15 @@ class HttpMonitorResourceIT {
             .type(DEFAULT_TYPE)
             .url(DEFAULT_URL)
             .headers(DEFAULT_HEADERS)
-            .body(DEFAULT_BODY);
+            .body(DEFAULT_BODY)
+            .intervalSeconds(DEFAULT_INTERVAL_SECONDS)
+            .timeoutSeconds(DEFAULT_TIMEOUT_SECONDS)
+            .retryCount(DEFAULT_RETRY_COUNT)
+            .retryDelaySeconds(DEFAULT_RETRY_DELAY_SECONDS)
+            .responseTimeWarningMs(DEFAULT_RESPONSE_TIME_WARNING_MS)
+            .responseTimeCriticalMs(DEFAULT_RESPONSE_TIME_CRITICAL_MS)
+            .uptimeWarningPercent(DEFAULT_UPTIME_WARNING_PERCENT)
+            .uptimeCriticalPercent(DEFAULT_UPTIME_CRITICAL_PERCENT);
     }
 
     /**
@@ -119,7 +151,15 @@ class HttpMonitorResourceIT {
             .type(UPDATED_TYPE)
             .url(UPDATED_URL)
             .headers(UPDATED_HEADERS)
-            .body(UPDATED_BODY);
+            .body(UPDATED_BODY)
+            .intervalSeconds(UPDATED_INTERVAL_SECONDS)
+            .timeoutSeconds(UPDATED_TIMEOUT_SECONDS)
+            .retryCount(UPDATED_RETRY_COUNT)
+            .retryDelaySeconds(UPDATED_RETRY_DELAY_SECONDS)
+            .responseTimeWarningMs(UPDATED_RESPONSE_TIME_WARNING_MS)
+            .responseTimeCriticalMs(UPDATED_RESPONSE_TIME_CRITICAL_MS)
+            .uptimeWarningPercent(UPDATED_UPTIME_WARNING_PERCENT)
+            .uptimeCriticalPercent(UPDATED_UPTIME_CRITICAL_PERCENT);
     }
 
     @BeforeEach
@@ -293,7 +333,11 @@ class HttpMonitorResourceIT {
             .type(UPDATED_TYPE)
             .url(UPDATED_URL)
             .headers(UPDATED_HEADERS)
-            .body(UPDATED_BODY);
+            .body(UPDATED_BODY)
+            .intervalSeconds(UPDATED_INTERVAL_SECONDS)
+            .timeoutSeconds(UPDATED_TIMEOUT_SECONDS)
+            .retryCount(UPDATED_RETRY_COUNT)
+            .retryDelaySeconds(UPDATED_RETRY_DELAY_SECONDS);
         HttpMonitorDTO apiMonitorDTO = apiMonitorMapper.toDto(updatedHttpMonitor);
 
         restHttpMonitorMockMvc
@@ -420,7 +464,11 @@ class HttpMonitorResourceIT {
             .type(UPDATED_TYPE)
             .url(UPDATED_URL)
             .headers(UPDATED_HEADERS)
-            .body(UPDATED_BODY);
+            .body(UPDATED_BODY)
+            .intervalSeconds(UPDATED_INTERVAL_SECONDS)
+            .timeoutSeconds(UPDATED_TIMEOUT_SECONDS)
+            .retryCount(UPDATED_RETRY_COUNT)
+            .retryDelaySeconds(UPDATED_RETRY_DELAY_SECONDS);
 
         restHttpMonitorMockMvc
             .perform(

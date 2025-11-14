@@ -42,9 +42,7 @@ public class Schedule implements Serializable {
     @Column(name = "thresholds_critical")
     private Integer thresholdsCritical;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "schedule")
-    @JsonIgnoreProperties(value = { "apiHeartbeats", "agentMonitors", "schedule" }, allowSetters = true)
-    private Set<HttpMonitor> apiMonitors = new HashSet<>();
+
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -126,36 +124,7 @@ public class Schedule implements Serializable {
         this.thresholdsCritical = thresholdsCritical;
     }
 
-    public Set<HttpMonitor> getHttpMonitors() {
-        return this.apiMonitors;
-    }
 
-    public void setHttpMonitors(Set<HttpMonitor> apiMonitors) {
-        if (this.apiMonitors != null) {
-            this.apiMonitors.forEach(i -> i.setSchedule(null));
-        }
-        if (apiMonitors != null) {
-            apiMonitors.forEach(i -> i.setSchedule(this));
-        }
-        this.apiMonitors = apiMonitors;
-    }
-
-    public Schedule apiMonitors(Set<HttpMonitor> apiMonitors) {
-        this.setHttpMonitors(apiMonitors);
-        return this;
-    }
-
-    public Schedule addHttpMonitor(HttpMonitor apiMonitor) {
-        this.apiMonitors.add(apiMonitor);
-        apiMonitor.setSchedule(this);
-        return this;
-    }
-
-    public Schedule removeHttpMonitor(HttpMonitor apiMonitor) {
-        this.apiMonitors.remove(apiMonitor);
-        apiMonitor.setSchedule(null);
-        return this;
-    }
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
 

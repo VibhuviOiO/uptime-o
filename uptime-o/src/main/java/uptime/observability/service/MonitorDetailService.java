@@ -83,10 +83,10 @@ public class MonitorDetailService {
             monitor.getUrl(),
             monitor.getMethod(),
             monitor.getType(),
-            monitor.getSchedule() != null ? monitor.getSchedule().getInterval() : null,
+            monitor.getIntervalSeconds(),
             true, // enabled - no field for this in entity
-            monitor.getSchedule() != null ? monitor.getSchedule().getThresholdsWarning() : null,
-            monitor.getSchedule() != null ? monitor.getSchedule().getThresholdsCritical() : null,
+            monitor.getResponseTimeWarningMs(),
+            monitor.getResponseTimeCriticalMs(),
             null, // createdAt - no field for this in entity
             null, // updatedAt - no field for this in entity
             totalChecks,
@@ -146,8 +146,8 @@ public class MonitorDetailService {
             Region region = datacenter != null ? datacenter.getRegion() : null;
 
             HttpMonitor monitor = httpMonitorRepository.findById(monitorId).orElse(null);
-            Integer warningThreshold = monitor != null && monitor.getSchedule() != null ? monitor.getSchedule().getThresholdsWarning() : null;
-            Integer criticalThreshold = monitor != null && monitor.getSchedule() != null ? monitor.getSchedule().getThresholdsCritical() : null;
+            Integer warningThreshold = monitor != null ? monitor.getResponseTimeWarningMs() : null;
+            Integer criticalThreshold = monitor != null ? monitor.getResponseTimeCriticalMs() : null;
 
             Long totalChecks = (long) agentHeartbeats.size();
             Long successfulChecks = agentHeartbeats.stream().filter(h -> Boolean.TRUE.equals(h.getSuccess())).count();

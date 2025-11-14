@@ -76,10 +76,28 @@ export const HttpMonitorViewModal: React.FC<HttpMonitorViewModalProps> = ({ isOp
             </div>
             <div className="row mb-3">
               <div className="col-sm-4">
-                <strong>Schedule:</strong>
+                <strong>Interval:</strong>
               </div>
               <div className="col-sm-8">
-                <span>{monitor?.schedule?.name || '-'}</span>
+                <span>{monitor?.intervalSeconds}s</span>
+              </div>
+            </div>
+            <div className="row mb-3">
+              <div className="col-sm-4">
+                <strong>Timeout:</strong>
+              </div>
+              <div className="col-sm-8">
+                <span>{monitor?.timeoutSeconds}s</span>
+              </div>
+            </div>
+            <div className="row mb-3">
+              <div className="col-sm-4">
+                <strong>Retry:</strong>
+              </div>
+              <div className="col-sm-8">
+                <span>
+                  {monitor?.retryCount} attempts, {monitor?.retryDelaySeconds}s delay
+                </span>
               </div>
             </div>
             <div className="row">

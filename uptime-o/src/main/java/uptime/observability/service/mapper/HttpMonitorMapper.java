@@ -2,21 +2,23 @@ package uptime.observability.service.mapper;
 
 import org.mapstruct.*;
 import uptime.observability.domain.HttpMonitor;
-import uptime.observability.domain.Schedule;
 import uptime.observability.service.dto.HttpMonitorDTO;
-import uptime.observability.service.dto.ScheduleDTO;
 
 /**
  * Mapper for the entity {@link HttpMonitor} and its DTO {@link HttpMonitorDTO}.
  */
 @Mapper(componentModel = "spring")
 public interface HttpMonitorMapper extends EntityMapper<HttpMonitorDTO, HttpMonitor> {
-    @Mapping(target = "schedule", source = "schedule", qualifiedByName = "scheduleId")
+    @Mapping(target = "parentId", source = "parent.id")
     HttpMonitorDTO toDto(HttpMonitor s);
 
-    @Named("scheduleId")
+    @Mapping(target = "parent", source = "parentId", qualifiedByName = "httpMonitorId")
+    @Mapping(target = "children", ignore = true)
+    @Mapping(target = "removeChild", ignore = true)
+    HttpMonitor toEntity(HttpMonitorDTO dto);
+
+    @Named("httpMonitorId")
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
-    @Mapping(target = "name", source = "name")
-    ScheduleDTO toDtoScheduleId(Schedule schedule);
+    HttpMonitor fromId(Long id);
 }

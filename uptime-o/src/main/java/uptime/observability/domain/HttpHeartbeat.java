@@ -12,7 +12,7 @@ import org.hibernate.annotations.Type;
  * A HttpHeartbeat.
  */
 @Entity
-@Table(name = "api_heartbeats")
+@Table(name = "http_heartbeats")
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class HttpHeartbeat implements Serializable {
 

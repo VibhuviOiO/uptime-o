@@ -59,6 +59,11 @@ public class StatusPageResource {
         for (AgentMonitor am : activeAssignments) {
             if (am.getMonitor() == null || am.getAgent() == null) continue;
             
+            // Filter: Only include monitors with external visibility
+            if (!"external".equals(am.getMonitor().getMonitoringVisibility())) {
+                continue;
+            }
+            
             Long monitorId = am.getMonitor().getId();
             String regionName = am.getAgent().getDatacenter() != null && 
                                am.getAgent().getDatacenter().getRegion() != null

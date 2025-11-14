@@ -56,7 +56,6 @@ public interface AgentMonitorRepository extends JpaRepository<AgentMonitor, Long
      */
     @Query("SELECT DISTINCT am FROM AgentMonitor am " +
            "JOIN FETCH am.monitor m " +
-           "LEFT JOIN FETCH m.schedule " +
            "WHERE am.agent.id = :agentId AND am.active = :active")
     List<AgentMonitor> findByAgentIdAndActiveWithMonitorAndSchedule(@Param("agentId") Long agentId, @Param("active") Boolean active);
 

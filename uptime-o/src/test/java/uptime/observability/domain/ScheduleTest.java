@@ -25,25 +25,5 @@ class ScheduleTest {
         assertThat(schedule1).isNotEqualTo(schedule2);
     }
 
-    @Test
-    void apiMonitorTest() {
-        Schedule schedule = getScheduleRandomSampleGenerator();
-        HttpMonitor apiMonitorBack = getHttpMonitorRandomSampleGenerator();
 
-        schedule.addHttpMonitor(apiMonitorBack);
-        assertThat(schedule.getHttpMonitors()).containsOnly(apiMonitorBack);
-        assertThat(apiMonitorBack.getSchedule()).isEqualTo(schedule);
-
-        schedule.removeHttpMonitor(apiMonitorBack);
-        assertThat(schedule.getHttpMonitors()).doesNotContain(apiMonitorBack);
-        assertThat(apiMonitorBack.getSchedule()).isNull();
-
-        schedule.apiMonitors(new HashSet<>(Set.of(apiMonitorBack)));
-        assertThat(schedule.getHttpMonitors()).containsOnly(apiMonitorBack);
-        assertThat(apiMonitorBack.getSchedule()).isEqualTo(schedule);
-
-        schedule.setHttpMonitors(new HashSet<>());
-        assertThat(schedule.getHttpMonitors()).doesNotContain(apiMonitorBack);
-        assertThat(apiMonitorBack.getSchedule()).isNull();
-    }
 }

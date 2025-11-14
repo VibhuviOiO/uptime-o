@@ -62,8 +62,6 @@ public class HttpMonitorAsserts {
      * @param actual the actual entity
      */
     public static void assertHttpMonitorUpdatableRelationshipsEquals(HttpMonitor expected, HttpMonitor actual) {
-        assertThat(actual)
-            .as("Verify HttpMonitor relationships")
-            .satisfies(a -> assertThat(a.getSchedule()).as("check schedule").isEqualTo(expected.getSchedule()));
+        // No relationships to assert
     }
 }
