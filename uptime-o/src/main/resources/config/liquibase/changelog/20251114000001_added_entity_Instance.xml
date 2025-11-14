@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="20251114000001-1" author="jhipster">
+        <createTable tableName="instance">
+            <column name="id" type="bigint">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="hostname" type="varchar(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="description" type="varchar(500)">
+                <constraints nullable="true" />
+            </column>
+            <column name="instance_type" type="varchar(50)">
+                <constraints nullable="false" />
+            </column>
+            <column name="monitoring_type" type="varchar(50)">
+                <constraints nullable="false" />
+            </column>
+            <column name="agent_id" type="bigint">
+                <constraints nullable="true" />
+            </column>
+            <column name="operating_system" type="varchar(100)">
+                <constraints nullable="true" />
+            </column>
+            <column name="platform" type="varchar(100)">
+                <constraints nullable="true" />
+            </column>
+            <column name="private_ip_address" type="varchar(50)">
+                <constraints nullable="true" />
+            </column>
+            <column name="public_ip_address" type="varchar(50)">
+                <constraints nullable="true" />
+            </column>
+            <column name="tags" type="jsonb">
+                <constraints nullable="true" />
+            </column>
+            <column name="ping_enabled" type="boolean" defaultValueBoolean="true">
+                <constraints nullable="false" />
+            </column>
+            <column name="ping_interval" type="integer" defaultValueNumeric="30">
+                <constraints nullable="false" />
+            </column>
+            <column name="ping_timeout_ms" type="integer" defaultValueNumeric="3000">
+                <constraints nullable="false" />
+            </column>
+            <column name="ping_retry_count" type="integer" defaultValueNumeric="2">
+                <constraints nullable="false" />
+            </column>
+            <column name="hardware_monitoring_enabled" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false" />
+            </column>
+            <column name="hardware_monitoring_interval" type="integer" defaultValueNumeric="300">
+                <constraints nullable="false" />
+            </column>
+            <column name="cpu_warning_threshold" type="integer" defaultValueNumeric="70">
+                <constraints nullable="false" />
+            </column>
+            <column name="cpu_danger_threshold" type="integer" defaultValueNumeric="90">
+                <constraints nullable="false" />
+            </column>
+            <column name="memory_warning_threshold" type="integer" defaultValueNumeric="75">
+                <constraints nullable="false" />
+            </column>
+            <column name="memory_danger_threshold" type="integer" defaultValueNumeric="90">
+                <constraints nullable="false" />
+            </column>
+            <column name="disk_warning_threshold" type="integer" defaultValueNumeric="80">
+                <constraints nullable="false" />
+            </column>
+            <column name="disk_danger_threshold" type="integer" defaultValueNumeric="95">
+                <constraints nullable="false" />
+            </column>
+            <column name="created_at" type="timestamp">
+                <constraints nullable="true" />
+            </column>
+            <column name="updated_at" type="timestamp">
+                <constraints nullable="true" />
+            </column>
+            <column name="last_ping_at" type="timestamp">
+                <constraints nullable="true" />
+            </column>
+            <column name="last_hardware_check_at" type="timestamp">
+                <constraints nullable="true" />
+            </column>
+            <column name="datacenter_id" type="bigint">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20251114000001-2" author="jhipster">
+        <createSequence sequenceName="sequence_generator" startValue="1050" incrementBy="50"/>
+    </changeSet>
+
+</databaseChangeLog>

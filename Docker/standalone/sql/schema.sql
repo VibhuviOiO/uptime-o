@@ -53,8 +53,10 @@ CREATE TABLE agent_monitors (
 );
 
 -- ✅ Partitioned heartbeat table
+CREATE SEQUENCE api_heartbeats_id_seq;
+
 CREATE TABLE api_heartbeats (
-    id BIGSERIAL,
+    id BIGINT NOT NULL DEFAULT nextval('api_heartbeats_id_seq'),
     monitor_id INT REFERENCES api_monitors(id),
     agent_id INT REFERENCES agents(id),
     executed_at TIMESTAMP NOT NULL,
@@ -78,6 +80,8 @@ CREATE TABLE api_heartbeats (
     raw_response_body JSONB,
     PRIMARY KEY (id, executed_at)
 ) PARTITION BY RANGE (executed_at);
+
+ALTER SEQUENCE api_heartbeats_id_seq OWNED BY api_heartbeats.id;
 
 -- ✅ Today Partition (boot-strap)
 CREATE TABLE IF NOT EXISTS api_heartbeats_today

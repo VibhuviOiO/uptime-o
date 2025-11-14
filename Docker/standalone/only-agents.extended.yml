@@ -1,36 +1,10 @@
 services:
-  # PostgreSQL Database
-  postgres:
-    image: postgres:17
-    container_name: postgres
-    restart: always
-    environment:
-      POSTGRES_USER: uptimeo
-      POSTGRES_PASSWORD: uptimeo
-      POSTGRES_DB: uptimeo
-    ports:
-      - "5432:5432"
-    volumes:
-      - ./tmp/pgdata:/var/lib/postgresql/data
-      - ./sql/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
-      - ./sql/data.extended.sql:/docker-entrypoint-initdb.d/02-data.sql:ro
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U uptimeo -d uptimeo"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-    networks:
-      - uptimeo
-
   # Original 2 agents
   agent-us-east:
     image: uptimeo-agent:latest
     container_name: agent-us-east
-    depends_on:
-      postgres:
-        condition: service_healthy
     volumes:
-      - ./tmp/data/agent-us-east:/data
+    - ./tmp/data/agent-us-east:/data
     environment:
       DB_CONN_STRING: "postgres://uptimeo:uptimeo@postgres:5432/uptimeo?sslmode=disable"
       AGENT_ID: "1"
@@ -40,16 +14,13 @@ services:
       LOG_LEVEL: "INFO"
     restart: unless-stopped
     networks:
-      - uptimeo
+    - uptimeo
 
   agent-us-west:
     image: uptimeo-agent:latest
     container_name: agent-us-west
-    depends_on:
-      postgres:
-        condition: service_healthy
     volumes:
-      - ./tmp/data/agent-us-west:/data
+    - ./tmp/data/agent-us-west:/data
     environment:
       DB_CONN_STRING: "postgres://uptimeo:uptimeo@postgres:5432/uptimeo?sslmode=disable"
       AGENT_ID: "2"
@@ -59,17 +30,14 @@ services:
       LOG_LEVEL: "INFO"
     restart: unless-stopped
     networks:
-      - uptimeo
+    - uptimeo
 
   # Extended agents (3-14) for demo
   agent-eu-west:
     image: uptimeo-agent:latest
     container_name: agent-eu-west
-    depends_on:
-      postgres:
-        condition: service_healthy
     volumes:
-      - ./tmp/data/agent-eu-west:/data
+    - ./tmp/data/agent-eu-west:/data
     environment:
       DB_CONN_STRING: "postgres://uptimeo:uptimeo@postgres:5432/uptimeo?sslmode=disable"
       AGENT_ID: "3"
@@ -79,16 +47,13 @@ services:
       LOG_LEVEL: "INFO"
     restart: unless-stopped
     networks:
-      - uptimeo
+    - uptimeo
 
   agent-us-east-2:
     image: uptimeo-agent:latest
     container_name: agent-us-east-2
-    depends_on:
-      postgres:
-        condition: service_healthy
     volumes:
-      - ./tmp/data/agent-us-east-2:/data
+    - ./tmp/data/agent-us-east-2:/data
     environment:
       DB_CONN_STRING: "postgres://uptimeo:uptimeo@postgres:5432/uptimeo?sslmode=disable"
       AGENT_ID: "4"
@@ -98,16 +63,13 @@ services:
       LOG_LEVEL: "INFO"
     restart: unless-stopped
     networks:
-      - uptimeo
+    - uptimeo
 
   agent-us-east-3:
     image: uptimeo-agent:latest
     container_name: agent-us-east-3
-    depends_on:
-      postgres:
-        condition: service_healthy
     volumes:
-      - ./tmp/data/agent-us-east-3:/data
+    - ./tmp/data/agent-us-east-3:/data
     environment:
       DB_CONN_STRING: "postgres://uptimeo:uptimeo@postgres:5432/uptimeo?sslmode=disable"
       AGENT_ID: "5"
@@ -117,16 +79,13 @@ services:
       LOG_LEVEL: "INFO"
     restart: unless-stopped
     networks:
-      - uptimeo
+    - uptimeo
 
   agent-us-west-2:
     image: uptimeo-agent:latest
     container_name: agent-us-west-2
-    depends_on:
-      postgres:
-        condition: service_healthy
     volumes:
-      - ./tmp/data/agent-us-west-2:/data
+    - ./tmp/data/agent-us-west-2:/data
     environment:
       DB_CONN_STRING: "postgres://uptimeo:uptimeo@postgres:5432/uptimeo?sslmode=disable"
       AGENT_ID: "6"
@@ -136,16 +95,13 @@ services:
       LOG_LEVEL: "INFO"
     restart: unless-stopped
     networks:
-      - uptimeo
+    - uptimeo
 
   agent-eu-north:
     image: uptimeo-agent:latest
     container_name: agent-eu-north
-    depends_on:
-      postgres:
-        condition: service_healthy
     volumes:
-      - ./tmp/data/agent-eu-north:/data
+    - ./tmp/data/agent-eu-north:/data
     environment:
       DB_CONN_STRING: "postgres://uptimeo:uptimeo@postgres:5432/uptimeo?sslmode=disable"
       AGENT_ID: "7"
@@ -155,16 +111,13 @@ services:
       LOG_LEVEL: "INFO"
     restart: unless-stopped
     networks:
-      - uptimeo
+    - uptimeo
 
   agent-eu-west-2:
     image: uptimeo-agent:latest
     container_name: agent-eu-west-2
-    depends_on:
-      postgres:
-        condition: service_healthy
     volumes:
-      - ./tmp/data/agent-eu-west-2:/data
+    - ./tmp/data/agent-eu-west-2:/data
     environment:
       DB_CONN_STRING: "postgres://uptimeo:uptimeo@postgres:5432/uptimeo?sslmode=disable"
       AGENT_ID: "8"
@@ -174,16 +127,13 @@ services:
       LOG_LEVEL: "INFO"
     restart: unless-stopped
     networks:
-      - uptimeo
+    - uptimeo
 
   agent-oceania:
     image: uptimeo-agent:latest
     container_name: agent-oceania
-    depends_on:
-      postgres:
-        condition: service_healthy
     volumes:
-      - ./tmp/data/agent-oceania:/data
+    - ./tmp/data/agent-oceania:/data
     environment:
       DB_CONN_STRING: "postgres://uptimeo:uptimeo@postgres:5432/uptimeo?sslmode=disable"
       AGENT_ID: "9"
@@ -193,16 +143,13 @@ services:
       LOG_LEVEL: "INFO"
     restart: unless-stopped
     networks:
-      - uptimeo
+    - uptimeo
 
   agent-asia-pacific:
     image: uptimeo-agent:latest
     container_name: agent-asia-pacific
-    depends_on:
-      postgres:
-        condition: service_healthy
     volumes:
-      - ./tmp/data/agent-asia-pacific:/data
+    - ./tmp/data/agent-asia-pacific:/data
     environment:
       DB_CONN_STRING: "postgres://uptimeo:uptimeo@postgres:5432/uptimeo?sslmode=disable"
       AGENT_ID: "10"
@@ -212,16 +159,13 @@ services:
       LOG_LEVEL: "INFO"
     restart: unless-stopped
     networks:
-      - uptimeo
+    - uptimeo
 
   agent-south-america:
     image: uptimeo-agent:latest
     container_name: agent-south-america
-    depends_on:
-      postgres:
-        condition: service_healthy
     volumes:
-      - ./tmp/data/agent-south-america:/data
+    - ./tmp/data/agent-south-america:/data
     environment:
       DB_CONN_STRING: "postgres://uptimeo:uptimeo@postgres:5432/uptimeo?sslmode=disable"
       AGENT_ID: "11"
@@ -231,16 +175,13 @@ services:
       LOG_LEVEL: "INFO"
     restart: unless-stopped
     networks:
-      - uptimeo
+    - uptimeo
 
   agent-middle-east:
     image: uptimeo-agent:latest
     container_name: agent-middle-east
-    depends_on:
-      postgres:
-        condition: service_healthy
     volumes:
-      - ./tmp/data/agent-middle-east:/data
+    - ./tmp/data/agent-middle-east:/data
     environment:
       DB_CONN_STRING: "postgres://uptimeo:uptimeo@postgres:5432/uptimeo?sslmode=disable"
       AGENT_ID: "12"
@@ -250,16 +191,13 @@ services:
       LOG_LEVEL: "INFO"
     restart: unless-stopped
     networks:
-      - uptimeo
+    - uptimeo
 
   agent-africa:
     image: uptimeo-agent:latest
     container_name: agent-africa
-    depends_on:
-      postgres:
-        condition: service_healthy
     volumes:
-      - ./tmp/data/agent-africa:/data
+    - ./tmp/data/agent-africa:/data
     environment:
       DB_CONN_STRING: "postgres://uptimeo:uptimeo@postgres:5432/uptimeo?sslmode=disable"
       AGENT_ID: "13"
@@ -269,16 +207,13 @@ services:
       LOG_LEVEL: "INFO"
     restart: unless-stopped
     networks:
-      - uptimeo
+    - uptimeo
 
   agent-canada:
     image: uptimeo-agent:latest
     container_name: agent-canada
-    depends_on:
-      postgres:
-        condition: service_healthy
     volumes:
-      - ./tmp/data/agent-canada:/data
+    - ./tmp/data/agent-canada:/data
     environment:
       DB_CONN_STRING: "postgres://uptimeo:uptimeo@postgres:5432/uptimeo?sslmode=disable"
       AGENT_ID: "14"
@@ -288,22 +223,19 @@ services:
       LOG_LEVEL: "INFO"
     restart: unless-stopped
     networks:
-      - uptimeo
+    - uptimeo
 
   # Status Page
   status-page:
     image: ghcr.io/vibhuvioio/uptimeo-statuspage:latest
     container_name: status-page
-    depends_on:
-      postgres:
-        condition: service_healthy
     env_file:
-      - .env
+    - .env
     ports:
-      - "8077:8077"
+    - "8077:8077"
     restart: unless-stopped
     networks:
-      - uptimeo
+    - uptimeo
 
 networks:
   uptimeo:

@@ -13,6 +13,8 @@ import HttpHeartbeatAggregated from './http-heartbeat/http-heartbeat-aggregated'
 import HttpMetrics from './http-metrics/http-metrics';
 import MonitorDetail from './http-monitor-detail/monitor-detail';
 import AuditLog from './audit-log';
+import Instance from './instance';
+import PingHeartbeat from './ping-heartbeat';
 /* jhipster-needle-add-route-import - JHipster will add routes here */
 
 export default () => {
@@ -30,6 +32,8 @@ export default () => {
         <Route path="http-metrics" element={<HttpMetrics />} />
         <Route path="http-monitor-detail/:id" element={<MonitorDetail />} />
         <Route path="audit-log/*" element={<AuditLog />} />
+        <Route path="instance/*" element={<Instance />} />
+        <Route path="ping-heartbeat/*" element={<PingHeartbeat />} />
         {/* jhipster-needle-add-route-path - JHipster will add routes here */}
       </ErrorBoundaryRoutes>
     </div>

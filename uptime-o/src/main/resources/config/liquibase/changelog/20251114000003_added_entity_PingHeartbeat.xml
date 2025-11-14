@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="20251114000003-1" author="jhipster">
+        <createTable tableName="ping_heartbeat">
+            <column name="id" type="bigint">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="instance_id" type="bigint">
+                <constraints nullable="false" />
+            </column>
+            <column name="executed_at" type="timestamp">
+                <constraints nullable="false" />
+            </column>
+            <column name="heartbeat_type" type="varchar(20)">
+                <constraints nullable="false" />
+            </column>
+            <column name="success" type="boolean">
+                <constraints nullable="false" />
+            </column>
+            <column name="response_time_ms" type="integer">
+                <constraints nullable="true" />
+            </column>
+            <column name="packet_loss" type="float">
+                <constraints nullable="true" />
+            </column>
+            <column name="jitter_ms" type="integer">
+                <constraints nullable="true" />
+            </column>
+            <column name="cpu_usage" type="float">
+                <constraints nullable="true" />
+            </column>
+            <column name="memory_usage" type="float">
+                <constraints nullable="true" />
+            </column>
+            <column name="disk_usage" type="float">
+                <constraints nullable="true" />
+            </column>
+            <column name="load_average" type="float">
+                <constraints nullable="true" />
+            </column>
+            <column name="process_count" type="integer">
+                <constraints nullable="true" />
+            </column>
+            <column name="network_rx_bytes" type="bigint">
+                <constraints nullable="true" />
+            </column>
+            <column name="network_tx_bytes" type="bigint">
+                <constraints nullable="true" />
+            </column>
+            <column name="uptime_seconds" type="bigint">
+                <constraints nullable="true" />
+            </column>
+            <column name="status" type="varchar(20)">
+                <constraints nullable="false" />
+            </column>
+            <column name="error_message" type="text">
+                <constraints nullable="true" />
+            </column>
+            <column name="error_type" type="varchar(100)">
+                <constraints nullable="true" />
+            </column>
+            <column name="agent_id" type="bigint">
+                <constraints nullable="true" />
+            </column>
+            <column name="metadata" type="jsonb">
+                <constraints nullable="true" />
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20251114000003-2" author="jhipster">
+        <createIndex indexName="idx_ping_heartbeat_instance_id" tableName="ping_heartbeat">
+            <column name="instance_id"/>
+        </createIndex>
+        <createIndex indexName="idx_ping_heartbeat_executed_at" tableName="ping_heartbeat">
+            <column name="executed_at"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>
