@@ -25,9 +25,9 @@
       "relationshipType": "one-to-many"
     },
     {
-      "otherEntityName": "datacenter",
+      "otherEntityName": "region",
       "otherEntityRelationshipName": "agent",
-      "relationshipName": "datacenter",
+      "relationshipName": "region",
       "relationshipSide": "right",
       "relationshipType": "many-to-one"
     }

@@ -40,6 +40,10 @@ public class Region implements Serializable {
     @JsonIgnoreProperties(value = { "agents", "region" }, allowSetters = true)
     private Set<Datacenter> datacenters = new HashSet<>();
 
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "region")
+    @JsonIgnoreProperties(value = { "apiHeartbeats", "agentMonitors", "region" }, allowSetters = true)
+    private Set<Agent> agents = new HashSet<>();
+
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
     public Long getId() {
@@ -122,6 +126,37 @@ public class Region implements Serializable {
     public Region removeDatacenter(Datacenter datacenter) {
         this.datacenters.remove(datacenter);
         datacenter.setRegion(null);
+        return this;
+    }
+
+    public Set<Agent> getAgents() {
+        return this.agents;
+    }
+
+    public void setAgents(Set<Agent> agents) {
+        if (this.agents != null) {
+            this.agents.forEach(i -> i.setRegion(null));
+        }
+        if (agents != null) {
+            agents.forEach(i -> i.setRegion(this));
+        }
+        this.agents = agents;
+    }
+
+    public Region agents(Set<Agent> agents) {
+        this.setAgents(agents);
+        return this;
+    }
+
+    public Region addAgent(Agent agent) {
+        this.agents.add(agent);
+        agent.setRegion(this);
+        return this;
+    }
+
+    public Region removeAgent(Agent agent) {
+        this.agents.remove(agent);
+        agent.setRegion(null);
         return this;
     }
 

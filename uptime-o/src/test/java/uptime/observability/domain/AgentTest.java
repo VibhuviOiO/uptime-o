@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uptime.observability.domain.AgentTestSamples.*;
 import static uptime.observability.domain.HttpHeartbeatTestSamples.*;
 import static uptime.observability.domain.DatacenterTestSamples.*;
+import static uptime.observability.domain.RegionTestSamples.*;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -49,14 +50,14 @@ class AgentTest {
     }
 
     @Test
-    void datacenterTest() {
+    void regionTest() {
         Agent agent = getAgentRandomSampleGenerator();
-        Datacenter datacenterBack = getDatacenterRandomSampleGenerator();
+        Region regionBack = getRegionRandomSampleGenerator();
 
-        agent.setDatacenter(datacenterBack);
-        assertThat(agent.getDatacenter()).isEqualTo(datacenterBack);
+        agent.setRegion(regionBack);
+        assertThat(agent.getRegion()).isEqualTo(regionBack);
 
-        agent.datacenter(null);
-        assertThat(agent.getDatacenter()).isNull();
+        agent.region(null);
+        assertThat(agent.getRegion()).isNull();
     }
 }

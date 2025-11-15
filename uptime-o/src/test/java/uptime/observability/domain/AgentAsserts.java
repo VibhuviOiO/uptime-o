@@ -59,6 +59,6 @@ public class AgentAsserts {
     public static void assertAgentUpdatableRelationshipsEquals(Agent expected, Agent actual) {
         assertThat(actual)
             .as("Verify Agent relationships")
-            .satisfies(a -> assertThat(a.getDatacenter()).as("check datacenter").isEqualTo(expected.getDatacenter()));
+            .satisfies(a -> assertThat(a.getRegion()).as("check region").isEqualTo(expected.getRegion()));
     }
 }

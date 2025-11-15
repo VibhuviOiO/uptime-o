@@ -65,9 +65,8 @@ public class StatusPageResource {
             }
             
             Long monitorId = am.getMonitor().getId();
-            String regionName = am.getAgent().getDatacenter() != null && 
-                               am.getAgent().getDatacenter().getRegion() != null
-                ? am.getAgent().getDatacenter().getRegion().getName()
+            String regionName = am.getAgent().getRegion() != null
+                ? am.getAgent().getRegion().getName()
                 : "Unknown";
 
             expectedMonitorRegions.computeIfAbsent(monitorId, k -> new HashSet<>()).add(regionName);
@@ -86,9 +85,8 @@ public class StatusPageResource {
 
             Long monitorId = hb.getMonitor().getId();
             Long agentId = hb.getAgent().getId();
-            String regionName = hb.getAgent().getDatacenter() != null && 
-                               hb.getAgent().getDatacenter().getRegion() != null
-                ? hb.getAgent().getDatacenter().getRegion().getName()
+            String regionName = hb.getAgent().getRegion() != null
+                ? hb.getAgent().getRegion().getName()
                 : "Unknown";
 
             // Only include if this agent-monitor assignment is still active

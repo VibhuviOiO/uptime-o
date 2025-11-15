@@ -12,9 +12,6 @@ import uptime.observability.domain.*;
 import uptime.observability.repository.*;
 import uptime.observability.service.dto.*;
 
-/**
- * Service for Monitor Detail page - provides comprehensive monitor statistics and agent-wise breakdown
- */
 @Service
 @Transactional(readOnly = true)
 public class MonitorDetailService {
@@ -27,19 +24,14 @@ public class MonitorDetailService {
     @Autowired
     private HttpHeartbeatRepository httpHeartbeatRepository;
 
-    /**
-     * Get detailed monitor information with statistics
-     */
     public MonitorDetailDTO getMonitorDetail(Long monitorId) {
         LOG.debug("Fetching monitor detail for ID: {}", monitorId);
 
         HttpMonitor monitor = httpMonitorRepository.findById(monitorId)
             .orElseThrow(() -> new RuntimeException("Monitor not found with id: " + monitorId));
 
-        // Get all heartbeats for this monitor
         List<HttpHeartbeat> heartbeats = httpHeartbeatRepository.findByMonitorIdOrderByExecutedAtDesc(monitorId);
 
-        // Calculate statistics
         Long totalChecks = (long) heartbeats.size();
         Long successfulChecks = heartbeats.stream().filter(h -> Boolean.TRUE.equals(h.getSuccess())).count();
         Long failedChecks = totalChecks - successfulChecks;
@@ -52,17 +44,13 @@ public class MonitorDetailService {
 
         Double uptimePercentage = totalChecks > 0 ? (successfulChecks * 100.0) / totalChecks : 0.0;
 
-        // Get last check info
         Instant lastCheckedAt = heartbeats.isEmpty() ? null : heartbeats.get(0).getExecutedAt();
         Boolean lastSuccess = heartbeats.isEmpty() ? null : heartbeats.get(0).getSuccess();
 
-        // Get unique regions and agents
         List<String> regions = heartbeats.stream()
             .map(h -> h.getAgent())
             .filter(Objects::nonNull)
-            .map(Agent::getDatacenter)
-            .filter(Objects::nonNull)
-            .map(Datacenter::getRegion)
+            .map(Agent::getRegion)
             .filter(Objects::nonNull)
             .map(Region::getName)
             .distinct()
@@ -84,11 +72,11 @@ public class MonitorDetailService {
             monitor.getMethod(),
             monitor.getType(),
             monitor.getIntervalSeconds(),
-            true, // enabled - no field for this in entity
+            true,
             monitor.getResponseTimeWarningMs(),
             monitor.getResponseTimeCriticalMs(),
-            null, // createdAt - no field for this in entity
-            null, // updatedAt - no field for this in entity
+            null,
+            null,
             totalChecks,
             successfulChecks,
             failedChecks,
@@ -104,14 +92,10 @@ public class MonitorDetailService {
         return dto;
     }
 
-    /**
-     * Get agent-wise metrics breakdown for a monitor
-     */
     public List<AgentMetricsDTO> getAgentMetrics(Long monitorId, Instant startTime, Instant endTime, String agentRegion) {
         LOG.debug("Fetching agent metrics for monitor: {}, startTime: {}, endTime: {}, region: {}", 
             monitorId, startTime, endTime, agentRegion);
 
-        // Get heartbeats filtered by time range
         List<HttpHeartbeat> heartbeats = httpHeartbeatRepository
             .findByMonitorIdAndExecutedAtBetweenOrderByExecutedAtDesc(
                 monitorId, 
@@ -119,22 +103,18 @@ public class MonitorDetailService {
                 endTime != null ? endTime : Instant.now()
             );
 
-        // Filter by region if specified
         if (agentRegion != null && !agentRegion.isEmpty() && !agentRegion.equalsIgnoreCase("all")) {
             heartbeats = heartbeats.stream()
                 .filter(h -> h.getAgent() != null && 
-                           h.getAgent().getDatacenter() != null && 
-                           h.getAgent().getDatacenter().getRegion() != null && 
-                           agentRegion.equals(h.getAgent().getDatacenter().getRegion().getName()))
+                           h.getAgent().getRegion() != null && 
+                           agentRegion.equals(h.getAgent().getRegion().getName()))
                 .collect(Collectors.toList());
         }
 
-        // Group by agent
         Map<String, List<HttpHeartbeat>> heartbeatsByAgent = heartbeats.stream()
             .filter(h -> h.getAgent() != null)
             .collect(Collectors.groupingBy(h -> h.getAgent().getName()));
 
-        // Build agent metrics
         List<AgentMetricsDTO> agentMetrics = new ArrayList<>();
         
         for (Map.Entry<String, List<HttpHeartbeat>> entry : heartbeatsByAgent.entrySet()) {
@@ -142,8 +122,7 @@ public class MonitorDetailService {
             if (agentHeartbeats.isEmpty()) continue;
 
             Agent agent = agentHeartbeats.get(0).getAgent();
-            Datacenter datacenter = agent.getDatacenter();
-            Region region = datacenter != null ? datacenter.getRegion() : null;
+            Region region = agent.getRegion();
 
             HttpMonitor monitor = httpMonitorRepository.findById(monitorId).orElse(null);
             Integer warningThreshold = monitor != null ? monitor.getResponseTimeWarningMs() : null;
@@ -153,7 +132,6 @@ public class MonitorDetailService {
             Long successfulChecks = agentHeartbeats.stream().filter(h -> Boolean.TRUE.equals(h.getSuccess())).count();
             Long failedChecks = totalChecks - successfulChecks;
 
-            // Calculate warning and critical counts
             Long warningChecks = warningThreshold != null ? agentHeartbeats.stream()
                 .filter(h -> h.getResponseTimeMs() != null && h.getResponseTimeMs() >= warningThreshold && 
                            (criticalThreshold == null || h.getResponseTimeMs() < criticalThreshold))
@@ -171,7 +149,6 @@ public class MonitorDetailService {
 
             Double uptimePercentage = totalChecks > 0 ? (successfulChecks * 100.0) / totalChecks : 0.0;
 
-            // Calculate percentiles
             List<Integer> responseTimes = agentHeartbeats.stream()
                 .filter(h -> h.getResponseTimeMs() != null)
                 .map(HttpHeartbeat::getResponseTimeMs)
@@ -181,7 +158,6 @@ public class MonitorDetailService {
             Integer p95 = calculatePercentile(responseTimes, 95);
             Integer p99 = calculatePercentile(responseTimes, 99);
 
-            // Get latest check
             Instant lastCheckedAt = agentHeartbeats.get(0).getExecutedAt();
             Boolean lastSuccess = agentHeartbeats.get(0).getSuccess();
             Integer lastResponseTime = agentHeartbeats.get(0).getResponseTimeMs();
@@ -189,7 +165,7 @@ public class MonitorDetailService {
             AgentMetricsDTO dto = new AgentMetricsDTO(
                 agent.getName(),
                 region != null ? region.getName() : null,
-                datacenter != null ? datacenter.getName() : null,
+                region != null ? region.getName() : null,
                 totalChecks,
                 successfulChecks,
                 failedChecks,
@@ -207,7 +183,6 @@ public class MonitorDetailService {
             agentMetrics.add(dto);
         }
 
-        // Sort by region, then by agent name
         agentMetrics.sort(Comparator
             .comparing(AgentMetricsDTO::getAgentRegion, Comparator.nullsLast(Comparator.naturalOrder()))
             .thenComparing(AgentMetricsDTO::getAgentName));
@@ -215,9 +190,6 @@ public class MonitorDetailService {
         return agentMetrics;
     }
 
-    /**
-     * Get time-series data for charts
-     */
     public List<TimeSeriesDataDTO> getTimeSeriesData(Long monitorId, Instant startTime, Instant endTime, String agentRegion) {
         LOG.debug("Fetching time-series data for monitor: {}, startTime: {}, endTime: {}, region: {}", 
             monitorId, startTime, endTime, agentRegion);
@@ -229,21 +201,18 @@ public class MonitorDetailService {
                 endTime != null ? endTime : Instant.now()
             );
 
-        // Filter by region if specified
         if (agentRegion != null && !agentRegion.isEmpty() && !agentRegion.equalsIgnoreCase("all")) {
             heartbeats = heartbeats.stream()
                 .filter(h -> h.getAgent() != null && 
-                           h.getAgent().getDatacenter() != null && 
-                           h.getAgent().getDatacenter().getRegion() != null && 
-                           agentRegion.equals(h.getAgent().getDatacenter().getRegion().getName()))
+                           h.getAgent().getRegion() != null && 
+                           agentRegion.equals(h.getAgent().getRegion().getName()))
                 .collect(Collectors.toList());
         }
 
         return heartbeats.stream()
             .map(h -> {
                 Agent agent = h.getAgent();
-                Region region = agent != null && agent.getDatacenter() != null ? 
-                    agent.getDatacenter().getRegion() : null;
+                Region region = agent != null ? agent.getRegion() : null;
 
                 return new TimeSeriesDataDTO(
                     h.getExecutedAt(),
@@ -268,9 +237,6 @@ public class MonitorDetailService {
             .collect(Collectors.toList());
     }
 
-    /**
-     * Calculate percentile from sorted list of integers
-     */
     private Integer calculatePercentile(List<Integer> sortedValues, int percentile) {
         if (sortedValues == null || sortedValues.isEmpty()) {
             return null;

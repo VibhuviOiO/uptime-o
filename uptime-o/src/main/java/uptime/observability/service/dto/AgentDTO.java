@@ -16,7 +16,7 @@ public class AgentDTO implements Serializable {
     @Size(min = 1, max = 50)
     private String name;
 
-    private DatacenterDTO datacenter;
+    private RegionDTO region;
 
     public Long getId() {
         return id;
@@ -34,12 +34,12 @@ public class AgentDTO implements Serializable {
         this.name = name;
     }
 
-    public DatacenterDTO getDatacenter() {
-        return datacenter;
+    public RegionDTO getRegion() {
+        return region;
     }
 
-    public void setDatacenter(DatacenterDTO datacenter) {
-        this.datacenter = datacenter;
+    public void setRegion(RegionDTO region) {
+        this.region = region;
     }
 
     @Override
@@ -69,7 +69,7 @@ public class AgentDTO implements Serializable {
         return "AgentDTO{" +
             "id=" + getId() +
             ", name='" + getName() + "'" +
-            ", datacenter=" + getDatacenter() +
+            ", region=" + getRegion() +
             "}";
     }
 }

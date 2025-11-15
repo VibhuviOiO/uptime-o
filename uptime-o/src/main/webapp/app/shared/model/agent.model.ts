@@ -1,9 +1,9 @@
-import { IDatacenter } from 'app/shared/model/datacenter.model';
+import { IRegion } from 'app/shared/model/region.model';
 
 export interface IAgent {
   id?: number;
   name?: string;
-  datacenter?: IDatacenter | null;
+  region?: IRegion | null;
 }
 
 export const defaultValue: Readonly<IAgent> = {};

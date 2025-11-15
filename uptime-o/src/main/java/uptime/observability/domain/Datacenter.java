@@ -33,9 +33,7 @@ public class Datacenter implements Serializable {
     @Column(name = "name", length = 50, nullable = false)
     private String name;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "datacenter")
-    @JsonIgnoreProperties(value = { "apiHeartbeats", "agentMonitors", "datacenter" }, allowSetters = true)
-    private Set<Agent> agents = new HashSet<>();
+
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnoreProperties(value = { "datacenters" }, allowSetters = true)
@@ -80,37 +78,6 @@ public class Datacenter implements Serializable {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public Set<Agent> getAgents() {
-        return this.agents;
-    }
-
-    public void setAgents(Set<Agent> agents) {
-        if (this.agents != null) {
-            this.agents.forEach(i -> i.setDatacenter(null));
-        }
-        if (agents != null) {
-            agents.forEach(i -> i.setDatacenter(this));
-        }
-        this.agents = agents;
-    }
-
-    public Datacenter agents(Set<Agent> agents) {
-        this.setAgents(agents);
-        return this;
-    }
-
-    public Datacenter addAgent(Agent agent) {
-        this.agents.add(agent);
-        agent.setDatacenter(this);
-        return this;
-    }
-
-    public Datacenter removeAgent(Agent agent) {
-        this.agents.remove(agent);
-        agent.setDatacenter(null);
-        return this;
     }
 
     public Region getRegion() {

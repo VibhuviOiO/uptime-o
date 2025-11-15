@@ -10,36 +10,36 @@ interface AgentEditModalProps {
   onSave?: () => void;
 }
 
-interface IDatacenter {
+interface IRegion {
   id?: number;
   name?: string;
 }
 
 export const AgentEditModal: React.FC<AgentEditModalProps> = ({ isOpen, toggle, agentId, onSave }) => {
-  const [formData, setFormData] = useState({ name: '', datacenterId: '' });
+  const [formData, setFormData] = useState({ name: '', regionId: '' });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [loading, setLoading] = useState(false);
-  const [datacenters, setDatacenters] = useState<IDatacenter[]>([]);
+  const [regions, setRegions] = useState<IRegion[]>([]);
 
   const isNew = !agentId;
 
   useEffect(() => {
     if (isOpen) {
-      loadDatacenters();
+      loadRegions();
       if (isNew) {
-        setFormData({ name: '', datacenterId: '' });
+        setFormData({ name: '', regionId: '' });
       } else if (agentId) {
         loadAgent(agentId);
       }
     }
   }, [isOpen, agentId, isNew]);
 
-  const loadDatacenters = async () => {
+  const loadRegions = async () => {
     try {
-      const response = await axios.get<IDatacenter[]>('/api/datacenters?page=0&size=1000&sort=name,asc');
-      setDatacenters(response.data);
+      const response = await axios.get<IRegion[]>('/api/regions?page=0&size=1000&sort=name,asc');
+      setRegions(response.data);
     } catch (error) {
-      toast.error('Failed to load datacenters');
+      toast.error('Failed to load regions');
     }
   };
 
@@ -49,7 +49,7 @@ export const AgentEditModal: React.FC<AgentEditModalProps> = ({ isOpen, toggle, 
       const agent = response.data;
       setFormData({
         name: agent.name || '',
-        datacenterId: agent.datacenter?.id ? String(agent.datacenter.id) : '',
+        regionId: agent.region?.id ? String(agent.region.id) : '',
       });
     } catch (error) {
       toast.error('Failed to load agent');
@@ -101,8 +101,8 @@ export const AgentEditModal: React.FC<AgentEditModalProps> = ({ isOpen, toggle, 
         name: formData.name,
       };
 
-      if (formData.datacenterId) {
-        data.datacenter = { id: parseInt(formData.datacenterId, 10) };
+      if (formData.regionId) {
+        data.region = { id: parseInt(formData.regionId, 10) };
       }
 
       if (isNew) {
@@ -144,20 +144,13 @@ export const AgentEditModal: React.FC<AgentEditModalProps> = ({ isOpen, toggle, 
             {errors.name && <div className="invalid-feedback d-block">{errors.name}</div>}
           </FormGroup>
           <FormGroup>
-            <Label for="datacenterId">Datacenter (Optional)</Label>
-            <Input
-              type="select"
-              name="datacenterId"
-              id="datacenterId"
-              value={formData.datacenterId}
-              onChange={handleChange}
-              disabled={loading}
-            >
-              <option value="">-- Select Datacenter --</option>
-              {datacenters &&
-                datacenters.map(datacenter => (
-                  <option key={datacenter.id} value={datacenter.id}>
-                    {datacenter.name}
+            <Label for="regionId">Region (Optional)</Label>
+            <Input type="select" name="regionId" id="regionId" value={formData.regionId} onChange={handleChange} disabled={loading}>
+              <option value="">-- Select Region --</option>
+              {regions &&
+                regions.map(region => (
+                  <option key={region.id} value={region.id}>
+                    {region.name}
                   </option>
                 ))}
             </Input>

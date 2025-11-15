@@ -56,7 +56,7 @@
                                  baseTableName="agent_monitors"
                                  constraintName="fk_agent_monitors_monitor_id"
                                  referencedColumnNames="id"
-                                 referencedTableName="api_monitors"/>
+                                 referencedTableName="http_monitors"/>
     </changeSet>
 
     <!-- Add unique constraint on agent_id + monitor_id -->

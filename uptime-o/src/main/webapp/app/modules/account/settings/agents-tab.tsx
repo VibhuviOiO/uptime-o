@@ -7,7 +7,7 @@ import { toast } from 'react-toastify';
 import { AgentEditModal } from 'app/modules/home/components/AgentEditModal';
 import AgentDeleteModal from 'app/modules/home/components/AgentDeleteModal';
 
-interface IDatacenter {
+interface IRegion {
   id?: number;
   name?: string;
 }
@@ -16,8 +16,8 @@ interface IAgent {
   id?: number;
   name?: string;
   agentCode?: string;
-  datacenterId?: number;
-  datacenter?: IDatacenter;
+  regionId?: number;
+  region?: IRegion;
 }
 
 export const AgentsTab = () => {
@@ -107,7 +107,7 @@ export const AgentsTab = () => {
           <thead>
             <tr>
               <th>Name</th>
-              <th>Datacenter</th>
+              <th>Region</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -115,7 +115,7 @@ export const AgentsTab = () => {
             {agents.map((agent, i) => (
               <tr key={`entity-${i}`}>
                 <td>{agent.name}</td>
-                <td>{agent.datacenter?.name || '-'}</td>
+                <td>{agent.region?.name || '-'}</td>
                 <td>
                   <Button
                     color="link"

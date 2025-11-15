@@ -37,8 +37,8 @@ public class Agent implements Serializable {
     private Set<AgentMonitor> agentMonitors = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "agents", "region" }, allowSetters = true)
-    private Datacenter datacenter;
+    @JsonIgnoreProperties(value = { "agents", "datacenters" }, allowSetters = true)
+    private Region region;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -99,16 +99,16 @@ public class Agent implements Serializable {
         return this;
     }
 
-    public Datacenter getDatacenter() {
-        return this.datacenter;
+    public Region getRegion() {
+        return this.region;
     }
 
-    public void setDatacenter(Datacenter datacenter) {
-        this.datacenter = datacenter;
+    public void setRegion(Region region) {
+        this.region = region;
     }
 
-    public Agent datacenter(Datacenter datacenter) {
-        this.setDatacenter(datacenter);
+    public Agent region(Region region) {
+        this.setRegion(region);
         return this;
     }
 

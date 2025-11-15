@@ -88,12 +88,7 @@ public class HttpMetricsService {
             return null;
         }
 
-        Datacenter datacenter = agent.getDatacenter();
-        if (datacenter == null) {
-            return null;
-        }
-
-        Region region = datacenter.getRegion();
+        Region region = agent.getRegion();
 
         // Filter by region
         if (regionName != null && !regionName.isEmpty()) {
@@ -102,12 +97,7 @@ public class HttpMetricsService {
             }
         }
 
-        // Filter by datacenter
-        if (datacenterName != null && !datacenterName.isEmpty()) {
-            if (!datacenter.getName().equalsIgnoreCase(datacenterName)) {
-                return null;
-            }
-        }
+
 
         // Filter by agent
         if (agentName != null && !agentName.isEmpty()) {
@@ -126,7 +116,7 @@ public class HttpMetricsService {
             latestHeartbeat.getSuccess(),
             agentCount != null ? agentCount : 0,
             region != null ? region.getName() : "-",
-            datacenter.getName(),
+            region != null ? region.getName() : "-",
             agent.getName(),
             latestHeartbeat.getExecutedAt(),
             latestHeartbeat.getResponseTimeMs() != null ? latestHeartbeat.getResponseTimeMs() : 0
