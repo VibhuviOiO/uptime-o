@@ -1,4 +1,3 @@
-import schedule from 'app/entities/schedule/schedule.reducer';
 import httpMonitor from 'app/entities/http-monitor/http-monitor.reducer';
 import region from 'app/entities/region/region.reducer';
 import datacenter from 'app/entities/datacenter/datacenter.reducer';
@@ -12,7 +11,6 @@ import serviceHeartbeat from 'app/entities/service-heartbeat/service-heartbeat.r
 /* jhipster-needle-add-reducer-import - JHipster will add reducer here */
 
 const entitiesReducers = {
-  schedule,
   httpMonitor,
   region,
   datacenter,

@@ -27,7 +27,7 @@ import { RegionsTab } from './regions-tab';
 import { DatacentersTab } from './datacenters-tab';
 import { InstancesTab } from './instances-tab';
 import { ServicesTab } from './services-tab';
-import { SchedulesTab } from './schedules-tab';
+import { HttpMonitorsTab } from './http-monitors-tab';
 import { AgentsTab } from './agents-tab';
 import BrandingTab from 'app/entities/branding/branding-tab';
 import './settings.scss';
@@ -39,7 +39,7 @@ export type SettingsTab =
   | 'datacenters'
   | 'instances'
   | 'services'
-  | 'schedules'
+  | 'http-monitors'
   | 'agents'
   | 'branding'
   | 'user'
@@ -61,7 +61,7 @@ export const SettingsPage = () => {
       'datacenters',
       'instances',
       'services',
-      'schedules',
+      'http-monitors',
       'agents',
       'branding',
       'user',
@@ -79,7 +79,7 @@ export const SettingsPage = () => {
           tab === 'datacenters' ||
           tab === 'instances' ||
           tab === 'services' ||
-          tab === 'schedules' ||
+          tab === 'http-monitors' ||
           tab === 'agents' ||
           tab === 'branding')
       ) {
@@ -111,8 +111,8 @@ export const SettingsPage = () => {
         return isAdmin ? <InstancesTab /> : <ProfileTab />;
       case 'services':
         return isAdmin ? <ServicesTab /> : <ProfileTab />;
-      case 'schedules':
-        return isAdmin ? <SchedulesTab /> : <ProfileTab />;
+      case 'http-monitors':
+        return isAdmin ? <HttpMonitorsTab /> : <ProfileTab />;
       case 'agents':
         return isAdmin ? <AgentsTab /> : <ProfileTab />;
       case 'branding':
@@ -173,17 +173,19 @@ export const SettingsPage = () => {
                     <FontAwesomeIcon icon={faServer} className="me-2" />
                     Services
                   </button>
-                  <button className={`nav-link ${activeTab === 'schedules' ? 'active' : ''}`} onClick={() => handleTabChange('schedules')}>
-                    <FontAwesomeIcon icon={faClock} className="me-2" />
-                    Schedules
+                  <button
+                    className={`nav-link ${activeTab === 'http-monitors' ? 'active' : ''}`}
+                    onClick={() => handleTabChange('http-monitors')}
+                  >
+                    <FontAwesomeIcon icon={faGlobe} className="me-2" />
+                    HTTP Monitors
                   </button>
+                  <div className="nav-section-divider">
+                    <span className="text-muted small">👁️ WATCHERS</span>
+                  </div>
                   <button className={`nav-link ${activeTab === 'agents' ? 'active' : ''}`} onClick={() => handleTabChange('agents')}>
                     <FontAwesomeIcon icon={faRobot} className="me-2" />
                     Agents
-                  </button>
-                  <button className={`nav-link ${activeTab === 'branding' ? 'active' : ''}`} onClick={() => handleTabChange('branding')}>
-                    <FontAwesomeIcon icon={faPalette} className="me-2" />
-                    Branding
                   </button>
                 </>
               )}
@@ -194,6 +196,10 @@ export const SettingsPage = () => {
                   <div className="nav-section-divider">
                     <span className="text-muted small">👤 ADMINISTRATION</span>
                   </div>
+                  <button className={`nav-link ${activeTab === 'branding' ? 'active' : ''}`} onClick={() => handleTabChange('branding')}>
+                    <FontAwesomeIcon icon={faPalette} className="me-2" />
+                    Branding
+                  </button>
                   <button className={`nav-link ${activeTab === 'user' ? 'active' : ''}`} onClick={() => handleTabChange('user')}>
                     <FontAwesomeIcon icon={faUsers} className="me-2" />
                     User Management

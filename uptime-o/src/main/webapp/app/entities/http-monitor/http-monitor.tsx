@@ -176,7 +176,7 @@ export const HttpMonitor = () => {
                     <tr>
                       <th>Name</th>
                       <th>URL</th>
-                      <th>Schedule</th>
+                      <th>Interval</th>
                       <th>Headers</th>
                       <th>Body</th>
                       <th>Mapped Agents</th>

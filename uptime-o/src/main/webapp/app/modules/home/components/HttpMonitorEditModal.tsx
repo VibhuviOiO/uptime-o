@@ -5,7 +5,6 @@ import { faPlus, faSync } from '@fortawesome/free-solid-svg-icons';
 import { IHttpMonitor } from 'app/shared/model/http-monitor.model';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import { ScheduleEditModal } from './ScheduleEditModal';
 
 interface HttpMonitorEditModalProps {
   isOpen: boolean;
@@ -45,8 +44,7 @@ export const HttpMonitorEditModal: React.FC<HttpMonitorEditModalProps> = ({ isOp
   });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [updating, setUpdating] = useState(false);
-  const [schedules, setSchedules] = useState<any[]>([]);
-  const [scheduleModalOpen, setScheduleModalOpen] = useState(false);
+
   const [groupMonitors, setGroupMonitors] = useState<IHttpMonitor[]>([]);
   const [selectedParentId, setSelectedParentId] = useState<number | null>(null);
   const [showExecutionSettings, setShowExecutionSettings] = useState(false);
@@ -58,7 +56,6 @@ export const HttpMonitorEditModal: React.FC<HttpMonitorEditModalProps> = ({ isOp
 
   useEffect(() => {
     if (isOpen) {
-      loadSchedules();
       loadGroupMonitors();
       if (isNew) {
         setFormData({
@@ -120,15 +117,6 @@ export const HttpMonitorEditModal: React.FC<HttpMonitorEditModalProps> = ({ isOp
       }
     }
   }, [isOpen, monitor, isNew]);
-
-  const loadSchedules = async () => {
-    try {
-      const response = await axios.get('/api/schedules?page=0&size=1000&sort=id,desc');
-      setSchedules(response.data);
-    } catch (error) {
-      console.error('Failed to load schedules:', error);
-    }
-  };
 
   const loadGroupMonitors = async () => {
     try {
@@ -201,22 +189,6 @@ export const HttpMonitorEditModal: React.FC<HttpMonitorEditModalProps> = ({ isOp
       setErrors(prev => ({
         ...prev,
         [name]: '',
-      }));
-    }
-  };
-
-  const loadSchedulePreset = (scheduleId: string) => {
-    const schedule = schedules.find(s => s.id === parseInt(scheduleId, 10));
-    if (schedule) {
-      setFormData(prev => ({
-        ...prev,
-        intervalSeconds: schedule.interval || prev.intervalSeconds,
-        timeoutSeconds: 30,
-        retryCount: 2,
-        retryDelaySeconds: 5,
-        responseTimeWarningMs: schedule.thresholdsWarning || prev.responseTimeWarningMs,
-        responseTimeCriticalMs: schedule.thresholdsCritical || prev.responseTimeCriticalMs,
-        includeResponseBody: schedule.includeResponseBody ?? prev.includeResponseBody,
       }));
     }
   };
@@ -460,44 +432,6 @@ export const HttpMonitorEditModal: React.FC<HttpMonitorEditModalProps> = ({ isOp
               </div>
               {showExecutionSettings && (
                 <div className="mt-2">
-                  <div className="d-flex align-items-center mb-2">
-                    <Label className="mb-0 me-2">Preload Execution Settings</Label>
-                    <Input
-                      type="select"
-                      onChange={e => {
-                        if (e.target.value) loadSchedulePreset(e.target.value);
-                      }}
-                      disabled={updating}
-                      style={{ fontSize: '0.75rem', width: 'auto', display: 'inline-block', padding: '0.2rem 0.5rem' }}
-                    >
-                      <option value="">Load preset...</option>
-                      {schedules.map(schedule => (
-                        <option key={schedule.id} value={schedule.id}>
-                          {schedule.name} ({schedule.interval}s)
-                        </option>
-                      ))}
-                    </Input>
-                    <Button
-                      color="link"
-                      size="sm"
-                      onClick={() => setScheduleModalOpen(true)}
-                      disabled={updating}
-                      title="Add new schedule"
-                      style={{ padding: '0.2rem 0.4rem', fontSize: '0.75rem' }}
-                    >
-                      <FontAwesomeIcon icon={faPlus} />
-                    </Button>
-                    <Button
-                      color="link"
-                      size="sm"
-                      onClick={loadSchedules}
-                      disabled={updating}
-                      title="Refresh schedules"
-                      style={{ padding: '0.2rem 0.4rem', fontSize: '0.75rem' }}
-                    >
-                      <FontAwesomeIcon icon={faSync} />
-                    </Button>
-                  </div>
                   <div className="row">
                     <div className="col-6">
                       <Label for="intervalSeconds" style={{ fontSize: '0.85rem' }}>
@@ -838,15 +772,6 @@ export const HttpMonitorEditModal: React.FC<HttpMonitorEditModalProps> = ({ isOp
           </div>
         </Form>
       </CardBody>
-      <ScheduleEditModal
-        isOpen={scheduleModalOpen}
-        toggle={() => setScheduleModalOpen(false)}
-        scheduleId={null}
-        onSave={() => {
-          loadSchedules();
-          setScheduleModalOpen(false);
-        }}
-      />
     </Card>
   );
 };

@@ -6,7 +6,7 @@ import { Collapse, Nav, Navbar, NavbarToggler } from 'reactstrap';
 import LoadingBar from 'react-redux-loading-bar';
 
 import { AccountMenu, AdminMenu } from '../menus';
-import { MonitoringMenu } from '../menus/main-menu';
+import { MonitoringMenu } from '../menus/monitoring';
 import { Brand } from './header-components';
 
 export interface IHeaderProps {

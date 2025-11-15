@@ -41,8 +41,6 @@ public class CacheConfiguration {
             createCache(cm, uptime.observability.repository.UserRepository.USERS_BY_LOGIN_CACHE);
             createCache(cm, uptime.observability.repository.UserRepository.USERS_BY_EMAIL_CACHE);
             createCache(cm, uptime.observability.domain.Authority.class.getName());
-            createCache(cm, uptime.observability.domain.Schedule.class.getName());
-            createCache(cm, uptime.observability.domain.Schedule.class.getName() + ".apiMonitors");
             createCache(cm, uptime.observability.domain.HttpMonitor.class.getName());
             createCache(cm, uptime.observability.domain.HttpMonitor.class.getName() + ".apiHeartbeats");
             createCache(cm, uptime.observability.domain.HttpMonitor.class.getName() + ".agentMonitors");

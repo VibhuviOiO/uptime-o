@@ -3,7 +3,6 @@ package uptime.observability.domain;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uptime.observability.domain.HttpHeartbeatTestSamples.*;
 import static uptime.observability.domain.HttpMonitorTestSamples.*;
-import static uptime.observability.domain.ScheduleTestSamples.*;
 
 import java.util.HashSet;
 import java.util.Set;
