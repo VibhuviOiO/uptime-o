@@ -18,6 +18,8 @@ export interface IHttpMonitor {
   resendNotificationCount?: number | null;
   certificateExpiryDays?: number | null;
   ignoreTlsError?: boolean | null;
+  checkSslCertificate?: boolean | null;
+  checkDnsResolution?: boolean | null;
   upsideDownMode?: boolean | null;
   maxRedirects?: number | null;
   description?: string | null;
@@ -40,6 +42,8 @@ export const defaultValue: Readonly<IHttpMonitor> = {
   resendNotificationCount: 0,
   certificateExpiryDays: 30,
   ignoreTlsError: false,
+  checkSslCertificate: true,
+  checkDnsResolution: true,
   upsideDownMode: false,
   maxRedirects: 10,
   description: '',

@@ -17,8 +17,13 @@ interface TimeSeriesData {
   responseServer?: string;
   responseCacheStatus?: string;
   dnsLookupMs?: number;
+  dnsResolvedIp?: string;
   tcpConnectMs?: number;
   tlsHandshakeMs?: number;
+  sslCertificateValid?: boolean;
+  sslCertificateExpiry?: string;
+  sslCertificateIssuer?: string;
+  sslDaysUntilExpiry?: number;
   timeToFirstByteMs?: number;
   rawResponseHeaders?: any;
   rawResponseBody?: any;
@@ -193,7 +198,60 @@ const MonitorHistoryModal: React.FC<MonitorHistoryModalProps> = ({
                   <span className="info-label">Cache Status</span>
                   <div className="info-value">{selectedRecord.responseCacheStatus || 'N/A'}</div>
                 </div>
+                {selectedRecord.dnsResolvedIp && (
+                  <div className="info-card">
+                    <span className="info-label">Resolved IP</span>
+                    <div className="info-value">{selectedRecord.dnsResolvedIp}</div>
+                  </div>
+                )}
               </div>
+
+              {/* SSL Certificate Info */}
+              {selectedRecord.sslCertificateExpiry && (
+                <div className="ssl-section">
+                  <h4 className="section-title">SSL Certificate</h4>
+                  <div className="info-grid">
+                    <div className="info-card">
+                      <span className="info-label">Status</span>
+                      <div className="info-value">
+                        <Badge
+                          color={
+                            !selectedRecord.sslCertificateValid
+                              ? 'danger'
+                              : selectedRecord.sslDaysUntilExpiry && selectedRecord.sslDaysUntilExpiry <= 7
+                                ? 'danger'
+                                : selectedRecord.sslDaysUntilExpiry && selectedRecord.sslDaysUntilExpiry <= 30
+                                  ? 'warning'
+                                  : 'success'
+                          }
+                        >
+                          {!selectedRecord.sslCertificateValid
+                            ? 'Invalid'
+                            : selectedRecord.sslDaysUntilExpiry && selectedRecord.sslDaysUntilExpiry <= 7
+                              ? 'Critical'
+                              : selectedRecord.sslDaysUntilExpiry && selectedRecord.sslDaysUntilExpiry <= 30
+                                ? 'Expiring Soon'
+                                : 'Valid'}
+                        </Badge>
+                      </div>
+                    </div>
+                    <div className="info-card">
+                      <span className="info-label">Expiry Date</span>
+                      <div className="info-value">{new Date(selectedRecord.sslCertificateExpiry).toLocaleDateString()}</div>
+                    </div>
+                    <div className="info-card">
+                      <span className="info-label">Days Until Expiry</span>
+                      <div className="info-value">{selectedRecord.sslDaysUntilExpiry} days</div>
+                    </div>
+                    {selectedRecord.sslCertificateIssuer && (
+                      <div className="info-card">
+                        <span className="info-label">Issuer</span>
+                        <div className="info-value">{selectedRecord.sslCertificateIssuer}</div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
 
               {/* Timing Breakdown */}
               {(selectedRecord.dnsLookupMs ||

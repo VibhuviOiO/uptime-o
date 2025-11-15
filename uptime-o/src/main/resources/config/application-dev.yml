@@ -40,8 +40,8 @@ spring:
       auto-commit: false
   liquibase:
     enabled: true
-    # Remove 'faker' if you do not want the sample data to be loaded automatically
-    contexts: dev
+    # Use 'realdata' context to load real monitoring data (2 agents, 8 monitors, 2 regions)
+    contexts: dev, realdata
   mail:
     host: localhost
     port: 25

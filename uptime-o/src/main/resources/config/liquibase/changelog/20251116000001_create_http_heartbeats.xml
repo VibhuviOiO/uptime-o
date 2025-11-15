@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="20251116000001-1" author="system">
+        <createTable tableName="http_heartbeats">
+            <column name="id" type="bigint">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="executed_at" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="success" type="boolean">
+                <constraints nullable="true"/>
+            </column>
+            <column name="response_time_ms" type="integer">
+                <constraints nullable="true"/>
+            </column>
+            <column name="response_size_bytes" type="integer">
+                <constraints nullable="true"/>
+            </column>
+            <column name="response_status_code" type="integer">
+                <constraints nullable="true"/>
+            </column>
+            <column name="response_content_type" type="varchar(50)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="response_server" type="varchar(50)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="response_cache_status" type="varchar(50)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="dns_lookup_ms" type="integer">
+                <constraints nullable="true"/>
+            </column>
+            <column name="dns_resolved_ip" type="varchar(100)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="tcp_connect_ms" type="integer">
+                <constraints nullable="true"/>
+            </column>
+            <column name="tls_handshake_ms" type="integer">
+                <constraints nullable="true"/>
+            </column>
+            <column name="ssl_certificate_valid" type="boolean">
+                <constraints nullable="true"/>
+            </column>
+            <column name="ssl_certificate_expiry" type="timestamp">
+                <constraints nullable="true"/>
+            </column>
+            <column name="ssl_certificate_issuer" type="varchar(500)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="ssl_days_until_expiry" type="integer">
+                <constraints nullable="true"/>
+            </column>
+            <column name="time_to_first_byte_ms" type="integer">
+                <constraints nullable="true"/>
+            </column>
+            <column name="warning_threshold_ms" type="integer">
+                <constraints nullable="true"/>
+            </column>
+            <column name="critical_threshold_ms" type="integer">
+                <constraints nullable="true"/>
+            </column>
+            <column name="error_type" type="varchar(50)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="error_message" type="text">
+                <constraints nullable="true"/>
+            </column>
+            <column name="raw_request_headers" type="jsonb">
+                <constraints nullable="true"/>
+            </column>
+            <column name="raw_response_headers" type="jsonb">
+                <constraints nullable="true"/>
+            </column>
+            <column name="raw_response_body" type="jsonb">
+                <constraints nullable="true"/>
+            </column>
+            <column name="monitor_id" type="bigint">
+                <constraints nullable="true"/>
+            </column>
+            <column name="agent_id" type="bigint">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+        
+        <addForeignKeyConstraint baseColumnNames="monitor_id"
+                                 baseTableName="http_heartbeats"
+                                 constraintName="fk_http_heartbeats_monitor_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="http_monitors"/>
+                                 
+        <addForeignKeyConstraint baseColumnNames="agent_id"
+                                 baseTableName="http_heartbeats"
+                                 constraintName="fk_http_heartbeats_agent_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="agents"/>
+    </changeSet>
+
+</databaseChangeLog>

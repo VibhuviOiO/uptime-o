@@ -36,9 +36,21 @@ public class HttpHeartbeatDTO implements Serializable {
 
     private Integer dnsLookupMs;
 
+    @Size(max = 100)
+    private String dnsResolvedIp;
+
     private Integer tcpConnectMs;
 
     private Integer tlsHandshakeMs;
+
+    private Boolean sslCertificateValid;
+
+    private Instant sslCertificateExpiry;
+
+    @Size(max = 500)
+    private String sslCertificateIssuer;
+
+    private Integer sslDaysUntilExpiry;
 
     private Integer timeToFirstByteMs;
 
@@ -141,6 +153,14 @@ public class HttpHeartbeatDTO implements Serializable {
         this.dnsLookupMs = dnsLookupMs;
     }
 
+    public String getDnsResolvedIp() {
+        return dnsResolvedIp;
+    }
+
+    public void setDnsResolvedIp(String dnsResolvedIp) {
+        this.dnsResolvedIp = dnsResolvedIp;
+    }
+
     public Integer getTcpConnectMs() {
         return tcpConnectMs;
     }
@@ -155,6 +175,38 @@ public class HttpHeartbeatDTO implements Serializable {
 
     public void setTlsHandshakeMs(Integer tlsHandshakeMs) {
         this.tlsHandshakeMs = tlsHandshakeMs;
+    }
+
+    public Boolean getSslCertificateValid() {
+        return sslCertificateValid;
+    }
+
+    public void setSslCertificateValid(Boolean sslCertificateValid) {
+        this.sslCertificateValid = sslCertificateValid;
+    }
+
+    public Instant getSslCertificateExpiry() {
+        return sslCertificateExpiry;
+    }
+
+    public void setSslCertificateExpiry(Instant sslCertificateExpiry) {
+        this.sslCertificateExpiry = sslCertificateExpiry;
+    }
+
+    public String getSslCertificateIssuer() {
+        return sslCertificateIssuer;
+    }
+
+    public void setSslCertificateIssuer(String sslCertificateIssuer) {
+        this.sslCertificateIssuer = sslCertificateIssuer;
+    }
+
+    public Integer getSslDaysUntilExpiry() {
+        return sslDaysUntilExpiry;
+    }
+
+    public void setSslDaysUntilExpiry(Integer sslDaysUntilExpiry) {
+        this.sslDaysUntilExpiry = sslDaysUntilExpiry;
     }
 
     public Integer getTimeToFirstByteMs() {

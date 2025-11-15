@@ -35,6 +35,8 @@ export const HttpMonitorEditModal: React.FC<HttpMonitorEditModalProps> = ({ isOp
     resendNotificationCount: 0,
     certificateExpiryDays: 30,
     ignoreTlsError: false,
+    checkSslCertificate: true,
+    checkDnsResolution: true,
     upsideDownMode: false,
     maxRedirects: 10,
     description: '',
@@ -78,6 +80,8 @@ export const HttpMonitorEditModal: React.FC<HttpMonitorEditModalProps> = ({ isOp
           resendNotificationCount: 0,
           certificateExpiryDays: 30,
           ignoreTlsError: false,
+          checkSslCertificate: true,
+          checkDnsResolution: true,
           upsideDownMode: false,
           maxRedirects: 10,
           description: '',
@@ -104,12 +108,15 @@ export const HttpMonitorEditModal: React.FC<HttpMonitorEditModalProps> = ({ isOp
           resendNotificationCount: monitor.resendNotificationCount || 0,
           certificateExpiryDays: monitor.certificateExpiryDays || 30,
           ignoreTlsError: monitor.ignoreTlsError || false,
+          checkSslCertificate: monitor.checkSslCertificate ?? true,
+          checkDnsResolution: monitor.checkDnsResolution ?? true,
           upsideDownMode: monitor.upsideDownMode || false,
           maxRedirects: monitor.maxRedirects || 10,
           description: monitor.description || '',
           tags: monitor.tags || '',
           monitoringVisibility: monitor.monitoringVisibility || 'internal',
         });
+        setSelectedParentId(monitor.parentId || null);
       }
     }
   }, [isOpen, monitor, isNew]);
@@ -249,6 +256,8 @@ export const HttpMonitorEditModal: React.FC<HttpMonitorEditModalProps> = ({ isOp
           dataToSubmit.resendNotificationCount = formData.resendNotificationCount;
           dataToSubmit.certificateExpiryDays = formData.certificateExpiryDays;
           dataToSubmit.ignoreTlsError = formData.ignoreTlsError;
+          dataToSubmit.checkSslCertificate = formData.checkSslCertificate;
+          dataToSubmit.checkDnsResolution = formData.checkDnsResolution;
           dataToSubmit.upsideDownMode = formData.upsideDownMode;
           dataToSubmit.maxRedirects = formData.maxRedirects;
           dataToSubmit.tags = formData.tags;
@@ -302,6 +311,8 @@ export const HttpMonitorEditModal: React.FC<HttpMonitorEditModalProps> = ({ isOp
           resendNotificationCount: 0,
           certificateExpiryDays: 30,
           ignoreTlsError: false,
+          checkSslCertificate: true,
+          checkDnsResolution: true,
           upsideDownMode: false,
           maxRedirects: 10,
           description: '',
@@ -330,9 +341,9 @@ export const HttpMonitorEditModal: React.FC<HttpMonitorEditModalProps> = ({ isOp
             <Label for="type">Type *</Label>
             <Input type="select" name="type" id="type" value={formData.type} onChange={handleChange} disabled={updating}>
               <option value="">Select...</option>
-              <option value="http">http</option>
-              <option value="http-keyword">http - keyword</option>
-              <option value="http-json">http - json</option>
+              <option value="HTTPS">HTTPS</option>
+              <option value="http-keyword">HTTPS - keyword</option>
+              <option value="http-json">HTTPS - json</option>
               <option value="group">group</option>
             </Input>
           </FormGroup>
@@ -359,6 +370,8 @@ export const HttpMonitorEditModal: React.FC<HttpMonitorEditModalProps> = ({ isOp
                 <option value="PUT">PUT</option>
                 <option value="DELETE">DELETE</option>
                 <option value="PATCH">PATCH</option>
+                <option value="HEAD">HEAD</option>
+                <option value="OPTIONS">OPTIONS</option>
               </Input>
             </FormGroup>
           )}
@@ -685,6 +698,40 @@ export const HttpMonitorEditModal: React.FC<HttpMonitorEditModalProps> = ({ isOp
                         disabled={updating}
                         min="0"
                       />
+                    </div>
+                  </div>
+                  <div className="row mt-2">
+                    <div className="col-6">
+                      <div className="form-check">
+                        <input
+                          className="form-check-input"
+                          type="checkbox"
+                          name="checkSslCertificate"
+                          id="checkSslCertificate"
+                          checked={formData.checkSslCertificate}
+                          onChange={handleChange}
+                          disabled={updating}
+                        />
+                        <label className="form-check-label" htmlFor="checkSslCertificate" style={{ fontSize: '0.85rem' }}>
+                          Check SSL Certificate
+                        </label>
+                      </div>
+                    </div>
+                    <div className="col-6">
+                      <div className="form-check">
+                        <input
+                          className="form-check-input"
+                          type="checkbox"
+                          name="checkDnsResolution"
+                          id="checkDnsResolution"
+                          checked={formData.checkDnsResolution}
+                          onChange={handleChange}
+                          disabled={updating}
+                        />
+                        <label className="form-check-label" htmlFor="checkDnsResolution" style={{ fontSize: '0.85rem' }}>
+                          Check DNS Resolution
+                        </label>
+                      </div>
                     </div>
                   </div>
                   <div className="row mt-2">

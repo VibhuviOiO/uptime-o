@@ -13,8 +13,13 @@ export interface IHttpHeartbeat {
   responseServer?: string | null;
   responseCacheStatus?: string | null;
   dnsLookupMs?: number | null;
+  dnsResolvedIp?: string | null;
   tcpConnectMs?: number | null;
   tlsHandshakeMs?: number | null;
+  sslCertificateValid?: boolean | null;
+  sslCertificateExpiry?: dayjs.Dayjs | null;
+  sslCertificateIssuer?: string | null;
+  sslDaysUntilExpiry?: number | null;
   timeToFirstByteMs?: number | null;
   warningThresholdMs?: number | null;
   criticalThresholdMs?: number | null;

@@ -91,6 +91,12 @@ public class HttpMonitor implements Serializable {
     @Column(name = "ignore_tls_error")
     private Boolean ignoreTlsError;
 
+    @Column(name = "check_ssl_certificate")
+    private Boolean checkSslCertificate;
+
+    @Column(name = "check_dns_resolution")
+    private Boolean checkDnsResolution;
+
     @Column(name = "upside_down_mode")
     private Boolean upsideDownMode;
 
@@ -435,6 +441,32 @@ public class HttpMonitor implements Serializable {
 
     public void setIgnoreTlsError(Boolean ignoreTlsError) {
         this.ignoreTlsError = ignoreTlsError;
+    }
+
+    public Boolean getCheckSslCertificate() {
+        return this.checkSslCertificate;
+    }
+
+    public HttpMonitor checkSslCertificate(Boolean checkSslCertificate) {
+        this.setCheckSslCertificate(checkSslCertificate);
+        return this;
+    }
+
+    public void setCheckSslCertificate(Boolean checkSslCertificate) {
+        this.checkSslCertificate = checkSslCertificate;
+    }
+
+    public Boolean getCheckDnsResolution() {
+        return this.checkDnsResolution;
+    }
+
+    public HttpMonitor checkDnsResolution(Boolean checkDnsResolution) {
+        this.setCheckDnsResolution(checkDnsResolution);
+        return this;
+    }
+
+    public void setCheckDnsResolution(Boolean checkDnsResolution) {
+        this.checkDnsResolution = checkDnsResolution;
     }
 
     public Boolean getUpsideDownMode() {

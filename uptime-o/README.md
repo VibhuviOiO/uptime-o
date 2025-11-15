@@ -60,6 +60,34 @@ Add the `help` flag on any command to see how you can use it. For example, `./np
 
 The `./npmw run` command will list all the scripts available to run for this project.
 
+### Running Monitoring Agents
+
+To receive monitoring heartbeats, run 2 agents (seeded data includes Agent ID 1 and 2):
+
+```bash
+# Agent 1 (US-East-Agent, Virginia datacenter)
+docker run -d \
+  --name agent-va \
+  --network host \
+  -e AGENT_ID="1" \
+  -e API_BASE_URL="http://localhost:8080" \
+  -e API_KEY="your_api_key_here" \
+  -v "$(pwd)/tmp/data/agent-va:/data" \
+  ghcr.io/vibhuvioio/uptimeo-agent:latest
+
+# Agent 2 (US-West-Agent, San Francisco datacenter)
+docker run -d \
+  --name agent-sf \
+  --network host \
+  -e AGENT_ID="2" \
+  -e API_BASE_URL="http://localhost:8080" \
+  -e API_KEY="your_api_key_here" \
+  -v "$(pwd)/tmp/data/agent-sf:/data" \
+  ghcr.io/vibhuvioio/uptimeo-agent:latest
+```
+
+Both agents will monitor all 8 seeded HTTP monitors every 60 seconds.
+
 ### PWA Support
 
 JHipster ships with PWA (Progressive Web App) support, and it's turned off by default. One of the main components of a PWA is a service worker.

@@ -15,6 +15,8 @@ import {
   faChartLine,
   faHeartbeat,
   faTachometerAlt,
+  faShieldAlt,
+  faCalendarAlt,
 } from '@fortawesome/free-solid-svg-icons';
 import { Card, CardBody, Badge, Button, Row, Col, Input, Label } from 'reactstrap';
 import axios from 'axios';
@@ -61,6 +63,11 @@ interface AgentMetrics {
   lastCheckedAt: string;
   lastSuccess: boolean;
   lastResponseTime: number;
+  sslCertificateValid?: boolean;
+  sslCertificateExpiry?: string;
+  sslCertificateIssuer?: string;
+  sslDaysUntilExpiry?: number;
+  dnsResolvedIp?: string;
 }
 
 interface TimeSeriesData {
@@ -497,6 +504,40 @@ const MonitorDetail: React.FC = () => {
                             <div className="tile-value">{agent.p99ResponseTime} ms</div>
                           </div>
                         </div>
+
+                        {/* SSL Certificate Tile */}
+                        {agent.sslCertificateExpiry && (
+                          <div className="info-tile stat-tile ssl">
+                            <div className="tile-icon">
+                              <FontAwesomeIcon icon={faShieldAlt} />
+                            </div>
+                            <div className="tile-content">
+                              <div className="tile-label">SSL CERT</div>
+                              <div className="tile-value">
+                                <Badge
+                                  color={
+                                    !agent.sslCertificateValid
+                                      ? 'danger'
+                                      : agent.sslDaysUntilExpiry && agent.sslDaysUntilExpiry <= 7
+                                        ? 'danger'
+                                        : agent.sslDaysUntilExpiry && agent.sslDaysUntilExpiry <= 30
+                                          ? 'warning'
+                                          : 'success'
+                                  }
+                                >
+                                  {!agent.sslCertificateValid
+                                    ? 'Invalid'
+                                    : agent.sslDaysUntilExpiry && agent.sslDaysUntilExpiry <= 7
+                                      ? 'Critical'
+                                      : agent.sslDaysUntilExpiry && agent.sslDaysUntilExpiry <= 30
+                                        ? 'Expiring'
+                                        : 'Valid'}
+                                </Badge>
+                              </div>
+                              {agent.sslDaysUntilExpiry && <div className="tile-subtitle">{agent.sslDaysUntilExpiry} days left</div>}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>

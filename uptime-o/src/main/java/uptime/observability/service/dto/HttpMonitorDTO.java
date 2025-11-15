@@ -64,6 +64,10 @@ public class HttpMonitorDTO implements Serializable {
 
     private Boolean ignoreTlsError;
 
+    private Boolean checkSslCertificate;
+
+    private Boolean checkDnsResolution;
+
     private Boolean upsideDownMode;
 
     private Integer maxRedirects;
@@ -227,6 +231,22 @@ public class HttpMonitorDTO implements Serializable {
 
     public void setIgnoreTlsError(Boolean ignoreTlsError) {
         this.ignoreTlsError = ignoreTlsError;
+    }
+
+    public Boolean getCheckSslCertificate() {
+        return checkSslCertificate;
+    }
+
+    public void setCheckSslCertificate(Boolean checkSslCertificate) {
+        this.checkSslCertificate = checkSslCertificate;
+    }
+
+    public Boolean getCheckDnsResolution() {
+        return checkDnsResolution;
+    }
+
+    public void setCheckDnsResolution(Boolean checkDnsResolution) {
+        this.checkDnsResolution = checkDnsResolution;
     }
 
     public Boolean getUpsideDownMode() {

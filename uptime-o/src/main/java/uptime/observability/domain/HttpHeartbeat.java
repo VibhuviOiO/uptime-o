@@ -55,11 +55,28 @@ public class HttpHeartbeat implements Serializable {
     @Column(name = "dns_lookup_ms")
     private Integer dnsLookupMs;
 
+    @Size(max = 100)
+    @Column(name = "dns_resolved_ip", length = 100)
+    private String dnsResolvedIp;
+
     @Column(name = "tcp_connect_ms")
     private Integer tcpConnectMs;
 
     @Column(name = "tls_handshake_ms")
     private Integer tlsHandshakeMs;
+
+    @Column(name = "ssl_certificate_valid")
+    private Boolean sslCertificateValid;
+
+    @Column(name = "ssl_certificate_expiry")
+    private Instant sslCertificateExpiry;
+
+    @Size(max = 500)
+    @Column(name = "ssl_certificate_issuer", length = 500)
+    private String sslCertificateIssuer;
+
+    @Column(name = "ssl_days_until_expiry")
+    private Integer sslDaysUntilExpiry;
 
     @Column(name = "time_to_first_byte_ms")
     private Integer timeToFirstByteMs;
@@ -229,6 +246,19 @@ public class HttpHeartbeat implements Serializable {
         this.dnsLookupMs = dnsLookupMs;
     }
 
+    public String getDnsResolvedIp() {
+        return this.dnsResolvedIp;
+    }
+
+    public HttpHeartbeat dnsResolvedIp(String dnsResolvedIp) {
+        this.setDnsResolvedIp(dnsResolvedIp);
+        return this;
+    }
+
+    public void setDnsResolvedIp(String dnsResolvedIp) {
+        this.dnsResolvedIp = dnsResolvedIp;
+    }
+
     public Integer getTcpConnectMs() {
         return this.tcpConnectMs;
     }
@@ -253,6 +283,58 @@ public class HttpHeartbeat implements Serializable {
 
     public void setTlsHandshakeMs(Integer tlsHandshakeMs) {
         this.tlsHandshakeMs = tlsHandshakeMs;
+    }
+
+    public Boolean getSslCertificateValid() {
+        return this.sslCertificateValid;
+    }
+
+    public HttpHeartbeat sslCertificateValid(Boolean sslCertificateValid) {
+        this.setSslCertificateValid(sslCertificateValid);
+        return this;
+    }
+
+    public void setSslCertificateValid(Boolean sslCertificateValid) {
+        this.sslCertificateValid = sslCertificateValid;
+    }
+
+    public Instant getSslCertificateExpiry() {
+        return this.sslCertificateExpiry;
+    }
+
+    public HttpHeartbeat sslCertificateExpiry(Instant sslCertificateExpiry) {
+        this.setSslCertificateExpiry(sslCertificateExpiry);
+        return this;
+    }
+
+    public void setSslCertificateExpiry(Instant sslCertificateExpiry) {
+        this.sslCertificateExpiry = sslCertificateExpiry;
+    }
+
+    public String getSslCertificateIssuer() {
+        return this.sslCertificateIssuer;
+    }
+
+    public HttpHeartbeat sslCertificateIssuer(String sslCertificateIssuer) {
+        this.setSslCertificateIssuer(sslCertificateIssuer);
+        return this;
+    }
+
+    public void setSslCertificateIssuer(String sslCertificateIssuer) {
+        this.sslCertificateIssuer = sslCertificateIssuer;
+    }
+
+    public Integer getSslDaysUntilExpiry() {
+        return this.sslDaysUntilExpiry;
+    }
+
+    public HttpHeartbeat sslDaysUntilExpiry(Integer sslDaysUntilExpiry) {
+        this.setSslDaysUntilExpiry(sslDaysUntilExpiry);
+        return this;
+    }
+
+    public void setSslDaysUntilExpiry(Integer sslDaysUntilExpiry) {
+        this.sslDaysUntilExpiry = sslDaysUntilExpiry;
     }
 
     public Integer getTimeToFirstByteMs() {

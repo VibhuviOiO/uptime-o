@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="99999999999999-1" author="system" context="realdata">
+        <!-- Schedules -->
+        <insert tableName="schedules">
+            <column name="id" valueNumeric="1"/>
+            <column name="name" value="60s GET"/>
+            <column name="interval" valueNumeric="60"/>
+            <column name="include_response_body" valueBoolean="true"/>
+            <column name="thresholds_warning" valueNumeric="500"/>
+            <column name="thresholds_critical" valueNumeric="1000"/>
+        </insert>
+
+        <!-- HTTP Monitors -->
+        <insert tableName="http_monitors">
+            <column name="id" valueNumeric="1"/>
+            <column name="name" value="ISRO Spacecrafts"/>
+            <column name="method" value="GET"/>
+            <column name="type" value="HTTPS"/>
+            <column name="url" value="https://isro.vercel.app/api/spacecrafts"/>
+            <column name="interval_seconds" valueNumeric="60"/>
+            <column name="timeout_seconds" valueNumeric="30"/>
+            <column name="retry_count" valueNumeric="2"/>
+            <column name="retry_delay_seconds" valueNumeric="5"/>
+            <column name="response_time_warning_ms" valueNumeric="500"/>
+            <column name="response_time_critical_ms" valueNumeric="1000"/>
+            <column name="enabled" valueBoolean="true"/>
+        </insert>
+        <insert tableName="http_monitors">
+            <column name="id" valueNumeric="2"/>
+            <column name="name" value="ISRO Launchers"/>
+            <column name="method" value="GET"/>
+            <column name="type" value="HTTPS"/>
+            <column name="url" value="https://isro.vercel.app/api/launchers"/>
+            <column name="interval_seconds" valueNumeric="60"/>
+            <column name="timeout_seconds" valueNumeric="30"/>
+            <column name="retry_count" valueNumeric="2"/>
+            <column name="retry_delay_seconds" valueNumeric="5"/>
+            <column name="response_time_warning_ms" valueNumeric="500"/>
+            <column name="response_time_critical_ms" valueNumeric="1000"/>
+            <column name="enabled" valueBoolean="true"/>
+        </insert>
+        <insert tableName="http_monitors">
+            <column name="id" valueNumeric="3"/>
+            <column name="name" value="ISRO Customer Satellites"/>
+            <column name="method" value="GET"/>
+            <column name="type" value="HTTPS"/>
+            <column name="url" value="https://isro.vercel.app/api/customer_satellites"/>
+            <column name="interval_seconds" valueNumeric="60"/>
+            <column name="timeout_seconds" valueNumeric="30"/>
+            <column name="retry_count" valueNumeric="2"/>
+            <column name="retry_delay_seconds" valueNumeric="5"/>
+            <column name="response_time_warning_ms" valueNumeric="500"/>
+            <column name="response_time_critical_ms" valueNumeric="1000"/>
+            <column name="enabled" valueBoolean="true"/>
+        </insert>
+        <insert tableName="http_monitors">
+            <column name="id" valueNumeric="4"/>
+            <column name="name" value="Aviation Weather METAR"/>
+            <column name="method" value="GET"/>
+            <column name="type" value="HTTPS"/>
+            <column name="url" value="https://aviationweather.gov/api/data/metar?ids=KMCI&amp;format=json"/>
+            <column name="interval_seconds" valueNumeric="60"/>
+            <column name="timeout_seconds" valueNumeric="30"/>
+            <column name="retry_count" valueNumeric="2"/>
+            <column name="retry_delay_seconds" valueNumeric="5"/>
+            <column name="response_time_warning_ms" valueNumeric="500"/>
+            <column name="response_time_critical_ms" valueNumeric="1000"/>
+            <column name="enabled" valueBoolean="true"/>
+        </insert>
+        <insert tableName="http_monitors">
+            <column name="id" valueNumeric="5"/>
+            <column name="name" value="NHTSA Vehicle API"/>
+            <column name="method" value="GET"/>
+            <column name="type" value="HTTPS"/>
+            <column name="url" value="https://vpic.nhtsa.dot.gov/api/vehicles/decodevinvaluesextended/5UXWX7C5*BA?format=json&amp;modelyear=2011"/>
+            <column name="interval_seconds" valueNumeric="60"/>
+            <column name="timeout_seconds" valueNumeric="30"/>
+            <column name="retry_count" valueNumeric="2"/>
+            <column name="retry_delay_seconds" valueNumeric="5"/>
+            <column name="response_time_warning_ms" valueNumeric="500"/>
+            <column name="response_time_critical_ms" valueNumeric="1000"/>
+            <column name="enabled" valueBoolean="true"/>
+        </insert>
+        <insert tableName="http_monitors">
+            <column name="id" valueNumeric="6"/>
+            <column name="name" value="Squiggle AFL Teams"/>
+            <column name="method" value="GET"/>
+            <column name="type" value="HTTPS"/>
+            <column name="url" value="https://api.squiggle.com.au/?q=teams"/>
+            <column name="interval_seconds" valueNumeric="60"/>
+            <column name="timeout_seconds" valueNumeric="30"/>
+            <column name="retry_count" valueNumeric="2"/>
+            <column name="retry_delay_seconds" valueNumeric="5"/>
+            <column name="response_time_warning_ms" valueNumeric="500"/>
+            <column name="response_time_critical_ms" valueNumeric="1000"/>
+            <column name="enabled" valueBoolean="true"/>
+        </insert>
+        <insert tableName="http_monitors">
+            <column name="id" valueNumeric="7"/>
+            <column name="name" value="NVD Schema"/>
+            <column name="method" value="GET"/>
+            <column name="type" value="HTTPS"/>
+            <column name="url" value="https://csrc.nist.gov/schema/nvd/feed/1.0/nvd_cve_feed_json_1.0.schema"/>
+            <column name="interval_seconds" valueNumeric="60"/>
+            <column name="timeout_seconds" valueNumeric="30"/>
+            <column name="retry_count" valueNumeric="2"/>
+            <column name="retry_delay_seconds" valueNumeric="5"/>
+            <column name="response_time_warning_ms" valueNumeric="500"/>
+            <column name="response_time_critical_ms" valueNumeric="1000"/>
+            <column name="enabled" valueBoolean="true"/>
+        </insert>
+        <insert tableName="http_monitors">
+            <column name="id" valueNumeric="8"/>
+            <column name="name" value="JSONPlaceholder Posts"/>
+            <column name="method" value="GET"/>
+            <column name="type" value="HTTPS"/>
+            <column name="url" value="https://jsonplaceholder.typicode.com/posts/1"/>
+            <column name="interval_seconds" valueNumeric="60"/>
+            <column name="timeout_seconds" valueNumeric="30"/>
+            <column name="retry_count" valueNumeric="2"/>
+            <column name="retry_delay_seconds" valueNumeric="5"/>
+            <column name="response_time_warning_ms" valueNumeric="500"/>
+            <column name="response_time_critical_ms" valueNumeric="1000"/>
+            <column name="enabled" valueBoolean="true"/>
+        </insert>
+
+        <!-- Regions -->
+        <insert tableName="regions">
+            <column name="id" valueNumeric="1"/>
+            <column name="name" value="US East"/>
+            <column name="region_code" value="us-east-1"/>
+            <column name="group_name" value="US"/>
+        </insert>
+        <insert tableName="regions">
+            <column name="id" valueNumeric="2"/>
+            <column name="name" value="US West"/>
+            <column name="region_code" value="us-west-1"/>
+            <column name="group_name" value="US"/>
+        </insert>
+
+        <!-- Datacenters -->
+        <insert tableName="datacenters">
+            <column name="id" valueNumeric="1"/>
+            <column name="code" value="va"/>
+            <column name="name" value="Virginia"/>
+            <column name="region_id" valueNumeric="1"/>
+        </insert>
+        <insert tableName="datacenters">
+            <column name="id" valueNumeric="2"/>
+            <column name="code" value="sf"/>
+            <column name="name" value="San Francisco"/>
+            <column name="region_id" valueNumeric="2"/>
+        </insert>
+
+        <!-- Agents -->
+        <insert tableName="agents">
+            <column name="id" valueNumeric="1"/>
+            <column name="name" value="US-East-Agent"/>
+            <column name="region_id" valueNumeric="1"/>
+        </insert>
+        <insert tableName="agents">
+            <column name="id" valueNumeric="2"/>
+            <column name="name" value="US-West-Agent"/>
+            <column name="region_id" valueNumeric="2"/>
+        </insert>
+
+        <!-- Agent Monitors (all 8 monitors to 2 agents) -->
+        <insert tableName="agent_monitors">
+            <column name="id" valueNumeric="1"/>
+            <column name="agent_id" valueNumeric="1"/>
+            <column name="monitor_id" valueNumeric="1"/>
+            <column name="active" valueBoolean="true"/>
+            <column name="created_by" value="system"/>
+            <column name="created_date" valueDate="${now}"/>
+        </insert>
+        <insert tableName="agent_monitors">
+            <column name="id" valueNumeric="2"/>
+            <column name="agent_id" valueNumeric="1"/>
+            <column name="monitor_id" valueNumeric="2"/>
+            <column name="active" valueBoolean="true"/>
+            <column name="created_by" value="system"/>
+            <column name="created_date" valueDate="${now}"/>
+        </insert>
+        <insert tableName="agent_monitors">
+            <column name="id" valueNumeric="3"/>
+            <column name="agent_id" valueNumeric="1"/>
+            <column name="monitor_id" valueNumeric="3"/>
+            <column name="active" valueBoolean="true"/>
+            <column name="created_by" value="system"/>
+            <column name="created_date" valueDate="${now}"/>
+        </insert>
+        <insert tableName="agent_monitors">
+            <column name="id" valueNumeric="4"/>
+            <column name="agent_id" valueNumeric="1"/>
+            <column name="monitor_id" valueNumeric="4"/>
+            <column name="active" valueBoolean="true"/>
+            <column name="created_by" value="system"/>
+            <column name="created_date" valueDate="${now}"/>
+        </insert>
+        <insert tableName="agent_monitors">
+            <column name="id" valueNumeric="5"/>
+            <column name="agent_id" valueNumeric="1"/>
+            <column name="monitor_id" valueNumeric="5"/>
+            <column name="active" valueBoolean="true"/>
+            <column name="created_by" value="system"/>
+            <column name="created_date" valueDate="${now}"/>
+        </insert>
+        <insert tableName="agent_monitors">
+            <column name="id" valueNumeric="6"/>
+            <column name="agent_id" valueNumeric="1"/>
+            <column name="monitor_id" valueNumeric="6"/>
+            <column name="active" valueBoolean="true"/>
+            <column name="created_by" value="system"/>
+            <column name="created_date" valueDate="${now}"/>
+        </insert>
+        <insert tableName="agent_monitors">
+            <column name="id" valueNumeric="7"/>
+            <column name="agent_id" valueNumeric="1"/>
+            <column name="monitor_id" valueNumeric="7"/>
+            <column name="active" valueBoolean="true"/>
+            <column name="created_by" value="system"/>
+            <column name="created_date" valueDate="${now}"/>
+        </insert>
+        <insert tableName="agent_monitors">
+            <column name="id" valueNumeric="8"/>
+            <column name="agent_id" valueNumeric="1"/>
+            <column name="monitor_id" valueNumeric="8"/>
+            <column name="active" valueBoolean="true"/>
+            <column name="created_by" value="system"/>
+            <column name="created_date" valueDate="${now}"/>
+        </insert>
+        <insert tableName="agent_monitors">
+            <column name="id" valueNumeric="9"/>
+            <column name="agent_id" valueNumeric="2"/>
+            <column name="monitor_id" valueNumeric="1"/>
+            <column name="active" valueBoolean="true"/>
+            <column name="created_by" value="system"/>
+            <column name="created_date" valueDate="${now}"/>
+        </insert>
+        <insert tableName="agent_monitors">
+            <column name="id" valueNumeric="10"/>
+            <column name="agent_id" valueNumeric="2"/>
+            <column name="monitor_id" valueNumeric="2"/>
+            <column name="active" valueBoolean="true"/>
+            <column name="created_by" value="system"/>
+            <column name="created_date" valueDate="${now}"/>
+        </insert>
+        <insert tableName="agent_monitors">
+            <column name="id" valueNumeric="11"/>
+            <column name="agent_id" valueNumeric="2"/>
+            <column name="monitor_id" valueNumeric="3"/>
+            <column name="active" valueBoolean="true"/>
+            <column name="created_by" value="system"/>
+            <column name="created_date" valueDate="${now}"/>
+        </insert>
+        <insert tableName="agent_monitors">
+            <column name="id" valueNumeric="12"/>
+            <column name="agent_id" valueNumeric="2"/>
+            <column name="monitor_id" valueNumeric="4"/>
+            <column name="active" valueBoolean="true"/>
+            <column name="created_by" value="system"/>
+            <column name="created_date" valueDate="${now}"/>
+        </insert>
+        <insert tableName="agent_monitors">
+            <column name="id" valueNumeric="13"/>
+            <column name="agent_id" valueNumeric="2"/>
+            <column name="monitor_id" valueNumeric="5"/>
+            <column name="active" valueBoolean="true"/>
+            <column name="created_by" value="system"/>
+            <column name="created_date" valueDate="${now}"/>
+        </insert>
+        <insert tableName="agent_monitors">
+            <column name="id" valueNumeric="14"/>
+            <column name="agent_id" valueNumeric="2"/>
+            <column name="monitor_id" valueNumeric="6"/>
+            <column name="active" valueBoolean="true"/>
+            <column name="created_by" value="system"/>
+            <column name="created_date" valueDate="${now}"/>
+        </insert>
+        <insert tableName="agent_monitors">
+            <column name="id" valueNumeric="15"/>
+            <column name="agent_id" valueNumeric="2"/>
+            <column name="monitor_id" valueNumeric="7"/>
+            <column name="active" valueBoolean="true"/>
+            <column name="created_by" value="system"/>
+            <column name="created_date" valueDate="${now}"/>
+        </insert>
+        <insert tableName="agent_monitors">
+            <column name="id" valueNumeric="16"/>
+            <column name="agent_id" valueNumeric="2"/>
+            <column name="monitor_id" valueNumeric="8"/>
+            <column name="active" valueBoolean="true"/>
+            <column name="created_by" value="system"/>
+            <column name="created_date" valueDate="${now}"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>
