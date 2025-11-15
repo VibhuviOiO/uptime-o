@@ -31,6 +31,11 @@
     <include file="config/liquibase/changelog/20251025202840_added_entity_constraints_Agent.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20251025202842_added_entity_constraints_AuditLog.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20251114000002_added_entity_constraints_Instance.xml" relativeToChangelogFile="false"/>
+    
+    <!-- Service monitoring tables (after Instance constraints) -->
+    <include file="config/liquibase/changelog/20251116000100_create_services.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20251116000101_create_service_instances.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20251116000102_create_service_heartbeats.xml" relativeToChangelogFile="false"/>
 
     <!-- jhipster-needle-liquibase-add-constraints-changelog - JHipster will add liquibase constraints changelogs here -->
     <!-- jhipster-needle-liquibase-add-incremental-changelog - JHipster will add incremental liquibase changelogs here -->

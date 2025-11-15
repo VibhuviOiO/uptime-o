@@ -298,6 +298,122 @@
             <column name="created_by" value="system"/>
             <column name="created_date" valueDate="${now}"/>
         </insert>
+
+        <!-- Instances (2 per datacenter) -->
+        <insert tableName="instances">
+            <column name="id" valueNumeric="1"/>
+            <column name="name" value="web-server-va-1"/>
+            <column name="hostname" value="web-va-1.example.com"/>
+            <column name="description" value="Web server in Virginia"/>
+            <column name="instance_type" value="VM"/>
+            <column name="monitoring_type" value="AGENT_MONITORED"/>
+            <column name="agent_id" valueNumeric="1"/>
+            <column name="operating_system" value="Linux"/>
+            <column name="platform" value="Ubuntu 22.04"/>
+            <column name="private_ip_address" value="10.0.1.10"/>
+            <column name="datacenter_id" valueNumeric="1"/>
+        </insert>
+        <insert tableName="instances">
+            <column name="id" valueNumeric="2"/>
+            <column name="name" value="db-server-va-1"/>
+            <column name="hostname" value="db-va-1.example.com"/>
+            <column name="description" value="Database server in Virginia"/>
+            <column name="instance_type" value="VM"/>
+            <column name="monitoring_type" value="AGENT_MONITORED"/>
+            <column name="agent_id" valueNumeric="1"/>
+            <column name="operating_system" value="Linux"/>
+            <column name="platform" value="Ubuntu 22.04"/>
+            <column name="private_ip_address" value="10.0.1.20"/>
+            <column name="datacenter_id" valueNumeric="1"/>
+        </insert>
+        <insert tableName="instances">
+            <column name="id" valueNumeric="3"/>
+            <column name="name" value="web-server-sf-1"/>
+            <column name="hostname" value="web-sf-1.example.com"/>
+            <column name="description" value="Web server in San Francisco"/>
+            <column name="instance_type" value="VM"/>
+            <column name="monitoring_type" value="AGENT_MONITORED"/>
+            <column name="agent_id" valueNumeric="2"/>
+            <column name="operating_system" value="Linux"/>
+            <column name="platform" value="Ubuntu 22.04"/>
+            <column name="private_ip_address" value="10.0.2.10"/>
+            <column name="datacenter_id" valueNumeric="2"/>
+        </insert>
+        <insert tableName="instances">
+            <column name="id" valueNumeric="4"/>
+            <column name="name" value="db-server-sf-1"/>
+            <column name="hostname" value="db-sf-1.example.com"/>
+            <column name="description" value="Database server in San Francisco"/>
+            <column name="instance_type" value="VM"/>
+            <column name="monitoring_type" value="AGENT_MONITORED"/>
+            <column name="agent_id" valueNumeric="2"/>
+            <column name="operating_system" value="Linux"/>
+            <column name="platform" value="Ubuntu 22.04"/>
+            <column name="private_ip_address" value="10.0.2.20"/>
+            <column name="datacenter_id" valueNumeric="2"/>
+        </insert>
+
+        <!-- Services (1 per datacenter) -->
+        <insert tableName="services">
+            <column name="id" valueNumeric="1"/>
+            <column name="name" value="PostgreSQL Cluster VA"/>
+            <column name="description" value="PostgreSQL database cluster in Virginia"/>
+            <column name="service_type" value="POSTGRESQL"/>
+            <column name="environment" value="PROD"/>
+            <column name="monitoring_enabled" valueBoolean="true"/>
+            <column name="interval_seconds" valueNumeric="30"/>
+            <column name="timeout_ms" valueNumeric="2000"/>
+            <column name="retry_count" valueNumeric="2"/>
+            <column name="latency_warning_ms" valueNumeric="200"/>
+            <column name="latency_critical_ms" valueNumeric="600"/>
+            <column name="is_active" valueBoolean="true"/>
+            <column name="datacenter_id" valueNumeric="1"/>
+        </insert>
+        <insert tableName="services">
+            <column name="id" valueNumeric="2"/>
+            <column name="name" value="Redis Cache SF"/>
+            <column name="description" value="Redis cache cluster in San Francisco"/>
+            <column name="service_type" value="REDIS"/>
+            <column name="environment" value="PROD"/>
+            <column name="monitoring_enabled" valueBoolean="true"/>
+            <column name="interval_seconds" valueNumeric="30"/>
+            <column name="timeout_ms" valueNumeric="2000"/>
+            <column name="retry_count" valueNumeric="2"/>
+            <column name="latency_warning_ms" valueNumeric="200"/>
+            <column name="latency_critical_ms" valueNumeric="600"/>
+            <column name="is_active" valueBoolean="true"/>
+            <column name="datacenter_id" valueNumeric="2"/>
+        </insert>
+
+        <!-- Service Instances (2 per service) -->
+        <insert tableName="service_instances">
+            <column name="id" valueNumeric="1"/>
+            <column name="service_id" valueNumeric="1"/>
+            <column name="instance_id" valueNumeric="2"/>
+            <column name="port" valueNumeric="5432"/>
+            <column name="is_active" valueBoolean="true"/>
+        </insert>
+        <insert tableName="service_instances">
+            <column name="id" valueNumeric="2"/>
+            <column name="service_id" valueNumeric="1"/>
+            <column name="instance_id" valueNumeric="1"/>
+            <column name="port" valueNumeric="5432"/>
+            <column name="is_active" valueBoolean="true"/>
+        </insert>
+        <insert tableName="service_instances">
+            <column name="id" valueNumeric="3"/>
+            <column name="service_id" valueNumeric="2"/>
+            <column name="instance_id" valueNumeric="3"/>
+            <column name="port" valueNumeric="6379"/>
+            <column name="is_active" valueBoolean="true"/>
+        </insert>
+        <insert tableName="service_instances">
+            <column name="id" valueNumeric="4"/>
+            <column name="service_id" valueNumeric="2"/>
+            <column name="instance_id" valueNumeric="4"/>
+            <column name="port" valueNumeric="6379"/>
+            <column name="is_active" valueBoolean="true"/>
+        </insert>
     </changeSet>
 
 </databaseChangeLog>

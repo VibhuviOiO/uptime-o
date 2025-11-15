@@ -12,6 +12,7 @@ import MonitorDetail from './http-monitor-detail/monitor-detail';
 import AuditLog from './audit-log';
 
 import PingHeartbeat from './ping-heartbeat';
+import ServiceHeartbeat from './service-heartbeat';
 /* jhipster-needle-add-route-import - JHipster will add routes here */
 
 export default () => {
@@ -29,6 +30,7 @@ export default () => {
         <Route path="audit-log/*" element={<AuditLog />} />
 
         <Route path="ping-heartbeat/*" element={<PingHeartbeat />} />
+        <Route path="service-heartbeat/*" element={<ServiceHeartbeat />} />
         {/* jhipster-needle-add-route-path - JHipster will add routes here */}
       </ErrorBoundaryRoutes>
     </div>

@@ -1,0 +1,60 @@
+{
+  "applications": "*",
+  "changelogDate": "20251116000102",
+  "dto": "mapstruct",
+  "embedded": false,
+  "entityTableName": "service_heartbeats",
+  "fields": [
+    {
+      "fieldName": "executedAt",
+      "fieldType": "Instant",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "success",
+      "fieldType": "Boolean",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "status",
+      "fieldType": "ServiceStatus",
+      "fieldValues": "UP,DOWN,WARNING,CRITICAL,DEGRADED,TIMEOUT",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "responseTimeMs",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "errorMessage",
+      "fieldType": "String",
+      "fieldTypeBlobContent": "text"
+    },
+    {
+      "fieldName": "metadata",
+      "fieldType": "String",
+      "fieldTypeBlobContent": "text"
+    },
+    {
+      "fieldName": "agentId",
+      "fieldType": "Long"
+    }
+  ],
+  "name": "ServiceHeartbeat",
+  "pagination": "pagination",
+  "readOnly": false,
+  "relationships": [
+    {
+      "relationshipName": "service",
+      "otherEntityName": "service",
+      "relationshipType": "many-to-one",
+      "relationshipValidateRules": "required"
+    },
+    {
+      "relationshipName": "serviceInstance",
+      "otherEntityName": "serviceInstance",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "service": "serviceClass"
+}

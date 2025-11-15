@@ -1,0 +1,82 @@
+{
+  "applications": "*",
+  "changelogDate": "20251116000100",
+  "dto": "mapstruct",
+  "embedded": false,
+  "entityTableName": "services",
+  "fields": [
+    {
+      "fieldName": "name",
+      "fieldType": "String",
+      "fieldValidateRules": ["required", "maxlength"],
+      "fieldValidateRulesMaxlength": "200"
+    },
+    {
+      "fieldName": "description",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength"],
+      "fieldValidateRulesMaxlength": "500"
+    },
+    {
+      "fieldName": "serviceType",
+      "fieldType": "ServiceType",
+      "fieldValues": "TCP,CASSANDRA,MONGODB,REDIS,KAFKA,POSTGRESQL,MYSQL,ELASTICSEARCH,RABBITMQ,CUSTOM",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "environment",
+      "fieldType": "Environment",
+      "fieldValues": "DEV,QA,STAGE,PROD,DMZ,DR",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "monitoringEnabled",
+      "fieldType": "Boolean"
+    },
+    {
+      "fieldName": "intervalSeconds",
+      "fieldType": "Integer",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "timeoutMs",
+      "fieldType": "Integer",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "retryCount",
+      "fieldType": "Integer",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "latencyWarningMs",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "latencyCriticalMs",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "advancedConfig",
+      "fieldType": "String",
+      "fieldTypeBlobContent": "text"
+    },
+    {
+      "fieldName": "isActive",
+      "fieldType": "Boolean"
+    },
+    {
+      "fieldName": "createdAt",
+      "fieldType": "Instant"
+    },
+    {
+      "fieldName": "updatedAt",
+      "fieldType": "Instant"
+    }
+  ],
+  "name": "Service",
+  "pagination": "pagination",
+  "readOnly": false,
+  "relationships": [],
+  "service": "serviceClass"
+}

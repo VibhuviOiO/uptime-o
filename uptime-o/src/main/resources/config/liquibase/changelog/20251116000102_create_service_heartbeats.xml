@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="20251116000102-1" author="system">
+        <createTable tableName="service_heartbeats">
+            <column name="id" type="bigint">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="service_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="service_instance_id" type="bigint"/>
+            <column name="executed_at" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="success" type="boolean">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="varchar(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="response_time_ms" type="integer"/>
+            <column name="error_message" type="text"/>
+            <column name="metadata" type="jsonb"/>
+            <column name="agent_id" type="bigint"/>
+        </createTable>
+        
+        <addForeignKeyConstraint baseColumnNames="service_id"
+                                 baseTableName="service_heartbeats"
+                                 constraintName="fk_service_heartbeats_service_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="services"/>
+                                 
+        <addForeignKeyConstraint baseColumnNames="service_instance_id"
+                                 baseTableName="service_heartbeats"
+                                 constraintName="fk_service_heartbeats_service_instance_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="service_instances"/>
+                                 
+        <createIndex tableName="service_heartbeats" indexName="idx_service_heartbeats_executed_at">
+            <column name="executed_at"/>
+        </createIndex>
+        
+        <createIndex tableName="service_heartbeats" indexName="idx_service_heartbeats_service_id">
+            <column name="service_id"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

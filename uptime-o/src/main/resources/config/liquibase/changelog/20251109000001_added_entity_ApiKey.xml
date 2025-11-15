@@ -7,7 +7,7 @@
                         http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
     <changeSet id="20251109000001-1" author="jhipster">
-        <createTable tableName="api_key">
+        <createTable tableName="api_keys">
             <column name="id" type="bigint">
                 <constraints primaryKey="true" nullable="false"/>
             </column>

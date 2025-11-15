@@ -1,0 +1,44 @@
+{
+  "applications": "*",
+  "changelogDate": "20251116000101",
+  "dto": "mapstruct",
+  "embedded": false,
+  "entityTableName": "service_instances",
+  "fields": [
+    {
+      "fieldName": "port",
+      "fieldType": "Integer",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "isActive",
+      "fieldType": "Boolean"
+    },
+    {
+      "fieldName": "createdAt",
+      "fieldType": "Instant"
+    },
+    {
+      "fieldName": "updatedAt",
+      "fieldType": "Instant"
+    }
+  ],
+  "name": "ServiceInstance",
+  "pagination": "pagination",
+  "readOnly": false,
+  "relationships": [
+    {
+      "relationshipName": "service",
+      "otherEntityName": "service",
+      "relationshipType": "many-to-one",
+      "relationshipValidateRules": "required"
+    },
+    {
+      "relationshipName": "instance",
+      "otherEntityName": "instance",
+      "relationshipType": "many-to-one",
+      "relationshipValidateRules": "required"
+    }
+  ],
+  "service": "serviceClass"
+}

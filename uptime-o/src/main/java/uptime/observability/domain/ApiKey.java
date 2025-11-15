@@ -11,7 +11,7 @@ import java.time.Instant;
  * An API Key for agent authentication.
  */
 @Entity
-@Table(name = "api_key")
+@Table(name = "api_keys")
 public class ApiKey extends AbstractAuditingEntity<Long> implements Serializable {
 
     private static final long serialVersionUID = 1L;

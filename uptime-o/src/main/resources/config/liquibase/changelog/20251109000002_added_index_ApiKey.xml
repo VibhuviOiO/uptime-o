@@ -8,7 +8,7 @@
 
     <changeSet id="20251109000002-1" author="jhipster">
         <comment>Add index on api_key.key_hash for fast O(1) lookup</comment>
-        <createIndex indexName="idx_api_key_key_hash" tableName="api_key" unique="true">
+        <createIndex indexName="idx_api_keys_key_hash" tableName="api_keys" unique="true">
             <column name="key_hash"/>
         </createIndex>
     </changeSet>

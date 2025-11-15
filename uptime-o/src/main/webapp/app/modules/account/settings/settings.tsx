@@ -26,6 +26,7 @@ import ApiKeyManagementTab from './tabs/api-key-management-tab';
 import { RegionsTab } from './regions-tab';
 import { DatacentersTab } from './datacenters-tab';
 import { InstancesTab } from './instances-tab';
+import { ServicesTab } from './services-tab';
 import { SchedulesTab } from './schedules-tab';
 import { AgentsTab } from './agents-tab';
 import BrandingTab from 'app/entities/branding/branding-tab';
@@ -37,6 +38,7 @@ export type SettingsTab =
   | 'regions'
   | 'datacenters'
   | 'instances'
+  | 'services'
   | 'schedules'
   | 'agents'
   | 'branding'
@@ -58,6 +60,7 @@ export const SettingsPage = () => {
       'regions',
       'datacenters',
       'instances',
+      'services',
       'schedules',
       'agents',
       'branding',
@@ -75,6 +78,7 @@ export const SettingsPage = () => {
           tab === 'regions' ||
           tab === 'datacenters' ||
           tab === 'instances' ||
+          tab === 'services' ||
           tab === 'schedules' ||
           tab === 'agents' ||
           tab === 'branding')
@@ -105,6 +109,8 @@ export const SettingsPage = () => {
         return isAdmin ? <DatacentersTab /> : <ProfileTab />;
       case 'instances':
         return isAdmin ? <InstancesTab /> : <ProfileTab />;
+      case 'services':
+        return isAdmin ? <ServicesTab /> : <ProfileTab />;
       case 'schedules':
         return isAdmin ? <SchedulesTab /> : <ProfileTab />;
       case 'agents':
@@ -162,6 +168,10 @@ export const SettingsPage = () => {
                   <button className={`nav-link ${activeTab === 'instances' ? 'active' : ''}`} onClick={() => handleTabChange('instances')}>
                     <FontAwesomeIcon icon={faServer} className="me-2" />
                     Instances
+                  </button>
+                  <button className={`nav-link ${activeTab === 'services' ? 'active' : ''}`} onClick={() => handleTabChange('services')}>
+                    <FontAwesomeIcon icon={faServer} className="me-2" />
+                    Services
                   </button>
                   <button className={`nav-link ${activeTab === 'schedules' ? 'active' : ''}`} onClick={() => handleTabChange('schedules')}>
                     <FontAwesomeIcon icon={faClock} className="me-2" />

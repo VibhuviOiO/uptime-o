@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="20251116000100-1" author="system">
+        <createTable tableName="services">
+            <column name="id" type="bigint">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="varchar(200)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="varchar(500)"/>
+            <column name="service_type" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="environment" type="varchar(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="monitoring_enabled" type="boolean" defaultValueBoolean="true"/>
+            <column name="interval_seconds" type="integer">
+                <constraints nullable="false"/>
+            </column>
+            <column name="timeout_ms" type="integer">
+                <constraints nullable="false"/>
+            </column>
+            <column name="retry_count" type="integer">
+                <constraints nullable="false"/>
+            </column>
+            <column name="latency_warning_ms" type="integer"/>
+            <column name="latency_critical_ms" type="integer"/>
+            <column name="advanced_config" type="jsonb"/>
+            <column name="is_active" type="boolean" defaultValueBoolean="true"/>
+            <column name="created_at" type="timestamp"/>
+            <column name="updated_at" type="timestamp"/>
+            <column name="datacenter_id" type="bigint"/>
+        </createTable>
+        
+        <addForeignKeyConstraint baseColumnNames="datacenter_id"
+                                 baseTableName="services"
+                                 constraintName="fk_services_datacenter_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="datacenters"/>
+    </changeSet>
+
+</databaseChangeLog>

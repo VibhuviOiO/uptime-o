@@ -25,6 +25,9 @@ export const MonitoringMenuItems = () => (
     <MenuItem icon="server" to="/ping-heartbeat" data-cy="ping-heartbeats">
       Ping Heartbeats
     </MenuItem>
+    <MenuItem icon="network-wired" to="/service-heartbeat" data-cy="service-heartbeats">
+      Service Heartbeats
+    </MenuItem>
     <MenuItem icon="chart-line" to="/http-heartbeat-aggregated" data-cy="monitoring-dashboard">
       Dashboard
     </MenuItem>

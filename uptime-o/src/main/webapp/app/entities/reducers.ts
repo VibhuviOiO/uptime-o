@@ -8,6 +8,7 @@ import apiHeartbeatAggregated from 'app/entities/http-heartbeat/http-heartbeat-a
 import auditLog from 'app/entities/audit-log/audit-log.reducer';
 import instance from 'app/entities/instance/instance.reducer';
 import pingHeartbeat from 'app/entities/ping-heartbeat/ping-heartbeat.reducer';
+import serviceHeartbeat from 'app/entities/service-heartbeat/service-heartbeat.reducer';
 /* jhipster-needle-add-reducer-import - JHipster will add reducer here */
 
 const entitiesReducers = {
@@ -21,6 +22,7 @@ const entitiesReducers = {
   auditLog,
   instance,
   pingHeartbeat,
+  serviceHeartbeat,
   /* jhipster-needle-add-reducer-combine - JHipster will add reducer here */
 };
 

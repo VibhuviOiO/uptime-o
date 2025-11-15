@@ -6,14 +6,14 @@
 
     <changeSet id="20251114000002-1" author="jhipster">
         <addForeignKeyConstraint baseColumnNames="datacenter_id"
-                                 baseTableName="instance"
-                                 constraintName="fk_instance__datacenter_id"
+                                 baseTableName="instances"
+                                 constraintName="fk_instances__datacenter_id"
                                  referencedColumnNames="id"
                                  referencedTableName="datacenters"/>
 
         <addForeignKeyConstraint baseColumnNames="agent_id"
-                                 baseTableName="instance"
-                                 constraintName="fk_instance__agent_id"
+                                 baseTableName="instances"
+                                 constraintName="fk_instances__agent_id"
                                  referencedColumnNames="id"
                                  referencedTableName="agents"/>
     </changeSet>
