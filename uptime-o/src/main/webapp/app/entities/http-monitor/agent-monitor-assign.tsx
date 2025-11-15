@@ -6,7 +6,7 @@ import axios from 'axios';
 interface IAgent {
   id: number;
   name: string;
-  datacenter?: {
+  region?: {
     id: number;
     name: string;
   };
@@ -115,11 +115,11 @@ export const AgentMonitorAssign: React.FC<IAgentMonitorAssignProps> = ({ isOpen,
 
   const groupedAgents = agents.reduce(
     (acc, agent) => {
-      const dcName = agent.datacenter?.name || 'Unassigned';
-      if (!acc[dcName]) {
-        acc[dcName] = [];
+      const regionName = agent.region?.name || 'Unassigned';
+      if (!acc[regionName]) {
+        acc[regionName] = [];
       }
-      acc[dcName].push(agent);
+      acc[regionName].push(agent);
       return acc;
     },
     {} as Record<string, IAgent[]>,
@@ -156,14 +156,14 @@ export const AgentMonitorAssign: React.FC<IAgentMonitorAssignProps> = ({ isOpen,
               </Alert>
             )}
 
-            {Object.entries(groupedAgents).map(([datacenterName, dcAgents]) => (
-              <div key={datacenterName} className="mb-4">
+            {Object.entries(groupedAgents).map(([regionName, regionAgents]) => (
+              <div key={regionName} className="mb-4">
                 <h6 className="text-muted mb-2">
-                  <FontAwesomeIcon icon="server" className="me-2" />
-                  {datacenterName}
+                  <FontAwesomeIcon icon="globe" className="me-2" />
+                  {regionName}
                 </h6>
                 <div className="border rounded p-3">
-                  {dcAgents.map(agent => (
+                  {regionAgents.map(agent => (
                     <FormGroup check key={agent.id} className="mb-2">
                       <Label check>
                         <Input

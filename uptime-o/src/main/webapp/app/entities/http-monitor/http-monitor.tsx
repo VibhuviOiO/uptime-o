@@ -203,7 +203,7 @@ export const HttpMonitor = () => {
                         </td>
                         <td>
                           {monitor.type === 'group' ? (
-                            <span className="badge bg-secondary">Group Monitor</span>
+                            '-'
                           ) : monitor.url ? (
                             <a href={monitor.url} target="_blank" rel="noopener noreferrer" title={monitor.url}>
                               {monitor.url.length > 30 ? `${monitor.url.substring(0, 30)}...` : monitor.url}
@@ -213,10 +213,14 @@ export const HttpMonitor = () => {
                           )}
                         </td>
                         <td>
-                          <div style={{ fontSize: '0.85rem' }}>
-                            <div>Interval: {monitor.intervalSeconds}s</div>
-                            <div style={{ fontSize: '0.75rem', color: '#6c757d' }}>Timeout: {monitor.timeoutSeconds}s</div>
-                          </div>
+                          {monitor.type === 'group' ? (
+                            '-'
+                          ) : (
+                            <div style={{ fontSize: '0.85rem' }}>
+                              <div>Interval: {monitor.intervalSeconds}s</div>
+                              <div style={{ fontSize: '0.75rem', color: '#6c757d' }}>Timeout: {monitor.timeoutSeconds}s</div>
+                            </div>
+                          )}
                         </td>
                         <td>
                           {monitor.headers ? (
@@ -249,54 +253,58 @@ export const HttpMonitor = () => {
                           )}
                         </td>
                         <td>
-                          <div style={{ display: 'flex', gap: '0.3rem', flexWrap: 'wrap', alignItems: 'center' }}>
-                            {monitor.id && agentAssignments[monitor.id] && agentAssignments[monitor.id].length > 0 ? (
-                              <>
-                                {agentAssignments[monitor.id].map((agent: any) => (
-                                  <span
-                                    key={agent.id}
-                                    style={{
-                                      fontSize: '0.7rem',
-                                      display: 'inline-flex',
-                                      alignItems: 'center',
-                                      gap: '0.3rem',
-                                      padding: '0.35rem 0.6rem',
-                                      backgroundColor: '#e7f3ff',
-                                      color: '#0066cc',
-                                      border: '1px solid #b3d9ff',
-                                      borderRadius: '12px',
-                                      fontWeight: '500',
-                                    }}
+                          {monitor.type === 'group' ? (
+                            '-'
+                          ) : (
+                            <div style={{ display: 'flex', gap: '0.3rem', flexWrap: 'wrap', alignItems: 'center' }}>
+                              {monitor.id && agentAssignments[monitor.id] && agentAssignments[monitor.id].length > 0 ? (
+                                <>
+                                  {agentAssignments[monitor.id].map((agent: any) => (
+                                    <span
+                                      key={agent.id}
+                                      style={{
+                                        fontSize: '0.7rem',
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                        gap: '0.3rem',
+                                        padding: '0.35rem 0.6rem',
+                                        backgroundColor: '#e7f3ff',
+                                        color: '#0066cc',
+                                        border: '1px solid #b3d9ff',
+                                        borderRadius: '12px',
+                                        fontWeight: '500',
+                                      }}
+                                    >
+                                      <FontAwesomeIcon icon={faBuilding} style={{ fontSize: '0.65rem' }} />
+                                      {agent.name}
+                                    </span>
+                                  ))}
+                                  <Button
+                                    color="link"
+                                    size="sm"
+                                    onClick={() => openAssignModal(monitor)}
+                                    title="Manage Agents"
+                                    style={{ padding: '0.2rem 0.4rem', color: '#0066cc', fontSize: '0.85rem' }}
                                   >
-                                    <FontAwesomeIcon icon={faBuilding} style={{ fontSize: '0.65rem' }} />
-                                    {agent.name}
-                                  </span>
-                                ))}
-                                <Button
-                                  color="link"
-                                  size="sm"
-                                  onClick={() => openAssignModal(monitor)}
-                                  title="Manage Agents"
-                                  style={{ padding: '0.2rem 0.4rem', color: '#0066cc', fontSize: '0.85rem' }}
-                                >
-                                  <FontAwesomeIcon icon={faPlus} />
-                                </Button>
-                              </>
-                            ) : (
-                              <>
-                                <span style={{ fontSize: '0.75rem', color: '#6c757d' }}>No agents</span>
-                                <Button
-                                  color="link"
-                                  size="sm"
-                                  onClick={() => openAssignModal(monitor)}
-                                  title="Assign Agents"
-                                  style={{ padding: '0.2rem 0.4rem', color: '#0066cc', fontSize: '0.85rem' }}
-                                >
-                                  <FontAwesomeIcon icon={faPlus} />
-                                </Button>
-                              </>
-                            )}
-                          </div>
+                                    <FontAwesomeIcon icon={faPlus} />
+                                  </Button>
+                                </>
+                              ) : (
+                                <>
+                                  <span style={{ fontSize: '0.75rem', color: '#6c757d' }}>No agents</span>
+                                  <Button
+                                    color="link"
+                                    size="sm"
+                                    onClick={() => openAssignModal(monitor)}
+                                    title="Assign Agents"
+                                    style={{ padding: '0.2rem 0.4rem', color: '#0066cc', fontSize: '0.85rem' }}
+                                  >
+                                    <FontAwesomeIcon icon={faPlus} />
+                                  </Button>
+                                </>
+                              )}
+                            </div>
+                          )}
                         </td>
                         <td>
                           <Button

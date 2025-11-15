@@ -6,8 +6,6 @@ import { IHttpMonitor } from 'app/shared/model/http-monitor.model';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { ScheduleEditModal } from './ScheduleEditModal';
-import RegionEditModal from './RegionEditModal';
-import DatacenterEditModal from './DatacenterEditModal';
 
 interface HttpMonitorEditModalProps {
   isOpen: boolean;
@@ -47,12 +45,6 @@ export const HttpMonitorEditModal: React.FC<HttpMonitorEditModalProps> = ({ isOp
   const [updating, setUpdating] = useState(false);
   const [schedules, setSchedules] = useState<any[]>([]);
   const [scheduleModalOpen, setScheduleModalOpen] = useState(false);
-  const [regions, setRegions] = useState<any[]>([]);
-  const [datacenters, setDatacenters] = useState<any[]>([]);
-  const [regionModalOpen, setRegionModalOpen] = useState(false);
-  const [datacenterModalOpen, setDatacenterModalOpen] = useState(false);
-  const [selectedRegionId, setSelectedRegionId] = useState<number | null>(null);
-  const [selectedDatacenterId, setSelectedDatacenterId] = useState<number | null>(null);
   const [groupMonitors, setGroupMonitors] = useState<IHttpMonitor[]>([]);
   const [selectedParentId, setSelectedParentId] = useState<number | null>(null);
   const [showExecutionSettings, setShowExecutionSettings] = useState(false);
@@ -65,8 +57,6 @@ export const HttpMonitorEditModal: React.FC<HttpMonitorEditModalProps> = ({ isOp
   useEffect(() => {
     if (isOpen) {
       loadSchedules();
-      loadRegions();
-      loadDatacenters();
       loadGroupMonitors();
       if (isNew) {
         setFormData({
@@ -130,24 +120,6 @@ export const HttpMonitorEditModal: React.FC<HttpMonitorEditModalProps> = ({ isOp
       setSchedules(response.data);
     } catch (error) {
       console.error('Failed to load schedules:', error);
-    }
-  };
-
-  const loadRegions = async () => {
-    try {
-      const response = await axios.get('/api/regions?page=0&size=1000&sort=id,desc');
-      setRegions(response.data);
-    } catch (error) {
-      console.error('Failed to load regions:', error);
-    }
-  };
-
-  const loadDatacenters = async () => {
-    try {
-      const response = await axios.get('/api/datacenters?page=0&size=1000&sort=id,desc');
-      setDatacenters(response.data);
-    } catch (error) {
-      console.error('Failed to load datacenters:', error);
     }
   };
 
@@ -249,46 +221,58 @@ export const HttpMonitorEditModal: React.FC<HttpMonitorEditModalProps> = ({ isOp
       try {
         const dataToSubmit: any = {
           name: formData.name,
-          method: formData.method,
           type: formData.type,
-          url: formData.url,
+          description: formData.description,
         };
 
-        if (formData.headers) {
-          try {
-            dataToSubmit.headers = JSON.parse(formData.headers);
-          } catch {
-            dataToSubmit.headers = formData.headers;
-          }
-        }
+        if (formData.type === 'group') {
+          // Group monitors only need name, type, and description
+          dataToSubmit.method = 'GET';
+          dataToSubmit.url = '';
+          dataToSubmit.intervalSeconds = 60;
+          dataToSubmit.timeoutSeconds = 30;
+          dataToSubmit.retryCount = 0;
+          dataToSubmit.retryDelaySeconds = 0;
+        } else {
+          // HTTP monitors need all fields
+          dataToSubmit.method = formData.method;
+          dataToSubmit.url = formData.url;
+          dataToSubmit.intervalSeconds = formData.intervalSeconds;
+          dataToSubmit.timeoutSeconds = formData.timeoutSeconds;
+          dataToSubmit.retryCount = formData.retryCount;
+          dataToSubmit.retryDelaySeconds = formData.retryDelaySeconds;
+          dataToSubmit.responseTimeWarningMs = formData.responseTimeWarningMs;
+          dataToSubmit.responseTimeCriticalMs = formData.responseTimeCriticalMs;
+          dataToSubmit.uptimeWarningPercent = formData.uptimeWarningPercent;
+          dataToSubmit.uptimeCriticalPercent = formData.uptimeCriticalPercent;
+          dataToSubmit.includeResponseBody = formData.includeResponseBody;
+          dataToSubmit.resendNotificationCount = formData.resendNotificationCount;
+          dataToSubmit.certificateExpiryDays = formData.certificateExpiryDays;
+          dataToSubmit.ignoreTlsError = formData.ignoreTlsError;
+          dataToSubmit.upsideDownMode = formData.upsideDownMode;
+          dataToSubmit.maxRedirects = formData.maxRedirects;
+          dataToSubmit.tags = formData.tags;
+          dataToSubmit.monitoringVisibility = formData.monitoringVisibility;
 
-        if (formData.body) {
-          try {
-            dataToSubmit.body = JSON.parse(formData.body);
-          } catch {
-            dataToSubmit.body = formData.body;
+          if (formData.headers) {
+            try {
+              dataToSubmit.headers = JSON.parse(formData.headers);
+            } catch {
+              dataToSubmit.headers = formData.headers;
+            }
           }
-        }
 
-        dataToSubmit.intervalSeconds = formData.intervalSeconds;
-        dataToSubmit.timeoutSeconds = formData.timeoutSeconds;
-        dataToSubmit.retryCount = formData.retryCount;
-        dataToSubmit.retryDelaySeconds = formData.retryDelaySeconds;
-        dataToSubmit.responseTimeWarningMs = formData.responseTimeWarningMs;
-        dataToSubmit.responseTimeCriticalMs = formData.responseTimeCriticalMs;
-        dataToSubmit.uptimeWarningPercent = formData.uptimeWarningPercent;
-        dataToSubmit.uptimeCriticalPercent = formData.uptimeCriticalPercent;
-        dataToSubmit.includeResponseBody = formData.includeResponseBody;
-        dataToSubmit.resendNotificationCount = formData.resendNotificationCount;
-        dataToSubmit.certificateExpiryDays = formData.certificateExpiryDays;
-        dataToSubmit.ignoreTlsError = formData.ignoreTlsError;
-        dataToSubmit.upsideDownMode = formData.upsideDownMode;
-        dataToSubmit.maxRedirects = formData.maxRedirects;
-        dataToSubmit.description = formData.description;
-        dataToSubmit.tags = formData.tags;
-        dataToSubmit.monitoringVisibility = formData.monitoringVisibility;
-        if (selectedParentId) {
-          dataToSubmit.parentId = selectedParentId;
+          if (formData.body) {
+            try {
+              dataToSubmit.body = JSON.parse(formData.body);
+            } catch {
+              dataToSubmit.body = formData.body;
+            }
+          }
+
+          if (selectedParentId) {
+            dataToSubmit.parentId = selectedParentId;
+          }
         }
 
         if (isNew) {
@@ -342,211 +326,114 @@ export const HttpMonitorEditModal: React.FC<HttpMonitorEditModalProps> = ({ isOp
           <Button close onClick={toggle} />
         </div>
         <Form onSubmit={handleSubmit}>
-          <div className="row">
-            <div className="col-6">
-              <FormGroup>
-                <div className="d-flex align-items-center mb-2">
-                  <Label className="mb-0 me-2">Region</Label>
-                  <Button
-                    color="link"
-                    size="sm"
-                    onClick={() => setRegionModalOpen(true)}
-                    disabled={updating}
-                    title="Add new region"
-                    style={{ padding: '0.2rem 0.4rem', fontSize: '0.75rem' }}
-                  >
-                    <FontAwesomeIcon icon={faPlus} />
-                  </Button>
-                  <Button
-                    color="link"
-                    size="sm"
-                    onClick={loadRegions}
-                    disabled={updating}
-                    title="Refresh regions"
-                    style={{ padding: '0.2rem 0.4rem', fontSize: '0.75rem' }}
-                  >
-                    <FontAwesomeIcon icon={faSync} />
-                  </Button>
-                </div>
-                <Input
-                  type="select"
-                  value={selectedRegionId || ''}
-                  onChange={e => {
-                    const regionId = e.target.value ? parseInt(e.target.value, 10) : null;
-                    setSelectedRegionId(regionId);
-                    setSelectedDatacenterId(null);
-                    if (regionId) {
-                      loadDatacenters();
-                    }
-                  }}
-                  disabled={updating}
-                >
-                  <option value="">Select region...</option>
-                  {regions.map(region => (
-                    <option key={region.id} value={region.id}>
-                      {region.name}
-                    </option>
-                  ))}
-                </Input>
-              </FormGroup>
-            </div>
-            <div className="col-6">
-              <FormGroup>
-                <div className="d-flex align-items-center mb-2">
-                  <Label className="mb-0 me-2">Datacenter</Label>
-                  <Button
-                    color="link"
-                    size="sm"
-                    onClick={() => setDatacenterModalOpen(true)}
-                    disabled={updating}
-                    title="Add new datacenter"
-                    style={{ padding: '0.2rem 0.4rem', fontSize: '0.75rem' }}
-                  >
-                    <FontAwesomeIcon icon={faPlus} />
-                  </Button>
-                  <Button
-                    color="link"
-                    size="sm"
-                    onClick={loadDatacenters}
-                    disabled={updating}
-                    title="Refresh datacenters"
-                    style={{ padding: '0.2rem 0.4rem', fontSize: '0.75rem' }}
-                  >
-                    <FontAwesomeIcon icon={faSync} />
-                  </Button>
-                </div>
-                <Input
-                  type="select"
-                  value={selectedDatacenterId || ''}
-                  onChange={e => setSelectedDatacenterId(e.target.value ? parseInt(e.target.value, 10) : null)}
-                  disabled={updating || !selectedRegionId}
-                >
-                  <option value="">Select datacenter...</option>
-                  {datacenters
-                    .filter(dc => !selectedRegionId || dc.region?.id === selectedRegionId)
-                    .map(datacenter => (
-                      <option key={datacenter.id} value={datacenter.id}>
-                        {datacenter.name}
-                      </option>
-                    ))}
-                </Input>
-              </FormGroup>
-            </div>
-          </div>
-          <div className="row">
-            <div className="col-6">
-              <FormGroup>
-                <Label for="name">Name *</Label>
-                <Input
-                  type="text"
-                  name="name"
-                  id="name"
-                  placeholder="Enter monitor name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  invalid={!!errors.name}
-                  disabled={updating}
-                />
-                {errors.name && <div className="invalid-feedback d-block">{errors.name}</div>}
-              </FormGroup>
-            </div>
-            <div className="col-3">
-              <FormGroup>
-                <Label for="type">Type *</Label>
-                <Input type="select" name="type" id="type" value={formData.type} onChange={handleChange} disabled={updating}>
-                  <option value="">Select...</option>
-                  <option value="http">http</option>
-                  <option value="http-keyword">http - keyword</option>
-                  <option value="http-json">http - json</option>
-                  <option value="group">group</option>
-                </Input>
-              </FormGroup>
-            </div>
-            <div className="col-3">
-              <FormGroup>
-                <Label for="method">Method</Label>
-                <Input type="select" name="method" id="method" value={formData.method} onChange={handleChange} disabled={updating}>
-                  <option value="GET">GET</option>
-                  <option value="POST">POST</option>
-                  <option value="PUT">PUT</option>
-                  <option value="DELETE">DELETE</option>
-                  <option value="PATCH">PATCH</option>
-                </Input>
-              </FormGroup>
-            </div>
-          </div>
-          {formData.type !== 'group' && (
+          <FormGroup>
+            <Label for="type">Type *</Label>
+            <Input type="select" name="type" id="type" value={formData.type} onChange={handleChange} disabled={updating}>
+              <option value="">Select...</option>
+              <option value="http">http</option>
+              <option value="http-keyword">http - keyword</option>
+              <option value="http-json">http - json</option>
+              <option value="group">group</option>
+            </Input>
+          </FormGroup>
+          <FormGroup>
+            <Label for="name">Name *</Label>
+            <Input
+              type="text"
+              name="name"
+              id="name"
+              placeholder="Enter monitor name"
+              value={formData.name}
+              onChange={handleChange}
+              invalid={!!errors.name}
+              disabled={updating}
+            />
+            {errors.name && <div className="invalid-feedback d-block">{errors.name}</div>}
+          </FormGroup>
+          {!isGroupType && (
             <FormGroup>
-              <Label for="url">URL *</Label>
-              <Input
-                type="text"
-                name="url"
-                id="url"
-                placeholder="Enter monitor URL (e.g., https://example.com)"
-                value={formData.url}
-                onChange={handleChange}
-                invalid={!!errors.url}
-                disabled={updating}
-              />
-              {errors.url && <div className="invalid-feedback d-block">{errors.url}</div>}
-            </FormGroup>
-          )}
-          <div className="row mb-3">
-            <div className="col-6">
-              <FormGroup>
-                <Label for="monitoringVisibility">Monitoring Visibility *</Label>
-                <Input
-                  type="select"
-                  name="monitoringVisibility"
-                  id="monitoringVisibility"
-                  value={formData.monitoringVisibility}
-                  onChange={handleChange}
-                  disabled={updating}
-                >
-                  <option value="internal">Internal (Team Only)</option>
-                  <option value="external">External (Public Status Page)</option>
-                </Input>
-              </FormGroup>
-            </div>
-            {!isGroupType && (
-              <div className="col-6">
-                <FormGroup>
-                  <Label>&nbsp;</Label>
-                  <div className="form-check" style={{ marginTop: '8px' }}>
-                    <input
-                      className="form-check-input"
-                      type="checkbox"
-                      name="includeResponseBody"
-                      id="includeResponseBody"
-                      checked={formData.includeResponseBody}
-                      onChange={handleChange}
-                      disabled={updating}
-                    />
-                    <label className="form-check-label" htmlFor="includeResponseBody">
-                      Include Response Body
-                    </label>
-                  </div>
-                </FormGroup>
-              </div>
-            )}
-          </div>
-          {formData.type !== 'group' && groupMonitors.length > 0 && (
-            <FormGroup>
-              <Label for="parentId">Parent Group (Optional)</Label>
-              <Input
-                type="select"
-                value={selectedParentId || ''}
-                onChange={e => setSelectedParentId(e.target.value ? parseInt(e.target.value, 10) : null)}
-                disabled={updating}
-              >
-                <option value="">No parent group</option>
-                {groupMonitors.map(group => (
-                  <option key={group.id} value={group.id}>
-                    {group.name}
-                  </option>
-                ))}
+              <Label for="method">Method *</Label>
+              <Input type="select" name="method" id="method" value={formData.method} onChange={handleChange} disabled={updating}>
+                <option value="GET">GET</option>
+                <option value="POST">POST</option>
+                <option value="PUT">PUT</option>
+                <option value="DELETE">DELETE</option>
+                <option value="PATCH">PATCH</option>
               </Input>
             </FormGroup>
+          )}
+          {!isGroupType && (
+            <>
+              <FormGroup>
+                <Label for="url">URL *</Label>
+                <Input
+                  type="text"
+                  name="url"
+                  id="url"
+                  placeholder="Enter monitor URL (e.g., https://example.com)"
+                  value={formData.url}
+                  onChange={handleChange}
+                  invalid={!!errors.url}
+                  disabled={updating}
+                />
+                {errors.url && <div className="invalid-feedback d-block">{errors.url}</div>}
+              </FormGroup>
+              <div className="row mb-3">
+                <div className="col-6">
+                  <FormGroup>
+                    <Label for="monitoringVisibility">Monitoring Visibility *</Label>
+                    <Input
+                      type="select"
+                      name="monitoringVisibility"
+                      id="monitoringVisibility"
+                      value={formData.monitoringVisibility}
+                      onChange={handleChange}
+                      disabled={updating}
+                    >
+                      <option value="internal">Internal (Team Only)</option>
+                      <option value="external">External (Public Status Page)</option>
+                    </Input>
+                  </FormGroup>
+                </div>
+                <div className="col-6">
+                  <FormGroup>
+                    <Label>&nbsp;</Label>
+                    <div className="form-check" style={{ marginTop: '8px' }}>
+                      <input
+                        className="form-check-input"
+                        type="checkbox"
+                        name="includeResponseBody"
+                        id="includeResponseBody"
+                        checked={formData.includeResponseBody}
+                        onChange={handleChange}
+                        disabled={updating}
+                      />
+                      <label className="form-check-label" htmlFor="includeResponseBody">
+                        Include Response Body
+                      </label>
+                    </div>
+                  </FormGroup>
+                </div>
+              </div>
+              {groupMonitors.length > 0 && (
+                <FormGroup>
+                  <Label for="parentId">Parent Group (Optional)</Label>
+                  <Input
+                    type="select"
+                    value={selectedParentId || ''}
+                    onChange={e => setSelectedParentId(e.target.value ? parseInt(e.target.value, 10) : null)}
+                    disabled={updating}
+                  >
+                    <option value="">No parent group</option>
+                    {groupMonitors.map(group => (
+                      <option key={group.id} value={group.id}>
+                        {group.name}
+                      </option>
+                    ))}
+                  </Input>
+                </FormGroup>
+              )}
+            </>
           )}
           {!isGroupType && (
             <div className="mb-3">
@@ -852,20 +739,20 @@ export const HttpMonitorEditModal: React.FC<HttpMonitorEditModalProps> = ({ isOp
               rows={2}
             />
           </FormGroup>
-          <FormGroup>
-            <Label for="tags">Tags</Label>
-            <Input
-              type="text"
-              name="tags"
-              id="tags"
-              placeholder="Enter tags (comma-separated)"
-              value={formData.tags}
-              onChange={handleChange}
-              disabled={updating}
-            />
-          </FormGroup>
           {!isGroupType && (
             <>
+              <FormGroup>
+                <Label for="tags">Tags</Label>
+                <Input
+                  type="text"
+                  name="tags"
+                  id="tags"
+                  placeholder="Enter tags (comma-separated)"
+                  value={formData.tags}
+                  onChange={handleChange}
+                  disabled={updating}
+                />
+              </FormGroup>
               <FormGroup>
                 <Label for="headers">Headers (Optional)</Label>
                 <Input
@@ -911,24 +798,6 @@ export const HttpMonitorEditModal: React.FC<HttpMonitorEditModalProps> = ({ isOp
         onSave={() => {
           loadSchedules();
           setScheduleModalOpen(false);
-        }}
-      />
-      <RegionEditModal
-        isOpen={regionModalOpen}
-        toggle={() => setRegionModalOpen(false)}
-        regionId={null}
-        onSave={() => {
-          loadRegions();
-          setRegionModalOpen(false);
-        }}
-      />
-      <DatacenterEditModal
-        isOpen={datacenterModalOpen}
-        toggle={() => setDatacenterModalOpen(false)}
-        datacenterId={null}
-        onSave={() => {
-          loadDatacenters();
-          setDatacenterModalOpen(false);
         }}
       />
     </Card>
