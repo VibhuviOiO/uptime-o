@@ -3,9 +3,9 @@ import { createAsyncThunk, isFulfilled, isPending } from '@reduxjs/toolkit';
 import { ASC } from 'app/shared/util/pagination.constants';
 import { cleanEntity } from 'app/shared/util/entity-utils';
 import { IQueryParams, createEntitySlice, EntityState, serializeAxiosError } from 'app/shared/reducers/reducer.utils';
-import { IPingHeartbeat, defaultValue } from 'app/shared/model/ping-heartbeat.model';
+import { IInstanceHeartbeat, defaultValue } from 'app/shared/model/instance-heartbeat.model';
 
-const initialState: EntityState<IPingHeartbeat> = {
+const initialState: EntityState<IInstanceHeartbeat> = {
   loading: false,
   errorMessage: null,
   entities: [],
@@ -15,24 +15,24 @@ const initialState: EntityState<IPingHeartbeat> = {
   updateSuccess: false,
 };
 
-const apiUrl = 'api/ping-heartbeats';
+const apiUrl = 'api/instance-heartbeats';
 
-export const getEntities = createAsyncThunk('pingHeartbeat/fetch_entity_list', async ({ page, size, sort }: IQueryParams) => {
+export const getEntities = createAsyncThunk('instanceHeartbeat/fetch_entity_list', async ({ page, size, sort }: IQueryParams) => {
   const requestUrl = `${apiUrl}?${sort ? `page=${page}&size=${size}&sort=${sort}&` : ''}cacheBuster=${new Date().getTime()}`;
-  return axios.get<IPingHeartbeat[]>(requestUrl);
+  return axios.get<IInstanceHeartbeat[]>(requestUrl);
 });
 
 export const getEntity = createAsyncThunk(
-  'pingHeartbeat/fetch_entity',
+  'instanceHeartbeat/fetch_entity',
   async (id: string | number) => {
     const requestUrl = `${apiUrl}/${id}`;
-    return axios.get<IPingHeartbeat>(requestUrl);
+    return axios.get<IInstanceHeartbeat>(requestUrl);
   },
   { serializeError: serializeAxiosError },
 );
 
-export const PingHeartbeatSlice = createEntitySlice({
-  name: 'pingHeartbeat',
+export const InstanceHeartbeatSlice = createEntitySlice({
+  name: 'instanceHeartbeat',
   initialState,
   extraReducers(builder) {
     builder
@@ -57,6 +57,6 @@ export const PingHeartbeatSlice = createEntitySlice({
   },
 });
 
-export const { reset } = PingHeartbeatSlice.actions;
+export const { reset } = InstanceHeartbeatSlice.actions;
 
-export default PingHeartbeatSlice.reducer;
+export default InstanceHeartbeatSlice.reducer;

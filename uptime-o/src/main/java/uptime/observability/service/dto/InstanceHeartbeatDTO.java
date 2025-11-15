@@ -7,7 +7,7 @@ import java.time.Instant;
 import uptime.observability.domain.HeartbeatStatus;
 import uptime.observability.domain.HeartbeatType;
 
-public class PingHeartbeatDTO implements Serializable {
+public class InstanceHeartbeatDTO implements Serializable {
 
     private Long id;
 

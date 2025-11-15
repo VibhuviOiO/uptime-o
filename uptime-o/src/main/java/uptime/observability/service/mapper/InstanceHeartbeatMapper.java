@@ -1,18 +1,18 @@
 package uptime.observability.service.mapper;
 
 import org.springframework.stereotype.Service;
-import uptime.observability.domain.PingHeartbeat;
-import uptime.observability.service.dto.PingHeartbeatDTO;
+import uptime.observability.domain.InstanceHeartbeat;
+import uptime.observability.service.dto.InstanceHeartbeatDTO;
 
 @Service
-public class PingHeartbeatMapper {
+public class InstanceHeartbeatMapper {
 
-    public PingHeartbeatDTO toDto(PingHeartbeat entity) {
+    public InstanceHeartbeatDTO toDto(InstanceHeartbeat entity) {
         if (entity == null) {
             return null;
         }
 
-        PingHeartbeatDTO dto = new PingHeartbeatDTO();
+        InstanceHeartbeatDTO dto = new InstanceHeartbeatDTO();
         dto.setId(entity.getId());
         dto.setInstanceId(entity.getInstanceId());
         dto.setExecutedAt(entity.getExecutedAt());
@@ -38,12 +38,12 @@ public class PingHeartbeatMapper {
         return dto;
     }
 
-    public PingHeartbeat toEntity(PingHeartbeatDTO dto) {
+    public InstanceHeartbeat toEntity(InstanceHeartbeatDTO dto) {
         if (dto == null) {
             return null;
         }
 
-        PingHeartbeat entity = new PingHeartbeat();
+        InstanceHeartbeat entity = new InstanceHeartbeat();
         entity.setId(dto.getId());
         entity.setInstanceId(dto.getInstanceId());
         entity.setExecutedAt(dto.getExecutedAt());

@@ -1,4 +1,4 @@
-export interface IPingHeartbeat {
+export interface IInstanceHeartbeat {
   id?: number;
   instanceId?: number;
   executedAt?: string;
@@ -22,6 +22,6 @@ export interface IPingHeartbeat {
   metadata?: any;
 }
 
-export const defaultValue: Readonly<IPingHeartbeat> = {
+export const defaultValue: Readonly<IInstanceHeartbeat> = {
   success: false,
 };

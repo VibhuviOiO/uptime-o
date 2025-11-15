@@ -8,10 +8,10 @@ import { ASC, DESC, ITEMS_PER_PAGE, SORT } from 'app/shared/util/pagination.cons
 import { overridePaginationStateWithQueryParams } from 'app/shared/util/entity-utils';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { APP_DATE_FORMAT } from 'app/config/constants';
-import { getEntities } from './ping-heartbeat.reducer';
+import { getEntities } from './instance-heartbeat.reducer';
 import '../entity.scss';
 
-export const PingHeartbeat = () => {
+export const InstanceHeartbeat = () => {
   const dispatch = useAppDispatch();
   const pageLocation = useLocation();
   const navigate = useNavigate();
@@ -20,9 +20,9 @@ export const PingHeartbeat = () => {
     overridePaginationStateWithQueryParams(getPaginationState(pageLocation, ITEMS_PER_PAGE, 'id'), pageLocation.search),
   );
 
-  const pingHeartbeatList = useAppSelector(state => state.pingHeartbeat.entities);
-  const loading = useAppSelector(state => state.pingHeartbeat.loading);
-  const totalItems = useAppSelector(state => state.pingHeartbeat.totalItems);
+  const instanceHeartbeatList = useAppSelector(state => state.instanceHeartbeat.entities);
+  const loading = useAppSelector(state => state.instanceHeartbeat.loading);
+  const totalItems = useAppSelector(state => state.instanceHeartbeat.totalItems);
 
   const getAllEntities = () => {
     dispatch(
@@ -101,10 +101,10 @@ export const PingHeartbeat = () => {
   };
 
   return (
-    <div className="ping-heartbeats-page">
-      <div className="ping-heartbeats-header">
+    <div className="instance-heartbeats-page">
+      <div className="instance-heartbeats-header">
         <div className="header-content">
-          <h1 id="ping-heartbeat-heading">
+          <h1 id="instance-heartbeat-heading">
             <FontAwesomeIcon icon={faHeartbeat} className="me-2" />
             Instance Heartbeats
           </h1>
@@ -116,7 +116,7 @@ export const PingHeartbeat = () => {
         </div>
       </div>
 
-      {pingHeartbeatList && pingHeartbeatList.length > 0 ? (
+      {instanceHeartbeatList && instanceHeartbeatList.length > 0 ? (
         <>
           <div className="smart-table-wrapper">
             <table className="smart-table">
@@ -152,7 +152,7 @@ export const PingHeartbeat = () => {
                 </tr>
               </thead>
               <tbody>
-                {pingHeartbeatList.map((heartbeat, i) => (
+                {instanceHeartbeatList.map((heartbeat, i) => (
                   <tr key={`entity-${i}`} className="table-row">
                     <td className="id-cell">
                       <span className="badge bg-secondary">{heartbeat.id}</span>
@@ -218,4 +218,4 @@ export const PingHeartbeat = () => {
   );
 };
 
-export default PingHeartbeat;
+export default InstanceHeartbeat;

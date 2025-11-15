@@ -21,7 +21,7 @@
     <include file="config/liquibase/changelog/20251109000002_added_index_ApiKey.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20251111000001_create_agent_locks.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20251114000001_added_entity_Instance.xml" relativeToChangelogFile="false"/>
-    <include file="config/liquibase/changelog/20251114000003_added_entity_PingHeartbeat.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20251114000003_added_entity_InstanceHeartbeat.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20251116000000_create_http_monitors.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20251116000001_create_http_heartbeats.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20251109000003_create_agent_monitor.xml" relativeToChangelogFile="false"/>

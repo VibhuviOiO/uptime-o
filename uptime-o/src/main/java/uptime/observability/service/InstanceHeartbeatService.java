@@ -1,0 +1,64 @@
+package uptime.observability.service;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import uptime.observability.domain.InstanceHeartbeat;
+import uptime.observability.repository.InstanceHeartbeatRepository;
+import uptime.observability.service.dto.InstanceHeartbeatDTO;
+import uptime.observability.service.mapper.InstanceHeartbeatMapper;
+
+@Service
+@Transactional
+public class InstanceHeartbeatService {
+
+    private static final Logger LOG = LoggerFactory.getLogger(InstanceHeartbeatService.class);
+
+    private final InstanceHeartbeatRepository instanceHeartbeatRepository;
+    private final InstanceHeartbeatMapper instanceHeartbeatMapper;
+
+    public InstanceHeartbeatService(InstanceHeartbeatRepository instanceHeartbeatRepository, InstanceHeartbeatMapper instanceHeartbeatMapper) {
+        this.instanceHeartbeatRepository = instanceHeartbeatRepository;
+        this.instanceHeartbeatMapper = instanceHeartbeatMapper;
+    }
+
+    public InstanceHeartbeatDTO save(InstanceHeartbeatDTO instanceHeartbeatDTO) {
+        LOG.debug("Request to save InstanceHeartbeat : {}", instanceHeartbeatDTO);
+        InstanceHeartbeat instanceHeartbeat = instanceHeartbeatMapper.toEntity(instanceHeartbeatDTO);
+        instanceHeartbeat = instanceHeartbeatRepository.save(instanceHeartbeat);
+        return instanceHeartbeatMapper.toDto(instanceHeartbeat);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<InstanceHeartbeatDTO> findAll(Pageable pageable) {
+        LOG.debug("Request to get all InstanceHeartbeats");
+        return instanceHeartbeatRepository.findAll(pageable).map(instanceHeartbeatMapper::toDto);
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<InstanceHeartbeatDTO> findOne(Long id) {
+        LOG.debug("Request to get InstanceHeartbeat : {}", id);
+        return instanceHeartbeatRepository.findById(id).map(instanceHeartbeatMapper::toDto);
+    }
+
+    @Transactional(readOnly = true)
+    public List<InstanceHeartbeatDTO> findByInstance(Long instanceId) {
+        LOG.debug("Request to get InstanceHeartbeats by Instance : {}", instanceId);
+        return instanceHeartbeatRepository
+            .findByInstanceIdOrderByExecutedAtDesc(instanceId)
+            .stream()
+            .map(instanceHeartbeatMapper::toDto)
+            .collect(Collectors.toList());
+    }
+
+    public void delete(Long id) {
+        LOG.debug("Request to delete InstanceHeartbeat : {}", id);
+        instanceHeartbeatRepository.deleteById(id);
+    }
+}

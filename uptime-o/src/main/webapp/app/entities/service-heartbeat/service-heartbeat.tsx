@@ -101,8 +101,8 @@ export const ServiceHeartbeat = () => {
   };
 
   return (
-    <div className="ping-heartbeats-page">
-      <div className="ping-heartbeats-header">
+    <div className="instance-heartbeats-page">
+      <div className="instance-heartbeats-header">
         <div className="header-content">
           <h1 id="service-heartbeat-heading">
             <FontAwesomeIcon icon={faHeartbeat} className="me-2" />

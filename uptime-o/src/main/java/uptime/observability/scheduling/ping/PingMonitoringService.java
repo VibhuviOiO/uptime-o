@@ -12,9 +12,9 @@ import uptime.observability.domain.HeartbeatStatus;
 import uptime.observability.domain.HeartbeatType;
 import uptime.observability.domain.Instance;
 import uptime.observability.domain.MonitoringType;
-import uptime.observability.domain.PingHeartbeat;
+import uptime.observability.domain.InstanceHeartbeat;
 import uptime.observability.repository.InstanceRepository;
-import uptime.observability.repository.PingHeartbeatRepository;
+import uptime.observability.repository.InstanceHeartbeatRepository;
 
 @Service
 public class PingMonitoringService {
@@ -22,11 +22,11 @@ public class PingMonitoringService {
     private static final Logger LOG = LoggerFactory.getLogger(PingMonitoringService.class);
 
     private final InstanceRepository instanceRepository;
-    private final PingHeartbeatRepository pingHeartbeatRepository;
+    private final InstanceHeartbeatRepository instanceHeartbeatRepository;
 
-    public PingMonitoringService(InstanceRepository instanceRepository, PingHeartbeatRepository pingHeartbeatRepository) {
+    public PingMonitoringService(InstanceRepository instanceRepository, InstanceHeartbeatRepository instanceHeartbeatRepository) {
         this.instanceRepository = instanceRepository;
-        this.pingHeartbeatRepository = pingHeartbeatRepository;
+        this.instanceHeartbeatRepository = instanceHeartbeatRepository;
     }
 
     @Scheduled(fixedDelay = 30000, initialDelay = 10000)
@@ -68,7 +68,7 @@ public class PingMonitoringService {
         LOG.debug("Executing ping for instance: {} ({})", instance.getName(), target);
 
         long startTime = System.currentTimeMillis();
-        PingHeartbeat heartbeat = new PingHeartbeat();
+        InstanceHeartbeat heartbeat = new InstanceHeartbeat();
         heartbeat.setInstanceId(instance.getId());
         heartbeat.setExecutedAt(Instant.now());
         heartbeat.setHeartbeatType(HeartbeatType.PING);
@@ -104,6 +104,6 @@ public class PingMonitoringService {
             LOG.error("Ping error for {}: {}", target, e.getMessage());
         }
 
-        pingHeartbeatRepository.save(heartbeat);
+        instanceHeartbeatRepository.save(heartbeat);
     }
 }

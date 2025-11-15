@@ -10,10 +10,10 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Type;
 
 @Entity
-@Table(name = "ping_heartbeats")
+@Table(name = "instance_heartbeats")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @SuppressWarnings("common-java:DuplicatedBlocks")
-public class PingHeartbeat implements Serializable {
+public class InstanceHeartbeat implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

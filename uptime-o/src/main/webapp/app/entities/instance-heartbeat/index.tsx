@@ -3,12 +3,12 @@ import { Route } from 'react-router';
 
 import ErrorBoundaryRoutes from 'app/shared/error/error-boundary-routes';
 
-import PingHeartbeat from './ping-heartbeat';
+import InstanceHeartbeat from './instance-heartbeat';
 
-const PingHeartbeatRoutes = () => (
+const InstanceHeartbeatRoutes = () => (
   <ErrorBoundaryRoutes>
-    <Route index element={<PingHeartbeat />} />
+    <Route index element={<InstanceHeartbeat />} />
   </ErrorBoundaryRoutes>
 );
 
-export default PingHeartbeatRoutes;
+export default InstanceHeartbeatRoutes;

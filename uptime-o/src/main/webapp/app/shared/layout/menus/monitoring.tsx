@@ -10,8 +10,8 @@ export const MonitoringMenu = () => (
     <MenuItem icon="heartbeat" to="/http-heartbeats" data-cy="http-heartbeats">
       HTTP Heartbeats
     </MenuItem>
-    <MenuItem icon="server" to="/ping-heartbeat" data-cy="ping-heartbeats">
-      Ping Heartbeats
+    <MenuItem icon="server" to="/instance-heartbeat" data-cy="instance-heartbeats">
+      Instance Heartbeats
     </MenuItem>
     <MenuItem icon="network-wired" to="/service-heartbeat" data-cy="service-heartbeats">
       Service Heartbeats
