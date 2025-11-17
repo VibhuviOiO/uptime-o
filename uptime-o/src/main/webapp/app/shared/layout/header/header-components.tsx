@@ -6,11 +6,15 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { getWebsiteSettings } from 'app/shared/services/website-settings.service';
 import { IWebsiteSettings } from 'app/shared/model/website-settings.model';
 
-export const BrandIcon = ({ logoPath, logoWidth, logoHeight }) => (
-  <div className="brand-icon">
-    <img src={logoPath || '/content/images/logo-jhipster.png'} alt="Logo" style={{ width: logoWidth, height: logoHeight }} />
-  </div>
-);
+export const BrandIcon = ({ logoPath, logoWidth, logoHeight }) => {
+  // Logo size is controlled by CSS for consistency
+
+  return (
+    <div className="brand-icon">
+      <img src={logoPath || '/content/images/logo-jhipster.png'} alt="Logo" />
+    </div>
+  );
+};
 
 export const Brand = () => {
   const [settings, setSettings] = useState<IWebsiteSettings>({
@@ -66,16 +70,25 @@ export const Brand = () => {
           metaAuthor.content = data.author;
         }
 
-        // Update favicon
-        if (data.faviconPath) {
-          const existingLink = document.querySelector<HTMLLinkElement>("link[rel*='icon']");
-          const link = existingLink || document.createElement('link');
-          link.type = 'image/x-icon';
-          link.rel = 'shortcut icon';
-          link.href = data.faviconPath;
-          if (!existingLink) {
-            head.appendChild(link);
-          }
+        // Update favicon only if it's different from default and accessible
+        if (data.faviconPath && data.faviconPath !== '/content/images/favicon.ico') {
+          // Test if the favicon URL is accessible before updating
+          const testImg = new Image();
+          testImg.onload = () => {
+            const existingLink = document.querySelector<HTMLLinkElement>("link[rel*='icon']");
+            const link = existingLink || document.createElement('link');
+            link.type = 'image/x-icon';
+            link.rel = 'shortcut icon';
+            link.href = data.faviconPath;
+            if (!existingLink) {
+              head.appendChild(link);
+            }
+          };
+          testImg.onerror = () => {
+            // Keep existing favicon if new one fails to load
+            console.warn('Failed to load favicon:', data.faviconPath);
+          };
+          testImg.src = data.faviconPath;
         }
       } catch (error) {
         console.error('Failed to load website settings:', error);

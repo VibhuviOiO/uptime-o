@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <!--
+        Added the entity Branding.
+    -->
+    <changeSet id="20241210120000-1" author="jhipster">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="true">SELECT '${application.branding.enabled:false}' = 'true'</sqlCheck>
+        </preConditions>
+        <createTable tableName="branding">
+            <column name="id" type="bigint">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="title" type="varchar(200)">
+                <constraints nullable="false" />
+            </column>
+            <column name="description" type="varchar(500)">
+                <constraints nullable="true" />
+            </column>
+            <column name="keywords" type="varchar(300)">
+                <constraints nullable="true" />
+            </column>
+            <column name="author" type="varchar(100)">
+                <constraints nullable="true" />
+            </column>
+            <column name="favicon_path" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="logo_path" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="logo_width" type="integer">
+                <constraints nullable="true" />
+            </column>
+            <column name="logo_height" type="integer">
+                <constraints nullable="true" />
+            </column>
+            <column name="footer_title" type="varchar(200)">
+                <constraints nullable="true" />
+            </column>
+            <column name="is_active" type="boolean">
+                <constraints nullable="false" />
+            </column>
+            <column name="created_at" type="${datetimeType}">
+                <constraints nullable="true" />
+            </column>
+            <column name="updated_at" type="${datetimeType}">
+                <constraints nullable="true" />
+            </column>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>

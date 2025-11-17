@@ -225,6 +225,8 @@ jhipster:
 # ===================================================================
 
 application:
+  branding:
+    enabled: true
   encryption:
     secret-key:
       # Override in application-dev.yml or application-prod.yml

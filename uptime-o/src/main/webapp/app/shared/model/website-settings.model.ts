@@ -8,6 +8,23 @@ export interface IWebsiteSettings {
   logoWidth?: number;
   logoHeight?: number;
   footerTitle?: string;
+  brandingEnabled?: boolean;
+}
+
+export interface IBranding {
+  id?: number;
+  title?: string;
+  description?: string;
+  keywords?: string;
+  author?: string;
+  faviconPath?: string;
+  logoPath?: string;
+  logoWidth?: number;
+  logoHeight?: number;
+  footerTitle?: string;
+  isActive?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export const defaultValue: Readonly<IWebsiteSettings> = {

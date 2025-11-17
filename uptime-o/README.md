@@ -259,22 +259,6 @@ Then run:
 ```sh
 docker compose -f src/main/docker/app.yml up -d
 ```
-## Branding Configuration
-
-```bash
-# Set environment variables in your terminal
-export WEBSITE_TITLE="Google Cloud Monitoring"
-export WEBSITE_DESCRIPTION="Enterprise-grade uptime monitoring powered by Google Cloud"
-export WEBSITE_KEYWORDS="google cloud,gcp,monitoring,uptime,observability"
-export WEBSITE_AUTHOR="Google Cloud Team"
-export WEBSITE_LOGOPATH="/content/images/logo-jhipster.png"
-export WEBSITE_LOGOWIDTH="220"
-export WEBSITE_LOGOHEIGHT="55"
-export WEBSITE_FOOTERTITLE="Powered by Google Cloud Platform"
-
-# Then start the application
-./mvnw
-```
 
 ## Create the the partition. : 
 

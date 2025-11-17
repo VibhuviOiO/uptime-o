@@ -77,6 +77,8 @@ public class SecurityConfiguration {
                     .requestMatchers(mvc.pattern("/api/account/reset-password/init")).permitAll()
                     .requestMatchers(mvc.pattern("/api/account/reset-password/finish")).permitAll()
                     .requestMatchers(mvc.pattern("/api/website-settings")).permitAll()
+                    .requestMatchers(mvc.pattern("/api/files/**")).permitAll()
+                    .requestMatchers(mvc.pattern("/api/public/brandings/active")).permitAll()
                     .requestMatchers(mvc.pattern("/api/public/status")).permitAll()
                     .requestMatchers(mvc.pattern("/api/public/heartbeats/**")).hasAnyAuthority(AuthoritiesConstants.API_AGENT, AuthoritiesConstants.USER, AuthoritiesConstants.ADMIN)
                     .requestMatchers(mvc.pattern("/api/public/monitors/**")).hasAnyAuthority(AuthoritiesConstants.API_AGENT, AuthoritiesConstants.USER, AuthoritiesConstants.ADMIN)

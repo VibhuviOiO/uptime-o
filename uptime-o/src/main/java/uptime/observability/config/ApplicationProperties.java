@@ -13,6 +13,7 @@ public class ApplicationProperties {
 
     private final Liquibase liquibase = new Liquibase();
     private final Encryption encryption = new Encryption();
+    private final Branding branding = new Branding();
 
     // jhipster-needle-application-properties-property
 
@@ -22,6 +23,10 @@ public class ApplicationProperties {
 
     public Encryption getEncryption() {
         return encryption;
+    }
+
+    public Branding getBranding() {
+        return branding;
     }
 
     // jhipster-needle-application-properties-property-getter
@@ -49,6 +54,19 @@ public class ApplicationProperties {
 
         public void setSecretKey(String secretKey) {
             this.secretKey = secretKey;
+        }
+    }
+
+    public static class Branding {
+
+        private Boolean enabled = false;
+
+        public Boolean getEnabled() {
+            return enabled;
+        }
+
+        public void setEnabled(Boolean enabled) {
+            this.enabled = enabled;
         }
     }
     // jhipster-needle-application-properties-property-class

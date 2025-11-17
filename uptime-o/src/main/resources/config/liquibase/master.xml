@@ -25,6 +25,7 @@
     <include file="config/liquibase/changelog/20251116000000_create_http_monitors.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20251116000001_create_http_heartbeats.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20251109000003_create_agent_monitor.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20241210120000_added_entity_Branding.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-changelog - JHipster will add liquibase changelogs here -->
     <include file="config/liquibase/changelog/20251025202839_added_entity_constraints_Datacenter.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20251025202840_added_entity_constraints_Agent.xml" relativeToChangelogFile="false"/>

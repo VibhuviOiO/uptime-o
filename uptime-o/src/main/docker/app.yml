@@ -1,44 +1,35 @@
-# This configuration is intended for development purpose, it's **your** responsibility to harden it for production
-name: uptimeo
 services:
-  app:
-    image: uptimeo
-    environment:
-      # JVM Configuration - Optimized for 500 concurrent users
-      - JAVA_OPTS=-Xms1024m -Xmx2048m -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp/heap_dump.hprof
-      
-      # Spring Profile
-      - SPRING_PROFILES_ACTIVE=prod,api-docs
-      
-      # Database Configuration
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgresql:5432/uptimeO
-      - SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE=20
-      - SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE=5
-      - SPRING_LIQUIBASE_URL=jdbc:postgresql://postgresql:5432/uptimeO
-      
-      # Logging Configuration
-      - LOGGING_LEVEL_ROOT=INFO
-      - LOGGING_FILE_NAME=/var/log/uptimeo/application.log
-      - LOGGING_FILE_MAX_SIZE=100MB
-      - LOGGING_FILE_MAX_HISTORY=30
-      
-      # Monitoring
-      - MANAGEMENT_PROMETHEUS_METRICS_EXPORT_ENABLED=true
+  uptimeo-app:
+    image: uptimeo:latest
+    container_name: uptimeo-app
+    env_file:
+      - ./.env
     ports:
-      - 127.0.0.1:8080:8080
+      - "8080:8080"
+    volumes:
+      # Persistent storage for uploaded images
+      - uptimeo_uploads:/var/uptimeo/uploads
+      # Persistent storage for logs
+      - uptimeo_logs:/var/log/uptimeo
     healthcheck:
       test:
         - CMD
         - curl
         - -f
         - http://localhost:8080/management/health
-      interval: 5s
-      timeout: 5s
-      retries: 40
-    depends_on:
-      postgresql:
-        condition: service_healthy
-  postgresql:
-    extends:
-      file: ./postgresql.yml
-      service: postgresql
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    restart: unless-stopped
+    networks:
+      - uptimeo
+
+volumes:
+  uptimeo_uploads:
+  uptimeo_logs:
+
+networks:
+  uptimeo:
+    name: uptimeo
+    external: true

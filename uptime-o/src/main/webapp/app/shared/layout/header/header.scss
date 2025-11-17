@@ -96,10 +96,14 @@ Navbar styles
   }
   .brand-icon {
     height: 35px;
-    width: auto;
+    max-width: 120px;
     display: inline-block;
     img {
-      width: 45px;
+      max-width: 120px;
+      max-height: 35px;
+      width: auto;
+      height: auto;
+      object-fit: contain;
     }
   }
 }
