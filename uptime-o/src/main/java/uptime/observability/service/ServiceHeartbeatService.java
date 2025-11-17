@@ -38,7 +38,26 @@ public class ServiceHeartbeatService {
     @Transactional(readOnly = true)
     public Page<ServiceHeartbeatDTO> findAll(Pageable pageable) {
         LOG.debug("Request to get all ServiceHeartbeats");
-        return serviceHeartbeatRepository.findAll(pageable).map(serviceHeartbeatMapper::toDto);
+        // Override default sort to show latest first
+        if (pageable.getSort().isUnsorted()) {
+            pageable = org.springframework.data.domain.PageRequest.of(
+                pageable.getPageNumber(), 
+                pageable.getPageSize(), 
+                org.springframework.data.domain.Sort.by("executedAt").descending()
+            );
+        }
+        return serviceHeartbeatRepository.findAll(pageable).map(heartbeat -> {
+            ServiceHeartbeatDTO dto = serviceHeartbeatMapper.toDto(heartbeat);
+            // Populate service and instance details
+            if (heartbeat.getService() != null) {
+                dto.setServiceName(heartbeat.getService().getName());
+            }
+            if (heartbeat.getServiceInstance() != null) {
+                dto.setInstanceName(heartbeat.getServiceInstance().getInstanceName());
+                dto.setInstancePort(heartbeat.getServiceInstance().getPort());
+            }
+            return dto;
+        });
     }
 
     @Transactional(readOnly = true)

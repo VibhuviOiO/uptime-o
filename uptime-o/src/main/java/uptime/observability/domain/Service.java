@@ -44,6 +44,9 @@ public class Service implements Serializable {
     @Column(name = "monitoring_enabled")
     private Boolean monitoringEnabled;
 
+    @Column(name = "cluster_monitoring_enabled")
+    private Boolean clusterMonitoringEnabled;
+
     @NotNull
     @Column(name = "interval_seconds", nullable = false)
     private Integer intervalSeconds;
@@ -154,6 +157,19 @@ public class Service implements Serializable {
 
     public Service monitoringEnabled(Boolean monitoringEnabled) {
         this.setMonitoringEnabled(monitoringEnabled);
+        return this;
+    }
+
+    public Boolean getClusterMonitoringEnabled() {
+        return clusterMonitoringEnabled;
+    }
+
+    public void setClusterMonitoringEnabled(Boolean clusterMonitoringEnabled) {
+        this.clusterMonitoringEnabled = clusterMonitoringEnabled;
+    }
+
+    public Service clusterMonitoringEnabled(Boolean clusterMonitoringEnabled) {
+        this.setClusterMonitoringEnabled(clusterMonitoringEnabled);
         return this;
     }
 

@@ -34,374 +34,177 @@
             <column name="response_time_critical_ms" valueNumeric="1000"/>
             <column name="enabled" valueBoolean="true"/>
         </insert>
-        <insert tableName="http_monitors">
-            <column name="id" valueNumeric="3"/>
-            <column name="name" value="ISRO Customer Satellites"/>
-            <column name="method" value="GET"/>
-            <column name="type" value="HTTPS"/>
-            <column name="url" value="https://isro.vercel.app/api/customer_satellites"/>
-            <column name="interval_seconds" valueNumeric="60"/>
-            <column name="timeout_seconds" valueNumeric="30"/>
-            <column name="retry_count" valueNumeric="2"/>
-            <column name="retry_delay_seconds" valueNumeric="5"/>
-            <column name="response_time_warning_ms" valueNumeric="500"/>
-            <column name="response_time_critical_ms" valueNumeric="1000"/>
-            <column name="enabled" valueBoolean="true"/>
-        </insert>
-        <insert tableName="http_monitors">
-            <column name="id" valueNumeric="4"/>
-            <column name="name" value="Aviation Weather METAR"/>
-            <column name="method" value="GET"/>
-            <column name="type" value="HTTPS"/>
-            <column name="url" value="https://aviationweather.gov/api/data/metar?ids=KMCI&amp;format=json"/>
-            <column name="interval_seconds" valueNumeric="60"/>
-            <column name="timeout_seconds" valueNumeric="30"/>
-            <column name="retry_count" valueNumeric="2"/>
-            <column name="retry_delay_seconds" valueNumeric="5"/>
-            <column name="response_time_warning_ms" valueNumeric="500"/>
-            <column name="response_time_critical_ms" valueNumeric="1000"/>
-            <column name="enabled" valueBoolean="true"/>
-        </insert>
-        <insert tableName="http_monitors">
-            <column name="id" valueNumeric="5"/>
-            <column name="name" value="NHTSA Vehicle API"/>
-            <column name="method" value="GET"/>
-            <column name="type" value="HTTPS"/>
-            <column name="url" value="https://vpic.nhtsa.dot.gov/api/vehicles/decodevinvaluesextended/5UXWX7C5*BA?format=json&amp;modelyear=2011"/>
-            <column name="interval_seconds" valueNumeric="60"/>
-            <column name="timeout_seconds" valueNumeric="30"/>
-            <column name="retry_count" valueNumeric="2"/>
-            <column name="retry_delay_seconds" valueNumeric="5"/>
-            <column name="response_time_warning_ms" valueNumeric="500"/>
-            <column name="response_time_critical_ms" valueNumeric="1000"/>
-            <column name="enabled" valueBoolean="true"/>
-        </insert>
-        <insert tableName="http_monitors">
-            <column name="id" valueNumeric="6"/>
-            <column name="name" value="Squiggle AFL Teams"/>
-            <column name="method" value="GET"/>
-            <column name="type" value="HTTPS"/>
-            <column name="url" value="https://api.squiggle.com.au/?q=teams"/>
-            <column name="interval_seconds" valueNumeric="60"/>
-            <column name="timeout_seconds" valueNumeric="30"/>
-            <column name="retry_count" valueNumeric="2"/>
-            <column name="retry_delay_seconds" valueNumeric="5"/>
-            <column name="response_time_warning_ms" valueNumeric="500"/>
-            <column name="response_time_critical_ms" valueNumeric="1000"/>
-            <column name="enabled" valueBoolean="true"/>
-        </insert>
-        <insert tableName="http_monitors">
-            <column name="id" valueNumeric="7"/>
-            <column name="name" value="NVD Schema"/>
-            <column name="method" value="GET"/>
-            <column name="type" value="HTTPS"/>
-            <column name="url" value="https://csrc.nist.gov/schema/nvd/feed/1.0/nvd_cve_feed_json_1.0.schema"/>
-            <column name="interval_seconds" valueNumeric="60"/>
-            <column name="timeout_seconds" valueNumeric="30"/>
-            <column name="retry_count" valueNumeric="2"/>
-            <column name="retry_delay_seconds" valueNumeric="5"/>
-            <column name="response_time_warning_ms" valueNumeric="500"/>
-            <column name="response_time_critical_ms" valueNumeric="1000"/>
-            <column name="enabled" valueBoolean="true"/>
-        </insert>
-        <insert tableName="http_monitors">
-            <column name="id" valueNumeric="8"/>
-            <column name="name" value="JSONPlaceholder Posts"/>
-            <column name="method" value="GET"/>
-            <column name="type" value="HTTPS"/>
-            <column name="url" value="https://jsonplaceholder.typicode.com/posts/1"/>
-            <column name="interval_seconds" valueNumeric="60"/>
-            <column name="timeout_seconds" valueNumeric="30"/>
-            <column name="retry_count" valueNumeric="2"/>
-            <column name="retry_delay_seconds" valueNumeric="5"/>
-            <column name="response_time_warning_ms" valueNumeric="500"/>
-            <column name="response_time_critical_ms" valueNumeric="1000"/>
-            <column name="enabled" valueBoolean="true"/>
-        </insert>
 
         <!-- Regions -->
         <insert tableName="regions">
             <column name="id" valueNumeric="1"/>
-            <column name="name" value="US East"/>
-            <column name="region_code" value="us-east-1"/>
-            <column name="group_name" value="US"/>
-        </insert>
-        <insert tableName="regions">
-            <column name="id" valueNumeric="2"/>
-            <column name="name" value="US West"/>
-            <column name="region_code" value="us-west-1"/>
-            <column name="group_name" value="US"/>
+            <column name="name" value="Home Network"/>
+            <column name="region_code" value="home-1"/>
+            <column name="group_name" value="HOME"/>
         </insert>
 
         <!-- Datacenters -->
         <insert tableName="datacenters">
             <column name="id" valueNumeric="1"/>
-            <column name="code" value="va"/>
-            <column name="name" value="Virginia"/>
+            <column name="code" value="home"/>
+            <column name="name" value="Home Lab"/>
             <column name="region_id" valueNumeric="1"/>
         </insert>
-        <insert tableName="datacenters">
-            <column name="id" valueNumeric="2"/>
-            <column name="code" value="sf"/>
-            <column name="name" value="San Francisco"/>
-            <column name="region_id" valueNumeric="2"/>
-        </insert>
 
-        <!-- Agents -->
-        <insert tableName="agents">
-            <column name="id" valueNumeric="1"/>
-            <column name="name" value="US-East-Agent"/>
-            <column name="region_id" valueNumeric="1"/>
-        </insert>
-        <insert tableName="agents">
-            <column name="id" valueNumeric="2"/>
-            <column name="name" value="US-West-Agent"/>
-            <column name="region_id" valueNumeric="2"/>
-        </insert>
-
-        <!-- Agent Monitors (all 8 monitors to 2 agents) -->
-        <insert tableName="agent_monitors">
-            <column name="id" valueNumeric="1"/>
-            <column name="agent_id" valueNumeric="1"/>
-            <column name="monitor_id" valueNumeric="1"/>
-            <column name="active" valueBoolean="true"/>
-            <column name="created_by" value="system"/>
-            <column name="created_date" valueDate="${now}"/>
-        </insert>
-        <insert tableName="agent_monitors">
-            <column name="id" valueNumeric="2"/>
-            <column name="agent_id" valueNumeric="1"/>
-            <column name="monitor_id" valueNumeric="2"/>
-            <column name="active" valueBoolean="true"/>
-            <column name="created_by" value="system"/>
-            <column name="created_date" valueDate="${now}"/>
-        </insert>
-        <insert tableName="agent_monitors">
-            <column name="id" valueNumeric="3"/>
-            <column name="agent_id" valueNumeric="1"/>
-            <column name="monitor_id" valueNumeric="3"/>
-            <column name="active" valueBoolean="true"/>
-            <column name="created_by" value="system"/>
-            <column name="created_date" valueDate="${now}"/>
-        </insert>
-        <insert tableName="agent_monitors">
-            <column name="id" valueNumeric="4"/>
-            <column name="agent_id" valueNumeric="1"/>
-            <column name="monitor_id" valueNumeric="4"/>
-            <column name="active" valueBoolean="true"/>
-            <column name="created_by" value="system"/>
-            <column name="created_date" valueDate="${now}"/>
-        </insert>
-        <insert tableName="agent_monitors">
-            <column name="id" valueNumeric="5"/>
-            <column name="agent_id" valueNumeric="1"/>
-            <column name="monitor_id" valueNumeric="5"/>
-            <column name="active" valueBoolean="true"/>
-            <column name="created_by" value="system"/>
-            <column name="created_date" valueDate="${now}"/>
-        </insert>
-        <insert tableName="agent_monitors">
-            <column name="id" valueNumeric="6"/>
-            <column name="agent_id" valueNumeric="1"/>
-            <column name="monitor_id" valueNumeric="6"/>
-            <column name="active" valueBoolean="true"/>
-            <column name="created_by" value="system"/>
-            <column name="created_date" valueDate="${now}"/>
-        </insert>
-        <insert tableName="agent_monitors">
-            <column name="id" valueNumeric="7"/>
-            <column name="agent_id" valueNumeric="1"/>
-            <column name="monitor_id" valueNumeric="7"/>
-            <column name="active" valueBoolean="true"/>
-            <column name="created_by" value="system"/>
-            <column name="created_date" valueDate="${now}"/>
-        </insert>
-        <insert tableName="agent_monitors">
-            <column name="id" valueNumeric="8"/>
-            <column name="agent_id" valueNumeric="1"/>
-            <column name="monitor_id" valueNumeric="8"/>
-            <column name="active" valueBoolean="true"/>
-            <column name="created_by" value="system"/>
-            <column name="created_date" valueDate="${now}"/>
-        </insert>
-        <insert tableName="agent_monitors">
-            <column name="id" valueNumeric="9"/>
-            <column name="agent_id" valueNumeric="2"/>
-            <column name="monitor_id" valueNumeric="1"/>
-            <column name="active" valueBoolean="true"/>
-            <column name="created_by" value="system"/>
-            <column name="created_date" valueDate="${now}"/>
-        </insert>
-        <insert tableName="agent_monitors">
-            <column name="id" valueNumeric="10"/>
-            <column name="agent_id" valueNumeric="2"/>
-            <column name="monitor_id" valueNumeric="2"/>
-            <column name="active" valueBoolean="true"/>
-            <column name="created_by" value="system"/>
-            <column name="created_date" valueDate="${now}"/>
-        </insert>
-        <insert tableName="agent_monitors">
-            <column name="id" valueNumeric="11"/>
-            <column name="agent_id" valueNumeric="2"/>
-            <column name="monitor_id" valueNumeric="3"/>
-            <column name="active" valueBoolean="true"/>
-            <column name="created_by" value="system"/>
-            <column name="created_date" valueDate="${now}"/>
-        </insert>
-        <insert tableName="agent_monitors">
-            <column name="id" valueNumeric="12"/>
-            <column name="agent_id" valueNumeric="2"/>
-            <column name="monitor_id" valueNumeric="4"/>
-            <column name="active" valueBoolean="true"/>
-            <column name="created_by" value="system"/>
-            <column name="created_date" valueDate="${now}"/>
-        </insert>
-        <insert tableName="agent_monitors">
-            <column name="id" valueNumeric="13"/>
-            <column name="agent_id" valueNumeric="2"/>
-            <column name="monitor_id" valueNumeric="5"/>
-            <column name="active" valueBoolean="true"/>
-            <column name="created_by" value="system"/>
-            <column name="created_date" valueDate="${now}"/>
-        </insert>
-        <insert tableName="agent_monitors">
-            <column name="id" valueNumeric="14"/>
-            <column name="agent_id" valueNumeric="2"/>
-            <column name="monitor_id" valueNumeric="6"/>
-            <column name="active" valueBoolean="true"/>
-            <column name="created_by" value="system"/>
-            <column name="created_date" valueDate="${now}"/>
-        </insert>
-        <insert tableName="agent_monitors">
-            <column name="id" valueNumeric="15"/>
-            <column name="agent_id" valueNumeric="2"/>
-            <column name="monitor_id" valueNumeric="7"/>
-            <column name="active" valueBoolean="true"/>
-            <column name="created_by" value="system"/>
-            <column name="created_date" valueDate="${now}"/>
-        </insert>
-        <insert tableName="agent_monitors">
-            <column name="id" valueNumeric="16"/>
-            <column name="agent_id" valueNumeric="2"/>
-            <column name="monitor_id" valueNumeric="8"/>
-            <column name="active" valueBoolean="true"/>
-            <column name="created_by" value="system"/>
-            <column name="created_date" valueDate="${now}"/>
-        </insert>
-
-        <!-- Instances (2 per datacenter) -->
+        <!-- Real Machine Instances -->
         <insert tableName="instances">
             <column name="id" valueNumeric="1"/>
-            <column name="name" value="web-server-va-1"/>
-            <column name="hostname" value="web-va-1.example.com"/>
-            <column name="description" value="Web server in Virginia"/>
-            <column name="instance_type" value="VM"/>
-            <column name="monitoring_type" value="AGENT_MONITORED"/>
-            <column name="agent_id" valueNumeric="1"/>
+            <column name="name" value="rp4"/>
+            <column name="hostname" value="rp4.local"/>
+            <column name="description" value="Raspberry Pi 4 - Docker host"/>
+            <column name="instance_type" value="BARE_METAL"/>
+            <column name="monitoring_type" value="SELF_HOSTED"/>
             <column name="operating_system" value="Linux"/>
-            <column name="platform" value="Ubuntu 22.04"/>
-            <column name="private_ip_address" value="10.0.1.10"/>
+            <column name="platform" value="Raspberry Pi OS"/>
+            <column name="private_ip_address" value="192.168.0.104"/>
+            <column name="ping_enabled" valueBoolean="true"/>
+            <column name="ping_interval" valueNumeric="30"/>
+            <column name="ping_timeout_ms" valueNumeric="3000"/>
+            <column name="ping_retry_count" valueNumeric="2"/>
+            <column name="hardware_monitoring_enabled" valueBoolean="false"/>
+            <column name="hardware_monitoring_interval" valueNumeric="300"/>
             <column name="datacenter_id" valueNumeric="1"/>
         </insert>
         <insert tableName="instances">
             <column name="id" valueNumeric="2"/>
-            <column name="name" value="db-server-va-1"/>
-            <column name="hostname" value="db-va-1.example.com"/>
-            <column name="description" value="Database server in Virginia"/>
-            <column name="instance_type" value="VM"/>
-            <column name="monitoring_type" value="AGENT_MONITORED"/>
-            <column name="agent_id" valueNumeric="1"/>
-            <column name="operating_system" value="Linux"/>
-            <column name="platform" value="Ubuntu 22.04"/>
-            <column name="private_ip_address" value="10.0.1.20"/>
+            <column name="name" value="swagup-machine"/>
+            <column name="hostname" value="swagup-machine.local"/>
+            <column name="description" value="Mac machine - Redis cluster host"/>
+            <column name="instance_type" value="BARE_METAL"/>
+            <column name="monitoring_type" value="SELF_HOSTED"/>
+            <column name="operating_system" value="macOS"/>
+            <column name="platform" value="macOS"/>
+            <column name="private_ip_address" value="192.168.0.103"/>
+            <column name="ping_enabled" valueBoolean="true"/>
+            <column name="ping_interval" valueNumeric="30"/>
+            <column name="ping_timeout_ms" valueNumeric="3000"/>
+            <column name="ping_retry_count" valueNumeric="2"/>
+            <column name="hardware_monitoring_enabled" valueBoolean="false"/>
+            <column name="hardware_monitoring_interval" valueNumeric="300"/>
             <column name="datacenter_id" valueNumeric="1"/>
         </insert>
-        <insert tableName="instances">
-            <column name="id" valueNumeric="3"/>
-            <column name="name" value="web-server-sf-1"/>
-            <column name="hostname" value="web-sf-1.example.com"/>
-            <column name="description" value="Web server in San Francisco"/>
-            <column name="instance_type" value="VM"/>
-            <column name="monitoring_type" value="AGENT_MONITORED"/>
-            <column name="agent_id" valueNumeric="2"/>
-            <column name="operating_system" value="Linux"/>
-            <column name="platform" value="Ubuntu 22.04"/>
-            <column name="private_ip_address" value="10.0.2.10"/>
-            <column name="datacenter_id" valueNumeric="2"/>
-        </insert>
-        <insert tableName="instances">
-            <column name="id" valueNumeric="4"/>
-            <column name="name" value="db-server-sf-1"/>
-            <column name="hostname" value="db-sf-1.example.com"/>
-            <column name="description" value="Database server in San Francisco"/>
-            <column name="instance_type" value="VM"/>
-            <column name="monitoring_type" value="AGENT_MONITORED"/>
-            <column name="agent_id" valueNumeric="2"/>
-            <column name="operating_system" value="Linux"/>
-            <column name="platform" value="Ubuntu 22.04"/>
-            <column name="private_ip_address" value="10.0.2.20"/>
-            <column name="datacenter_id" valueNumeric="2"/>
-        </insert>
 
-        <!-- Services (1 per datacenter) -->
+        <!-- Services -->
         <insert tableName="services">
             <column name="id" valueNumeric="1"/>
-            <column name="name" value="PostgreSQL Cluster VA"/>
-            <column name="description" value="PostgreSQL database cluster in Virginia"/>
-            <column name="service_type" value="POSTGRESQL"/>
-            <column name="environment" value="PROD"/>
-            <column name="monitoring_enabled" valueBoolean="true"/>
-            <column name="interval_seconds" valueNumeric="30"/>
-            <column name="timeout_ms" valueNumeric="2000"/>
-            <column name="retry_count" valueNumeric="2"/>
-            <column name="latency_warning_ms" valueNumeric="200"/>
-            <column name="latency_critical_ms" valueNumeric="600"/>
-            <column name="is_active" valueBoolean="true"/>
-            <column name="datacenter_id" valueNumeric="1"/>
-        </insert>
-        <insert tableName="services">
-            <column name="id" valueNumeric="2"/>
-            <column name="name" value="Redis Cache SF"/>
-            <column name="description" value="Redis cache cluster in San Francisco"/>
+            <column name="name" value="Redis Cluster swagup-machine"/>
+            <column name="description" value="6-node Redis cluster on Mac machine"/>
             <column name="service_type" value="REDIS"/>
-            <column name="environment" value="PROD"/>
+            <column name="environment" value="DEV"/>
             <column name="monitoring_enabled" valueBoolean="true"/>
+            <column name="cluster_monitoring_enabled" valueBoolean="true"/>
             <column name="interval_seconds" valueNumeric="30"/>
             <column name="timeout_ms" valueNumeric="2000"/>
             <column name="retry_count" valueNumeric="2"/>
             <column name="latency_warning_ms" valueNumeric="200"/>
             <column name="latency_critical_ms" valueNumeric="600"/>
             <column name="is_active" valueBoolean="true"/>
-            <column name="datacenter_id" valueNumeric="2"/>
+            <column name="datacenter_id" valueNumeric="1"/>
+        </insert>
+        <insert tableName="services">
+            <column name="id" valueNumeric="2"/>
+            <column name="name" value="Portainer CE rp4"/>
+            <column name="description" value="Portainer Community Edition on Raspberry Pi"/>
+            <column name="service_type" value="TCP"/>
+            <column name="environment" value="DEV"/>
+            <column name="monitoring_enabled" valueBoolean="true"/>
+            <column name="cluster_monitoring_enabled" valueBoolean="false"/>
+            <column name="interval_seconds" valueNumeric="60"/>
+            <column name="timeout_ms" valueNumeric="3000"/>
+            <column name="retry_count" valueNumeric="2"/>
+            <column name="latency_warning_ms" valueNumeric="500"/>
+            <column name="latency_critical_ms" valueNumeric="2000"/>
+            <column name="is_active" valueBoolean="true"/>
+            <column name="datacenter_id" valueNumeric="1"/>
+        </insert>
+        <insert tableName="services">
+            <column name="id" valueNumeric="3"/>
+            <column name="name" value="Komodo Periphery rp4"/>
+            <column name="description" value="Komodo Periphery service on Raspberry Pi"/>
+            <column name="service_type" value="TCP"/>
+            <column name="environment" value="DEV"/>
+            <column name="monitoring_enabled" valueBoolean="true"/>
+            <column name="cluster_monitoring_enabled" valueBoolean="false"/>
+            <column name="interval_seconds" valueNumeric="60"/>
+            <column name="timeout_ms" valueNumeric="3000"/>
+            <column name="retry_count" valueNumeric="2"/>
+            <column name="latency_warning_ms" valueNumeric="500"/>
+            <column name="latency_critical_ms" valueNumeric="2000"/>
+            <column name="is_active" valueBoolean="true"/>
+            <column name="datacenter_id" valueNumeric="1"/>
         </insert>
 
-        <!-- Service Instances (2 per service) -->
+        <!-- Service Instances for Redis Cluster (6 nodes on swagup-machine) -->
         <insert tableName="service_instances">
             <column name="id" valueNumeric="1"/>
             <column name="service_id" valueNumeric="1"/>
             <column name="instance_id" valueNumeric="2"/>
-            <column name="port" valueNumeric="5432"/>
+            <column name="port" valueNumeric="7000"/>
             <column name="is_active" valueBoolean="true"/>
         </insert>
         <insert tableName="service_instances">
             <column name="id" valueNumeric="2"/>
             <column name="service_id" valueNumeric="1"/>
-            <column name="instance_id" valueNumeric="1"/>
-            <column name="port" valueNumeric="5432"/>
+            <column name="instance_id" valueNumeric="2"/>
+            <column name="port" valueNumeric="7001"/>
             <column name="is_active" valueBoolean="true"/>
         </insert>
         <insert tableName="service_instances">
             <column name="id" valueNumeric="3"/>
-            <column name="service_id" valueNumeric="2"/>
-            <column name="instance_id" valueNumeric="3"/>
-            <column name="port" valueNumeric="6379"/>
+            <column name="service_id" valueNumeric="1"/>
+            <column name="instance_id" valueNumeric="2"/>
+            <column name="port" valueNumeric="7002"/>
             <column name="is_active" valueBoolean="true"/>
         </insert>
         <insert tableName="service_instances">
             <column name="id" valueNumeric="4"/>
+            <column name="service_id" valueNumeric="1"/>
+            <column name="instance_id" valueNumeric="2"/>
+            <column name="port" valueNumeric="7003"/>
+            <column name="is_active" valueBoolean="true"/>
+        </insert>
+        <insert tableName="service_instances">
+            <column name="id" valueNumeric="5"/>
+            <column name="service_id" valueNumeric="1"/>
+            <column name="instance_id" valueNumeric="2"/>
+            <column name="port" valueNumeric="7004"/>
+            <column name="is_active" valueBoolean="true"/>
+        </insert>
+        <insert tableName="service_instances">
+            <column name="id" valueNumeric="6"/>
+            <column name="service_id" valueNumeric="1"/>
+            <column name="instance_id" valueNumeric="2"/>
+            <column name="port" valueNumeric="7005"/>
+            <column name="is_active" valueBoolean="true"/>
+        </insert>
+
+        <!-- Service Instances for Portainer CE on rp4 -->
+        <insert tableName="service_instances">
+            <column name="id" valueNumeric="7"/>
             <column name="service_id" valueNumeric="2"/>
-            <column name="instance_id" valueNumeric="4"/>
-            <column name="port" valueNumeric="6379"/>
+            <column name="instance_id" valueNumeric="1"/>
+            <column name="port" valueNumeric="8000"/>
+            <column name="is_active" valueBoolean="true"/>
+        </insert>
+        <insert tableName="service_instances">
+            <column name="id" valueNumeric="8"/>
+            <column name="service_id" valueNumeric="2"/>
+            <column name="instance_id" valueNumeric="1"/>
+            <column name="port" valueNumeric="9000"/>
+            <column name="is_active" valueBoolean="true"/>
+        </insert>
+
+        <!-- Service Instances for Komodo Periphery on rp4 -->
+        <insert tableName="service_instances">
+            <column name="id" valueNumeric="9"/>
+            <column name="service_id" valueNumeric="3"/>
+            <column name="instance_id" valueNumeric="1"/>
+            <column name="port" valueNumeric="8120"/>
             <column name="is_active" valueBoolean="true"/>
         </insert>
     </changeSet>

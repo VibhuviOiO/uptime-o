@@ -40,6 +40,7 @@ public class ServiceInstanceResource {
         if (serviceInstanceDTO.getId() != null) {
             throw new BadRequestAlertException("A new serviceInstance cannot already have an ID", ENTITY_NAME, "idexists");
         }
+        // Set serviceId from path parameter before validation
         serviceInstanceDTO.setServiceId(serviceId);
         serviceInstanceDTO = serviceInstanceService.save(serviceInstanceDTO);
         return ResponseEntity.created(new URI("/api/service-instances/" + serviceInstanceDTO.getId()))

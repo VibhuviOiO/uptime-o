@@ -1,6 +1,8 @@
 export interface IInstanceHeartbeat {
   id?: number;
   instanceId?: number;
+  instanceName?: string;
+  instanceIpAddress?: string;
   executedAt?: string;
   heartbeatType?: 'PING' | 'HARDWARE';
   success?: boolean;

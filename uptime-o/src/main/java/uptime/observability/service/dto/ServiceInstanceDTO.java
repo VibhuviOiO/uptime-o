@@ -8,7 +8,6 @@ public class ServiceInstanceDTO implements Serializable {
 
     private Long id;
 
-    @NotNull
     private Long serviceId;
 
     @NotNull

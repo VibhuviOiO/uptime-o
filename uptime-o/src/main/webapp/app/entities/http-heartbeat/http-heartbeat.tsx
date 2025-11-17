@@ -17,9 +17,10 @@ export const HttpHeartbeat = () => {
   const pageLocation = useLocation();
   const navigate = useNavigate();
 
-  const [paginationState, setPaginationState] = useState(
-    overridePaginationStateWithQueryParams(getPaginationState(pageLocation, ITEMS_PER_PAGE, 'id'), pageLocation.search),
-  );
+  const [paginationState, setPaginationState] = useState({
+    ...overridePaginationStateWithQueryParams(getPaginationState(pageLocation, ITEMS_PER_PAGE, 'executedAt'), pageLocation.search),
+    order: DESC,
+  });
 
   const apiHeartbeatList = useAppSelector(state => state.apiHeartbeat.entities);
   const loading = useAppSelector(state => state.apiHeartbeat.loading);

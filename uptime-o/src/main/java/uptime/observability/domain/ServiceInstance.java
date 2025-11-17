@@ -159,6 +159,23 @@ public class ServiceInstance implements Serializable {
         return getClass().hashCode();
     }
 
+    // Helper methods to get instance details
+    public String getInstanceName() {
+        return instance != null ? instance.getName() : null;
+    }
+    
+    public String getInstanceHostname() {
+        return instance != null ? instance.getHostname() : null;
+    }
+    
+    public String getInstancePrivateIpAddress() {
+        return instance != null ? instance.getPrivateIpAddress() : null;
+    }
+    
+    public String getInstancePublicIpAddress() {
+        return instance != null ? instance.getPublicIpAddress() : null;
+    }
+
     @Override
     public String toString() {
         return "ServiceInstance{" +

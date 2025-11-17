@@ -22,7 +22,7 @@ import uptime.observability.service.dto.InstanceHeartbeatDTO;
 import uptime.observability.web.rest.errors.BadRequestAlertException;
 
 @RestController
-@RequestMapping("/api/ping-heartbeats")
+@RequestMapping("/api/instance-heartbeats")
 public class InstanceHeartbeatResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(InstanceHeartbeatResource.class);
@@ -45,7 +45,7 @@ public class InstanceHeartbeatResource {
             throw new BadRequestAlertException("A new instanceHeartbeat cannot already have an ID", ENTITY_NAME, "idexists");
         }
         instanceHeartbeatDTO = instanceHeartbeatService.save(instanceHeartbeatDTO);
-        return ResponseEntity.created(new URI("/api/ping-heartbeats/" + instanceHeartbeatDTO.getId()))
+        return ResponseEntity.created(new URI("/api/instance-heartbeats/" + instanceHeartbeatDTO.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, instanceHeartbeatDTO.getId().toString()))
             .body(instanceHeartbeatDTO);
     }

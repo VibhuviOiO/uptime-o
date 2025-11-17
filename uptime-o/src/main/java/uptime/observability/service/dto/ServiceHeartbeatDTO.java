@@ -14,6 +14,10 @@ public class ServiceHeartbeatDTO implements Serializable {
     private Long serviceId;
 
     private Long serviceInstanceId;
+    
+    private String serviceName;
+    private String instanceName;
+    private Integer instancePort;
 
     @NotNull
     private Instant executedAt;
@@ -110,6 +114,30 @@ public class ServiceHeartbeatDTO implements Serializable {
 
     public void setAgentId(Long agentId) {
         this.agentId = agentId;
+    }
+    
+    public String getServiceName() {
+        return serviceName;
+    }
+    
+    public void setServiceName(String serviceName) {
+        this.serviceName = serviceName;
+    }
+    
+    public String getInstanceName() {
+        return instanceName;
+    }
+    
+    public void setInstanceName(String instanceName) {
+        this.instanceName = instanceName;
+    }
+    
+    public Integer getInstancePort() {
+        return instancePort;
+    }
+    
+    public void setInstancePort(Integer instancePort) {
+        this.instancePort = instancePort;
     }
 
     @Override

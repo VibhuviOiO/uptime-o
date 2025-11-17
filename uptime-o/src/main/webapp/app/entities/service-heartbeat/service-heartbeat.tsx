@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Button, Badge } from 'reactstrap';
 import { JhiItemCount, JhiPagination, getPaginationState, TextFormat } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSort, faSortDown, faSortUp, faHeartbeat, faSync } from '@fortawesome/free-solid-svg-icons';
+import { faSort, faSortDown, faSortUp, faHeartbeat, faSync, faChevronDown, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { ASC, DESC, ITEMS_PER_PAGE, SORT } from 'app/shared/util/pagination.constants';
 import { overridePaginationStateWithQueryParams } from 'app/shared/util/entity-utils';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
@@ -16,13 +16,15 @@ export const ServiceHeartbeat = () => {
   const pageLocation = useLocation();
   const navigate = useNavigate();
 
-  const [paginationState, setPaginationState] = useState(
-    overridePaginationStateWithQueryParams(getPaginationState(pageLocation, ITEMS_PER_PAGE, 'id'), pageLocation.search),
-  );
+  const [paginationState, setPaginationState] = useState({
+    ...overridePaginationStateWithQueryParams(getPaginationState(pageLocation, ITEMS_PER_PAGE, 'executedAt'), pageLocation.search),
+    order: DESC,
+  });
 
   const serviceHeartbeatList = useAppSelector(state => state.serviceHeartbeat.entities);
   const loading = useAppSelector(state => state.serviceHeartbeat.loading);
   const totalItems = useAppSelector(state => state.serviceHeartbeat.totalItems);
+  const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
 
   const getAllEntities = () => {
     dispatch(
@@ -100,6 +102,164 @@ export const ServiceHeartbeat = () => {
     return <Badge color={statusColors[status] || 'secondary'}>{status}</Badge>;
   };
 
+  const toggleRowExpansion = (heartbeatId: number) => {
+    const newExpandedRows = new Set(expandedRows);
+    if (newExpandedRows.has(heartbeatId)) {
+      newExpandedRows.delete(heartbeatId);
+    } else {
+      newExpandedRows.add(heartbeatId);
+    }
+    setExpandedRows(newExpandedRows);
+  };
+
+  const renderClusterMetadata = (metadata: any) => {
+    if (!metadata) return null;
+
+    const cluster = metadata.cluster || {};
+    const stats = metadata.stats || {};
+    const memory = metadata.memory || {};
+    const server = metadata.server || {};
+    const totalKeys = metadata.total_keys || 0;
+    const connectedNode = metadata.connected_node || 'unknown';
+
+    const formatBytes = (bytes: number): string => {
+      if (bytes === 0) return '0 B';
+      const k = 1024;
+      const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    };
+
+    const formatUptime = (seconds: number): string => {
+      const days = Math.floor(seconds / 86400);
+      const hours = Math.floor((seconds % 86400) / 3600);
+      const minutes = Math.floor((seconds % 3600) / 60);
+
+      if (days > 0) return `${days}d ${hours}h ${minutes}m`;
+      if (hours > 0) return `${hours}h ${minutes}m`;
+      return `${minutes}m`;
+    };
+
+    return (
+      <div className="cluster-metadata">
+        {/* Cluster Status */}
+        <div className="mb-3">
+          <h6 className="text-muted mb-2">Cluster Status</h6>
+          <div className="row">
+            <div className="col-md-3">
+              <small>
+                <strong>State:</strong>{' '}
+                <Badge color={cluster.cluster_state === 'ok' ? 'success' : 'danger'}>
+                  {(cluster.cluster_state || 'unknown').toUpperCase()}
+                </Badge>
+              </small>
+            </div>
+            <div className="col-md-3">
+              <small>
+                <strong>Masters:</strong> {cluster.cluster_size || 0}
+              </small>
+            </div>
+            <div className="col-md-3">
+              <small>
+                <strong>Total Nodes:</strong> {cluster.cluster_known_nodes || 0}
+              </small>
+            </div>
+            <div className="col-md-3">
+              <small>
+                <strong>Total Keys:</strong> {totalKeys.toLocaleString()}
+              </small>
+            </div>
+          </div>
+          <div className="row mt-2">
+            <div className="col-md-4">
+              <small>
+                <strong>Slots Assigned:</strong> {cluster.cluster_slots_assigned || 0}/16384
+              </small>
+            </div>
+            <div className="col-md-4">
+              <small>
+                <strong>Slots Failed:</strong> {cluster.cluster_slots_fail || 0}
+              </small>
+            </div>
+            <div className="col-md-4">
+              <small>
+                <strong>Connected Node:</strong> {connectedNode}
+              </small>
+            </div>
+          </div>
+        </div>
+
+        {/* Performance Stats */}
+        {Object.keys(stats).length > 0 && (
+          <div className="mb-3">
+            <h6 className="text-muted mb-2">Performance</h6>
+            <div className="row">
+              <div className="col-md-3">
+                <small>
+                  <strong>Commands:</strong> {(stats.total_commands_processed || 0).toLocaleString()}
+                </small>
+              </div>
+              <div className="col-md-3">
+                <small>
+                  <strong>Ops/sec:</strong> {stats.instantaneous_ops_per_sec || 0}
+                </small>
+              </div>
+              <div className="col-md-3">
+                <small>
+                  <strong>Hits:</strong> {(stats.keyspace_hits || 0).toLocaleString()}
+                </small>
+              </div>
+              <div className="col-md-3">
+                <small>
+                  <strong>Misses:</strong> {(stats.keyspace_misses || 0).toLocaleString()}
+                </small>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Memory & Server Info */}
+        <div className="row">
+          {Object.keys(memory).length > 0 && (
+            <div className="col-md-6">
+              <h6 className="text-muted mb-2">Memory</h6>
+              <small>
+                <strong>Used:</strong> {formatBytes(memory.used_memory || 0)}
+              </small>
+              <br />
+              <small>
+                <strong>Peak:</strong> {formatBytes(memory.used_memory_peak || 0)}
+              </small>
+              <br />
+              <small>
+                <strong>Fragmentation:</strong>{' '}
+                <Badge color={memory.mem_fragmentation_ratio > 2 ? 'warning' : 'success'}>
+                  {(memory.mem_fragmentation_ratio || 1).toFixed(2)}
+                </Badge>
+              </small>
+            </div>
+          )}
+          {Object.keys(server).length > 0 && (
+            <div className="col-md-6">
+              <h6 className="text-muted mb-2">Server</h6>
+              <small>
+                <strong>Version:</strong> {server.redis_version || 'unknown'}
+              </small>
+              <br />
+              <small>
+                <strong>Uptime:</strong> {formatUptime(server.uptime_in_seconds || 0)}
+              </small>
+              <br />
+              <small>
+                <strong>Clients:</strong> {server.connected_clients || 0} connected, {server.blocked_clients || 0} blocked
+              </small>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="instance-heartbeats-page">
       <div className="instance-heartbeats-header">
@@ -138,6 +298,9 @@ export const ServiceHeartbeat = () => {
                     <span className="th-content">Service</span>
                   </th>
                   <th>
+                    <span className="th-content">Type</span>
+                  </th>
+                  <th>
                     <span className="th-content">Instance</span>
                   </th>
                   <th>
@@ -153,19 +316,51 @@ export const ServiceHeartbeat = () => {
               </thead>
               <tbody>
                 {serviceHeartbeatList.map((heartbeat, i) => (
-                  <tr key={`entity-${i}`} className="table-row">
-                    <td className="id-cell">
-                      <span className="badge bg-secondary">{heartbeat.id}</span>
-                    </td>
-                    <td>
-                      <TextFormat type="date" value={heartbeat.executedAt} format={APP_DATE_FORMAT} />
-                    </td>
-                    <td>{heartbeat.serviceId}</td>
-                    <td>{heartbeat.serviceInstanceId || <span className="text-muted">Cluster-wide</span>}</td>
-                    <td>{getStatusBadge(heartbeat.status)}</td>
-                    <td>{heartbeat.responseTimeMs ? <span className="text-success">{heartbeat.responseTimeMs}ms</span> : '-'}</td>
-                    <td>{heartbeat.agentId || '-'}</td>
-                  </tr>
+                  <React.Fragment key={`entity-${i}`}>
+                    <tr className="table-row">
+                      <td className="id-cell">
+                        <div className="d-flex align-items-center">
+                          {!heartbeat.instanceName && heartbeat.metadata && (
+                            <Button
+                              color="link"
+                              size="sm"
+                              onClick={() => toggleRowExpansion(heartbeat.id)}
+                              style={{ padding: 0, marginRight: '0.5rem' }}
+                            >
+                              <FontAwesomeIcon icon={expandedRows.has(heartbeat.id) ? faChevronDown : faChevronRight} />
+                            </Button>
+                          )}
+                          <span className="badge bg-secondary">{heartbeat.id}</span>
+                        </div>
+                      </td>
+                      <td>
+                        <TextFormat type="date" value={heartbeat.executedAt} format={APP_DATE_FORMAT} />
+                      </td>
+                      <td>{heartbeat.serviceName || `Service ${heartbeat.serviceId}`}</td>
+                      <td>{heartbeat.instanceName ? <Badge color="secondary">TCP</Badge> : <Badge color="primary">CLUSTER</Badge>}</td>
+                      <td>
+                        {heartbeat.instanceName ? (
+                          <div>
+                            <div>{heartbeat.instanceName}</div>
+                            <small className="text-muted">Port: {heartbeat.instancePort}</small>
+                          </div>
+                        ) : (
+                          <span className="text-muted">Cluster-wide</span>
+                        )}
+                      </td>
+                      <td>{getStatusBadge(heartbeat.status)}</td>
+                      <td>{heartbeat.responseTimeMs ? <span className="text-success">{heartbeat.responseTimeMs}ms</span> : '-'}</td>
+                      <td>{heartbeat.agentId || '-'}</td>
+                    </tr>
+                    {!heartbeat.instanceName && heartbeat.metadata && expandedRows.has(heartbeat.id) && (
+                      <tr>
+                        <td colSpan={8} style={{ backgroundColor: '#f8f9fa', padding: '1rem' }}>
+                          <h6>Cluster Details</h6>
+                          {renderClusterMetadata(heartbeat.metadata)}
+                        </td>
+                      </tr>
+                    )}
+                  </React.Fragment>
                 ))}
               </tbody>
             </table>

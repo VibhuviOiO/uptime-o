@@ -19,4 +19,11 @@ public interface InstanceRepository extends JpaRepository<Instance, Long> {
     List<Instance> findByMonitoringType(uptime.observability.domain.MonitoringType monitoringType);
     
     List<Instance> findByAgentId(Long agentId);
+    
+    List<Instance> findByPingEnabledTrue();
+    
+    List<Instance> findByHardwareMonitoringEnabledTrue();
+    
+    @Query("SELECT i FROM Instance i WHERE i.pingEnabled = true AND i.monitoringType = uptime.observability.domain.MonitoringType.SELF_HOSTED")
+    List<Instance> findSelfHostedWithPingEnabled();
 }

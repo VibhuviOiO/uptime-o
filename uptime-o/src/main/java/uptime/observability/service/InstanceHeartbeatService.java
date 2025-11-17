@@ -13,6 +13,7 @@ import uptime.observability.domain.InstanceHeartbeat;
 import uptime.observability.repository.InstanceHeartbeatRepository;
 import uptime.observability.service.dto.InstanceHeartbeatDTO;
 import uptime.observability.service.mapper.InstanceHeartbeatMapper;
+import uptime.observability.repository.InstanceRepository;
 
 @Service
 @Transactional
@@ -22,10 +23,12 @@ public class InstanceHeartbeatService {
 
     private final InstanceHeartbeatRepository instanceHeartbeatRepository;
     private final InstanceHeartbeatMapper instanceHeartbeatMapper;
+    private final InstanceRepository instanceRepository;
 
-    public InstanceHeartbeatService(InstanceHeartbeatRepository instanceHeartbeatRepository, InstanceHeartbeatMapper instanceHeartbeatMapper) {
+    public InstanceHeartbeatService(InstanceHeartbeatRepository instanceHeartbeatRepository, InstanceHeartbeatMapper instanceHeartbeatMapper, InstanceRepository instanceRepository) {
         this.instanceHeartbeatRepository = instanceHeartbeatRepository;
         this.instanceHeartbeatMapper = instanceHeartbeatMapper;
+        this.instanceRepository = instanceRepository;
     }
 
     public InstanceHeartbeatDTO save(InstanceHeartbeatDTO instanceHeartbeatDTO) {
@@ -38,7 +41,24 @@ public class InstanceHeartbeatService {
     @Transactional(readOnly = true)
     public Page<InstanceHeartbeatDTO> findAll(Pageable pageable) {
         LOG.debug("Request to get all InstanceHeartbeats");
-        return instanceHeartbeatRepository.findAll(pageable).map(instanceHeartbeatMapper::toDto);
+        // Override default sort to show latest first
+        if (pageable.getSort().isUnsorted()) {
+            pageable = org.springframework.data.domain.PageRequest.of(
+                pageable.getPageNumber(), 
+                pageable.getPageSize(), 
+                org.springframework.data.domain.Sort.by("executedAt").descending()
+            );
+        }
+        return instanceHeartbeatRepository.findAll(pageable).map(heartbeat -> {
+            InstanceHeartbeatDTO dto = instanceHeartbeatMapper.toDto(heartbeat);
+            // Populate instance details
+            instanceRepository.findById(heartbeat.getInstanceId()).ifPresent(instance -> {
+                dto.setInstanceName(instance.getName());
+                dto.setInstanceIpAddress(instance.getPrivateIpAddress() != null ? 
+                    instance.getPrivateIpAddress() : instance.getPublicIpAddress());
+            });
+            return dto;
+        });
     }
 
     @Transactional(readOnly = true)

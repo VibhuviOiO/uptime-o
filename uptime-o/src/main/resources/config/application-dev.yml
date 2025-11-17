@@ -115,5 +115,10 @@ application:
     secret-key: Zx6YF8vKjN9pQr3TmW7nU2hV5sC1bL4eA8dG0fJ # Generated key for dev environment (DO NOT use in production!)
   branding:
     enabled: true # Enable database-driven branding configuration
-
-
+  monitoring:
+    mode: STANDALONE
+    local:
+      enabled: true
+    agents:
+      enabled: false
+      multi-agent: false

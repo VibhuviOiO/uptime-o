@@ -229,14 +229,10 @@ application:
     enabled: true
   encryption:
     secret-key:
-      # Override in application-dev.yml or application-prod.yml
-
-      # Website branding configuration - can be overridden via environment variables
-website:
-  title: ${WEBSITE_TITLE:UptimeO}
-  headerData: ${WEBSITE_HEADERDATA:}
-  faviconPath: ${WEBSITE_FAVICONPATH:/content/images/favicon.ico}
-  logoPath: ${WEBSITE_LOGOPATH:/content/images/logo.png}
-  logoWidth: ${WEBSITE_LOGOWIDTH:50}
-  logoHeight: ${WEBSITE_LOGOHEIGHT:30}
-  footerTitle: ${WEBSITE_FOOTERTITLE:Powered by UptimeO}
+  monitoring:
+    mode: STANDALONE
+    local:
+      enabled: true
+    agents:
+      enabled: false
+      multi-agent: false

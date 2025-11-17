@@ -20,6 +20,7 @@
                 <constraints nullable="false"/>
             </column>
             <column name="monitoring_enabled" type="boolean" defaultValueBoolean="true"/>
+            <column name="cluster_monitoring_enabled" type="boolean" defaultValueBoolean="false"/>
             <column name="interval_seconds" type="integer">
                 <constraints nullable="false"/>
             </column>

@@ -14,6 +14,9 @@ public class InstanceHeartbeatDTO implements Serializable {
     @NotNull
     private Long instanceId;
 
+    private String instanceName;
+    private String instanceIpAddress;
+
     @NotNull
     private Instant executedAt;
 
@@ -210,5 +213,21 @@ public class InstanceHeartbeatDTO implements Serializable {
 
     public void setMetadata(JsonNode metadata) {
         this.metadata = metadata;
+    }
+
+    public String getInstanceName() {
+        return instanceName;
+    }
+
+    public void setInstanceName(String instanceName) {
+        this.instanceName = instanceName;
+    }
+
+    public String getInstanceIpAddress() {
+        return instanceIpAddress;
+    }
+
+    public void setInstanceIpAddress(String instanceIpAddress) {
+        this.instanceIpAddress = instanceIpAddress;
     }
 }

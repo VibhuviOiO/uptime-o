@@ -16,9 +16,10 @@ export const InstanceHeartbeat = () => {
   const pageLocation = useLocation();
   const navigate = useNavigate();
 
-  const [paginationState, setPaginationState] = useState(
-    overridePaginationStateWithQueryParams(getPaginationState(pageLocation, ITEMS_PER_PAGE, 'id'), pageLocation.search),
-  );
+  const [paginationState, setPaginationState] = useState({
+    ...overridePaginationStateWithQueryParams(getPaginationState(pageLocation, ITEMS_PER_PAGE, 'executedAt'), pageLocation.search),
+    order: DESC,
+  });
 
   const instanceHeartbeatList = useAppSelector(state => state.instanceHeartbeat.entities);
   const loading = useAppSelector(state => state.instanceHeartbeat.loading);
@@ -135,7 +136,10 @@ export const InstanceHeartbeat = () => {
                     </span>
                   </th>
                   <th>
-                    <span className="th-content">Instance</span>
+                    <span className="th-content">Instance Name</span>
+                  </th>
+                  <th>
+                    <span className="th-content">IP Address</span>
                   </th>
                   <th>
                     <span className="th-content">Type</span>
@@ -160,7 +164,8 @@ export const InstanceHeartbeat = () => {
                     <td>
                       <TextFormat type="date" value={heartbeat.executedAt} format={APP_DATE_FORMAT} />
                     </td>
-                    <td>{heartbeat.instanceId}</td>
+                    <td>{heartbeat.instanceName || `Instance ${heartbeat.instanceId}`}</td>
+                    <td>{heartbeat.instanceIpAddress || '-'}</td>
                     <td>
                       <Badge color={heartbeat.heartbeatType === 'PING' ? 'info' : 'primary'}>{heartbeat.heartbeatType}</Badge>
                     </td>

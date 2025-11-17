@@ -92,6 +92,14 @@ public class HttpHeartbeatService {
     @Transactional(readOnly = true)
     public Page<HttpHeartbeatDTO> findAll(Pageable pageable) {
         LOG.debug("Request to get all HttpHeartbeats");
+        // Override default sort to show latest first
+        if (pageable.getSort().isUnsorted()) {
+            pageable = org.springframework.data.domain.PageRequest.of(
+                pageable.getPageNumber(), 
+                pageable.getPageSize(), 
+                org.springframework.data.domain.Sort.by("executedAt").descending()
+            );
+        }
         return apiHeartbeatRepository.findAll(pageable).map(apiHeartbeatMapper::toDto);
     }
 
