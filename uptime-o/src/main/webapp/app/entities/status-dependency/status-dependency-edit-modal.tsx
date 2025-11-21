@@ -1,265 +1,177 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardHeader, CardBody, Button, Form, FormGroup, Label, Input, Alert } from 'reactstrap';
+import { Button, Form, FormGroup, Label, Input, Card, CardBody, CardHeader } from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSave, faTimes } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { IStatusDependency, DependencyType } from 'app/shared/model/status-dependency.model';
 
-interface DatacenterOption {
-  id: number;
-  name: string;
-}
-
-interface EntityOption {
-  id: number;
-  name: string;
-}
-
 interface StatusDependencyEditModalProps {
   isOpen: boolean;
   toggle: () => void;
-  statusDependency: IStatusDependency | null;
+  dependency: IStatusDependency | null;
   onSave: () => void;
+  httpMonitors: any[];
+  services: any[];
+  instances: any[];
 }
 
-export const StatusDependencyEditModal: React.FC<StatusDependencyEditModalProps> = ({ isOpen, toggle, statusDependency, onSave }) => {
+export const StatusDependencyEditModal: React.FC<StatusDependencyEditModalProps> = ({
+  isOpen,
+  toggle,
+  dependency,
+  onSave,
+  httpMonitors,
+  services,
+  instances,
+}) => {
   const [formData, setFormData] = useState<IStatusDependency>({
-    parentType: 'SERVICE',
-    parentId: 0,
-    childType: 'HTTP',
-    childId: 0,
+    parentType: DependencyType.HTTP,
+    parentId: undefined,
+    childType: DependencyType.SERVICE,
+    childId: undefined,
   });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [datacenters, setDatacenters] = useState<DatacenterOption[]>([]);
-  const [selectedDatacenter, setSelectedDatacenter] = useState<number | null>(null);
-  const [parentOptions, setParentOptions] = useState<EntityOption[]>([]);
-  const [childOptions, setChildOptions] = useState<EntityOption[]>([]);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    if (isOpen) {
-      loadDatacenters();
-    }
-    if (statusDependency) {
-      setFormData(statusDependency);
+    if (dependency) {
+      setFormData(dependency);
     } else {
       setFormData({
-        parentType: 'SERVICE',
-        parentId: 0,
-        childType: 'HTTP',
-        childId: 0,
+        parentType: DependencyType.HTTP,
+        parentId: undefined,
+        childType: DependencyType.SERVICE,
+        childId: undefined,
       });
     }
-    setError(null);
-  }, [statusDependency, isOpen]);
-
-  useEffect(() => {
-    if (selectedDatacenter && formData.parentType) {
-      loadEntityOptions(formData.parentType, setParentOptions);
-    }
-  }, [selectedDatacenter, formData.parentType]);
-
-  useEffect(() => {
-    if (selectedDatacenter && formData.childType) {
-      loadEntityOptions(formData.childType, setChildOptions);
-    }
-  }, [selectedDatacenter, formData.childType]);
-
-  const loadDatacenters = async () => {
-    try {
-      const response = await axios.get<DatacenterOption[]>('/api/datacenters');
-      setDatacenters(response.data);
-    } catch (err) {
-      console.error('Failed to load datacenters:', err);
-    }
-  };
-
-  const loadEntityOptions = async (type: string, setter: React.Dispatch<React.SetStateAction<EntityOption[]>>) => {
-    if (!selectedDatacenter) return;
-
-    try {
-      let url = '';
-      switch (type) {
-        case 'HTTP':
-          url = '/api/http-monitors';
-          break;
-        case 'SERVICE':
-          url = `/api/services?datacenterId.equals=${selectedDatacenter}`;
-          break;
-        case 'INSTANCE':
-          url = `/api/instances?datacenterId.equals=${selectedDatacenter}`;
-          break;
-        default:
-          return;
-      }
-
-      const response = await axios.get(url);
-      const options = response.data.map((item: any) => ({
-        id: item.id,
-        name: item.name || `${item.method} ${item.url}` || item.hostname || `ID: ${item.id}`,
-      }));
-      setter(options);
-    } catch (err) {
-      console.error(`Failed to load ${type} options:`, err);
-      setter([]);
-    }
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-
-    if (name === 'parentType') {
-      setFormData(prev => ({ ...prev, parentType: value as keyof typeof DependencyType, parentId: 0 }));
-      setParentOptions([]);
-    } else if (name === 'childType') {
-      setFormData(prev => ({ ...prev, childType: value as keyof typeof DependencyType, childId: 0 }));
-      setChildOptions([]);
-    } else {
-      setFormData(prev => ({
-        ...prev,
-        [name]: name.includes('Id') ? parseInt(value, 10) || 0 : value,
-      }));
-    }
-  };
-
-  const handleDatacenterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const datacenterId = parseInt(e.target.value, 10) || null;
-    setSelectedDatacenter(datacenterId);
-    setParentOptions([]);
-    setChildOptions([]);
-    setFormData(prev => ({ ...prev, parentId: 0, childId: 0 }));
-  };
+  }, [dependency]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    setError(null);
 
+    if (!formData.parentId || !formData.childId) {
+      toast.error('Please select both parent and child items');
+      return;
+    }
+
+    setSaving(true);
     try {
-      if (statusDependency?.id) {
-        await axios.put(`/api/status-dependencies/${statusDependency.id}`, formData);
-        toast.success('Status dependency updated successfully');
+      if (dependency?.id) {
+        await axios.put(`/api/status-dependencies/${dependency.id}`, formData);
+        toast.success('Dependency updated successfully');
       } else {
         await axios.post('/api/status-dependencies', formData);
-        toast.success('Status dependency created successfully');
+        toast.success('Dependency created successfully');
       }
       onSave();
       toggle();
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || 'Failed to save status dependency';
-      setError(errorMessage);
-      toast.error(errorMessage);
+    } catch (error) {
+      toast.error('Failed to save dependency');
     } finally {
-      setLoading(false);
+      setSaving(false);
     }
   };
 
-  if (!isOpen) {
-    return null;
-  }
+  const getAvailableItems = (type: DependencyType) => {
+    switch (type) {
+      case DependencyType.HTTP:
+        return httpMonitors;
+      case DependencyType.SERVICE:
+        return services;
+      case DependencyType.INSTANCE:
+        return instances;
+      default:
+        return [];
+    }
+  };
 
   return (
     <Card>
-      <CardHeader className="d-flex justify-content-between align-items-center">
-        <h5 className="mb-0">
-          <FontAwesomeIcon icon="sitemap" className="me-2" />
-          {statusDependency ? 'Edit Status Dependency' : 'Create New Status Dependency'}
-        </h5>
-        <Button color="link" onClick={toggle} className="p-0">
-          <FontAwesomeIcon icon="times" />
-        </Button>
+      <CardHeader>
+        <h5 className="mb-0">{dependency ? 'Edit Dependency' : 'Add Dependency'}</h5>
       </CardHeader>
-      <Form onSubmit={handleSubmit}>
-        <CardBody>
-          {error && <Alert color="danger">{error}</Alert>}
-
+      <CardBody>
+        <Form onSubmit={handleSubmit}>
           <FormGroup>
-            <Label for="datacenter">Datacenter *</Label>
+            <Label for="parentType">Parent Type (Depends On)</Label>
             <Input
               type="select"
-              name="datacenter"
-              id="datacenter"
-              value={selectedDatacenter || ''}
-              onChange={handleDatacenterChange}
+              id="parentType"
+              value={formData.parentType}
+              onChange={e => setFormData({ ...formData, parentType: e.target.value as DependencyType, parentId: undefined })}
               required
             >
-              <option value="">Select Datacenter</option>
-              {datacenters.map(dc => (
-                <option key={dc.id} value={dc.id}>
-                  {dc.name}
-                </option>
-              ))}
+              <option value={DependencyType.HTTP}>HTTP Monitor</option>
+              <option value={DependencyType.SERVICE}>Service</option>
+              <option value={DependencyType.INSTANCE}>Instance</option>
             </Input>
           </FormGroup>
 
           <FormGroup>
-            <Label for="parentType">Parent Type *</Label>
-            <Input type="select" name="parentType" id="parentType" value={formData.parentType || ''} onChange={handleInputChange} required>
-              <option value="SERVICE">Service</option>
-              <option value="HTTP">HTTP Monitor</option>
-              <option value="INSTANCE">Instance</option>
-            </Input>
-          </FormGroup>
-
-          <FormGroup>
-            <Label for="parentId">Parent *</Label>
+            <Label for="parentId">Parent Item</Label>
             <Input
               type="select"
-              name="parentId"
               id="parentId"
               value={formData.parentId || ''}
-              onChange={handleInputChange}
+              onChange={e => setFormData({ ...formData, parentId: Number(e.target.value) })}
               required
-              disabled={!selectedDatacenter || parentOptions.length === 0}
             >
-              <option value="">Select {formData.parentType}</option>
-              {parentOptions.map(option => (
-                <option key={option.id} value={option.id}>
-                  {option.name}
+              <option value="">Select {formData.parentType}...</option>
+              {getAvailableItems(formData.parentType).map((item: any) => (
+                <option key={item.id} value={item.id}>
+                  {item.name}
                 </option>
               ))}
             </Input>
           </FormGroup>
 
-          <FormGroup>
-            <Label for="childType">Child Type *</Label>
-            <Input type="select" name="childType" id="childType" value={formData.childType || ''} onChange={handleInputChange} required>
-              <option value="SERVICE">Service</option>
-              <option value="HTTP">HTTP Monitor</option>
-              <option value="INSTANCE">Instance</option>
-            </Input>
-          </FormGroup>
+          <hr />
 
           <FormGroup>
-            <Label for="childId">Child *</Label>
+            <Label for="childType">Child Type (Dependency)</Label>
             <Input
               type="select"
-              name="childId"
+              id="childType"
+              value={formData.childType}
+              onChange={e => setFormData({ ...formData, childType: e.target.value as DependencyType, childId: undefined })}
+              required
+            >
+              <option value={DependencyType.HTTP}>HTTP Monitor</option>
+              <option value={DependencyType.SERVICE}>Service</option>
+              <option value={DependencyType.INSTANCE}>Instance</option>
+            </Input>
+          </FormGroup>
+
+          <FormGroup>
+            <Label for="childId">Child Item</Label>
+            <Input
+              type="select"
               id="childId"
               value={formData.childId || ''}
-              onChange={handleInputChange}
+              onChange={e => setFormData({ ...formData, childId: Number(e.target.value) })}
               required
-              disabled={!selectedDatacenter || childOptions.length === 0}
             >
-              <option value="">Select {formData.childType}</option>
-              {childOptions.map(option => (
-                <option key={option.id} value={option.id}>
-                  {option.name}
+              <option value="">Select {formData.childType}...</option>
+              {getAvailableItems(formData.childType).map((item: any) => (
+                <option key={item.id} value={item.id}>
+                  {item.name}
                 </option>
               ))}
             </Input>
           </FormGroup>
 
-          <div className="d-flex gap-2 mt-3">
-            <Button color="secondary" onClick={toggle} disabled={loading}>
+          <div className="d-flex justify-content-end gap-2">
+            <Button color="secondary" onClick={toggle} disabled={saving}>
+              <FontAwesomeIcon icon={faTimes} className="me-2" />
               Cancel
             </Button>
-            <Button color="primary" type="submit" disabled={loading}>
-              {loading ? 'Saving...' : statusDependency ? 'Update' : 'Create'}
+            <Button color="primary" type="submit" disabled={saving}>
+              <FontAwesomeIcon icon={faSave} className="me-2" />
+              {saving ? 'Saving...' : 'Save'}
             </Button>
           </div>
-        </CardBody>
-      </Form>
+        </Form>
+      </CardBody>
     </Card>
   );
 };

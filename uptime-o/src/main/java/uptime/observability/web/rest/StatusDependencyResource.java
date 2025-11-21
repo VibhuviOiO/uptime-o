@@ -17,6 +17,8 @@ import tech.jhipster.web.util.PaginationUtil;
 import tech.jhipster.web.util.ResponseUtil;
 import uptime.observability.domain.StatusDependency;
 import uptime.observability.repository.StatusDependencyRepository;
+import uptime.observability.service.StatusDependencyService;
+import uptime.observability.service.dto.DependencyTreeDTO;
 import uptime.observability.web.rest.errors.BadRequestAlertException;
 
 @RestController
@@ -29,9 +31,11 @@ public class StatusDependencyResource {
     private String applicationName;
 
     private final StatusDependencyRepository statusDependencyRepository;
+    private final StatusDependencyService statusDependencyService;
 
-    public StatusDependencyResource(StatusDependencyRepository statusDependencyRepository) {
+    public StatusDependencyResource(StatusDependencyRepository statusDependencyRepository, StatusDependencyService statusDependencyService) {
         this.statusDependencyRepository = statusDependencyRepository;
+        this.statusDependencyService = statusDependencyService;
     }
 
     /**
@@ -56,6 +60,24 @@ public class StatusDependencyResource {
         Page<StatusDependency> page = statusDependencyRepository.findAll(pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
+    }
+
+    /**
+     * GET /status-pages/:statusPageId/dependencies : get dependencies for a status page.
+     */
+    @GetMapping("/status-pages/{statusPageId}/dependencies")
+    public ResponseEntity<List<StatusDependency>> getDependenciesByStatusPage(@PathVariable Long statusPageId) {
+        List<StatusDependency> dependencies = statusDependencyRepository.findByStatusPageId(statusPageId);
+        return ResponseEntity.ok().body(dependencies);
+    }
+
+    /**
+     * GET /status-dependencies/tree : get dependency tree with status.
+     */
+    @GetMapping("/status-dependencies/tree")
+    public ResponseEntity<List<DependencyTreeDTO>> getDependencyTree() {
+        List<DependencyTreeDTO> tree = statusDependencyService.getDependencyTree();
+        return ResponseEntity.ok().body(tree);
     }
 
     /**

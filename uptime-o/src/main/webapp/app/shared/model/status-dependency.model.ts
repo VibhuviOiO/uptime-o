@@ -6,13 +6,13 @@ export enum DependencyType {
 
 export interface IStatusDependency {
   id?: number;
-  parentType?: keyof typeof DependencyType;
+  parentType?: DependencyType;
   parentId?: number;
-  childType?: keyof typeof DependencyType;
+  childType?: DependencyType;
   childId?: number;
-  metadata?: any | null;
-  statusPageId?: number | null;
-  createdAt?: string | null;
+  metadata?: any;
+  statusPageId?: number;
+  createdAt?: string;
 }
 
 export const defaultValue: Readonly<IStatusDependency> = {};

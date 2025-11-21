@@ -14,6 +14,8 @@ public interface ServiceHeartbeatRepository extends JpaRepository<ServiceHeartbe
     
     Optional<ServiceHeartbeat> findFirstByServiceIdAndServiceInstanceIsNullOrderByExecutedAtDesc(Long serviceId);
     
+    Optional<ServiceHeartbeat> findFirstByServiceIdOrderByExecutedAtDesc(Long serviceId);
+    
     @Query("SELECT COUNT(DISTINCT sh.serviceInstance.id) FROM ServiceHeartbeat sh WHERE sh.service = :service AND sh.serviceInstance IS NOT NULL")
     long countDistinctServiceInstancesByService(Service service);
     

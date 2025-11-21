@@ -1,62 +1,113 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Table, Spinner, Card, CardBody } from 'reactstrap';
+import { Button, Table, Spinner, Card, CardBody, Badge, Nav, NavItem, NavLink, TabContent, TabPane } from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPencil, faTrash, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faTrash, faProjectDiagram, faList, faSitemap } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import { IStatusDependency } from 'app/shared/model/status-dependency.model';
-// import { StatusDependencyEditModal } from './status-dependency-edit-modal';
+import { IStatusDependency, DependencyType } from 'app/shared/model/status-dependency.model';
+import { StatusDependencyEditModal } from './status-dependency-edit-modal';
+import DependencyTree from './dependency-tree';
 
 const StatusDependency = () => {
-  const [statusDependencies, setStatusDependencies] = useState<IStatusDependency[]>([]);
+  const [activeTab, setActiveTab] = useState('list');
+  const [dependencies, setDependencies] = useState<IStatusDependency[]>([]);
   const [loading, setLoading] = useState(true);
   const [editModalOpen, setEditModalOpen] = useState(false);
-  const [selectedStatusDependency, setSelectedStatusDependency] = useState<IStatusDependency | null>(null);
+  const [selectedDependency, setSelectedDependency] = useState<IStatusDependency | null>(null);
+
+  // Get available items for dependencies
+  const [httpMonitors, setHttpMonitors] = useState([]);
+  const [services, setServices] = useState([]);
+  const [instances, setInstances] = useState([]);
 
   useEffect(() => {
-    loadStatusDependencies();
+    loadDependencies();
+    loadAvailableItems();
   }, []);
 
-  const loadStatusDependencies = async () => {
+  const loadDependencies = async () => {
     setLoading(true);
     try {
       const response = await axios.get<IStatusDependency[]>('/api/status-dependencies');
-      setStatusDependencies(response.data);
+      setDependencies(response.data);
     } catch (error) {
-      toast.error('Failed to load status dependencies');
+      toast.error('Failed to load dependencies');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleCreateClick = () => {
-    setSelectedStatusDependency(null);
-    setEditModalOpen(true);
+  const loadAvailableItems = async () => {
+    try {
+      const [httpRes, servicesRes, instancesRes] = await Promise.all([
+        axios.get('/api/http-monitors'),
+        axios.get('/api/services'),
+        axios.get('/api/instances'),
+      ]);
+      setHttpMonitors(httpRes.data);
+      setServices(servicesRes.data);
+      setInstances(instancesRes.data);
+    } catch (error) {
+      console.error('Failed to load available items', error);
+    }
   };
 
-  const handleEdit = (statusDependency: IStatusDependency) => {
-    setSelectedStatusDependency(statusDependency);
+  const handleCreateClick = () => {
+    setSelectedDependency(null);
     setEditModalOpen(true);
   };
 
   const handleCloseEditModal = () => {
     setEditModalOpen(false);
-    setSelectedStatusDependency(null);
+    setSelectedDependency(null);
   };
 
   const handleEditSuccess = () => {
-    loadStatusDependencies();
+    loadDependencies();
   };
 
-  const handleDelete = async (statusDependency: IStatusDependency) => {
-    if (window.confirm(`Are you sure you want to delete this dependency?`)) {
+  const handleDelete = async (dependency: IStatusDependency) => {
+    if (window.confirm('Are you sure you want to delete this dependency?')) {
       try {
-        await axios.delete(`/api/status-dependencies/${statusDependency.id}`);
-        toast.success('Status dependency deleted successfully');
-        loadStatusDependencies();
+        await axios.delete(`/api/status-dependencies/${dependency.id}`);
+        toast.success('Dependency deleted successfully');
+        loadDependencies();
       } catch (error) {
-        toast.error('Failed to delete status dependency');
+        toast.error('Failed to delete dependency');
       }
+    }
+  };
+
+  const getItemName = (type: DependencyType, id: number) => {
+    let items = [];
+    switch (type) {
+      case DependencyType.HTTP:
+        items = httpMonitors;
+        break;
+      case DependencyType.SERVICE:
+        items = services;
+        break;
+      case DependencyType.INSTANCE:
+        items = instances;
+        break;
+      default:
+        items = [];
+        break;
+    }
+    const item = items.find((i: any) => i.id === id);
+    return item ? item.name : `Unknown (${id})`;
+  };
+
+  const getTypeBadgeColor = (type: DependencyType) => {
+    switch (type) {
+      case DependencyType.HTTP:
+        return 'primary';
+      case DependencyType.SERVICE:
+        return 'success';
+      case DependencyType.INSTANCE:
+        return 'info';
+      default:
+        return 'secondary';
     }
   };
 
@@ -64,64 +115,72 @@ const StatusDependency = () => {
     return (
       <div className="text-center p-4">
         <Spinner color="primary" />
-        <p className="mt-2">Loading status dependencies...</p>
+        <p className="mt-2">Loading dependencies...</p>
       </div>
     );
   }
 
   return (
     <div className="tab-content-wrapper">
-      <div className="row g-3">
-        <div className={editModalOpen ? 'col-md-6' : 'col-md-12'}>
-          <Card>
-            <CardBody>
-              <div className="d-flex justify-content-between align-items-center mb-3">
-                <h5 className="mb-0">
-                  <FontAwesomeIcon icon="sitemap" className="me-2" />
-                  Status Dependencies
-                </h5>
-                <Button color="primary" size="sm" onClick={handleCreateClick}>
-                  <FontAwesomeIcon icon={faPlus} className="me-2" />
-                  New Dependency
-                </Button>
-              </div>
+      <Card>
+        <CardBody>
+          <div className="d-flex justify-content-between align-items-center mb-3">
+            <h5 className="mb-0">
+              <FontAwesomeIcon icon={faProjectDiagram} className="me-2" />
+              Service Dependencies
+            </h5>
+            <Button color="primary" size="sm" onClick={handleCreateClick}>
+              <FontAwesomeIcon icon={faPlus} className="me-2" />
+              Add Dependency
+            </Button>
+          </div>
 
-              {!statusDependencies || statusDependencies.length === 0 ? (
+          <Nav tabs>
+            <NavItem>
+              <NavLink className={activeTab === 'list' ? 'active' : ''} onClick={() => setActiveTab('list')} style={{ cursor: 'pointer' }}>
+                <FontAwesomeIcon icon={faList} className="me-2" />
+                List View
+              </NavLink>
+            </NavItem>
+            <NavItem>
+              <NavLink className={activeTab === 'tree' ? 'active' : ''} onClick={() => setActiveTab('tree')} style={{ cursor: 'pointer' }}>
+                <FontAwesomeIcon icon={faSitemap} className="me-2" />
+                Tree View
+              </NavLink>
+            </NavItem>
+          </Nav>
+
+          <TabContent activeTab={activeTab} className="mt-3">
+            <TabPane tabId="list">
+              {!dependencies || dependencies.length === 0 ? (
                 <div className="alert alert-info">
-                  <p>No status dependencies found. Create one to get started.</p>
+                  <p>No dependencies configured. Add dependencies to model service relationships.</p>
                 </div>
               ) : (
                 <Table responsive striped hover>
                   <thead>
                     <tr>
-                      <th>Parent</th>
-                      <th>Child</th>
-                      <th>Created At</th>
+                      <th>Parent (Depends On)</th>
+                      <th>Child (Dependency)</th>
                       <th>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {statusDependencies.map((dependency, i) => (
+                    {dependencies.map((dependency, i) => (
                       <tr key={`entity-${i}`}>
                         <td>
-                          <span className="badge bg-primary me-1">{dependency.parentType}</span>
-                          ID: {dependency.parentId}
+                          <Badge color={getTypeBadgeColor(dependency.parentType)} className="me-2">
+                            {dependency.parentType}
+                          </Badge>
+                          <strong>{getItemName(dependency.parentType, dependency.parentId)}</strong>
                         </td>
                         <td>
-                          <span className="badge bg-secondary me-1">{dependency.childType}</span>
-                          ID: {dependency.childId}
+                          <Badge color={getTypeBadgeColor(dependency.childType)} className="me-2">
+                            {dependency.childType}
+                          </Badge>
+                          <strong>{getItemName(dependency.childType, dependency.childId)}</strong>
                         </td>
-                        <td>{dependency.createdAt ? new Date(dependency.createdAt).toLocaleDateString() : '-'}</td>
                         <td>
-                          <Button
-                            color="link"
-                            size="sm"
-                            onClick={() => handleEdit(dependency)}
-                            title="Edit"
-                            style={{ padding: 0, marginRight: '0.5rem' }}
-                          >
-                            <FontAwesomeIcon icon={faPencil} />
-                          </Button>
                           <Button
                             color="link"
                             size="sm"
@@ -137,20 +196,27 @@ const StatusDependency = () => {
                   </tbody>
                 </Table>
               )}
-            </CardBody>
-          </Card>
+            </TabPane>
+            <TabPane tabId="tree">
+              <DependencyTree />
+            </TabPane>
+          </TabContent>
+        </CardBody>
+      </Card>
+
+      {editModalOpen && (
+        <div className="mt-3">
+          <StatusDependencyEditModal
+            isOpen={editModalOpen}
+            toggle={handleCloseEditModal}
+            dependency={selectedDependency}
+            onSave={handleEditSuccess}
+            httpMonitors={httpMonitors}
+            services={services}
+            instances={instances}
+          />
         </div>
-        {/* {editModalOpen && (
-          <div className="col-md-6">
-            <StatusDependencyEditModal
-              isOpen={editModalOpen}
-              toggle={handleCloseEditModal}
-              statusDependency={selectedStatusDependency}
-              onSave={handleEditSuccess}
-            />
-          </div>
-        )} */}
-      </div>
+      )}
     </div>
   );
 };

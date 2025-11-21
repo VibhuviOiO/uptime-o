@@ -7,8 +7,8 @@ export const StatusPageMenu = () => (
     <MenuItem icon="chart-bar" to="/status-page" data-cy="status-pages">
       Status Pages
     </MenuItem>
-    {/* <MenuItem icon="project-diagram" to="/status-dependency" data-cy="status-dependencies">
+    <MenuItem icon="project-diagram" to="/status-dependency" data-cy="status-dependencies">
       Dependencies
-    </MenuItem> */}
+    </MenuItem>
   </NavDropdown>
 );

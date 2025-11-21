@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button, Table } from 'reactstrap';
-import { JhiItemCount, JhiPagination, TextFormat, getPaginationState } from 'react-jhipster';
+import { JhiItemCount, JhiPagination, getPaginationState } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSort, faSortDown, faSortUp } from '@fortawesome/free-solid-svg-icons';
-import { APP_DATE_FORMAT } from 'app/config/constants';
 import { ASC, DESC, ITEMS_PER_PAGE, SORT } from 'app/shared/util/pagination.constants';
 import { overridePaginationStateWithQueryParams } from 'app/shared/util/entity-utils';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+
+dayjs.extend(relativeTime);
 
 import { getEntities } from './http-heartbeat.reducer';
 
@@ -186,9 +189,7 @@ export const HttpHeartbeat = () => {
                       {apiHeartbeat.id}
                     </Button>
                   </td>
-                  <td>
-                    {apiHeartbeat.executedAt ? <TextFormat type="date" value={apiHeartbeat.executedAt} format={APP_DATE_FORMAT} /> : null}
-                  </td>
+                  <td>{apiHeartbeat.executedAt ? dayjs(apiHeartbeat.executedAt).fromNow() : null}</td>
                   <td>{apiHeartbeat.success ? 'true' : 'false'}</td>
                   <td>{apiHeartbeat.responseTimeMs}</td>
                   <td>{apiHeartbeat.responseSizeBytes}</td>
