@@ -40,7 +40,9 @@ export const HttpMonitorEditModal: React.FC<HttpMonitorEditModalProps> = ({ isOp
     maxRedirects: 10,
     description: '',
     tags: '',
-    monitoringVisibility: 'internal',
+    expectedStatusCodes: '200',
+    performanceBudgetMs: null,
+    sizeBudgetKb: null,
   });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [updating, setUpdating] = useState(false);
@@ -83,7 +85,9 @@ export const HttpMonitorEditModal: React.FC<HttpMonitorEditModalProps> = ({ isOp
           maxRedirects: 10,
           description: '',
           tags: '',
-          monitoringVisibility: 'internal',
+          expectedStatusCodes: '200',
+          performanceBudgetMs: null,
+          sizeBudgetKb: null,
         });
       } else if (monitor) {
         setFormData({
@@ -111,7 +115,9 @@ export const HttpMonitorEditModal: React.FC<HttpMonitorEditModalProps> = ({ isOp
           maxRedirects: monitor.maxRedirects || 10,
           description: monitor.description || '',
           tags: monitor.tags || '',
-          monitoringVisibility: monitor.monitoringVisibility || 'internal',
+          expectedStatusCodes: monitor.expectedStatusCodes || '200',
+          performanceBudgetMs: monitor.performanceBudgetMs || null,
+          sizeBudgetKb: monitor.sizeBudgetKb || null,
         });
         setSelectedParentId(monitor.parentId || null);
       }
@@ -233,7 +239,9 @@ export const HttpMonitorEditModal: React.FC<HttpMonitorEditModalProps> = ({ isOp
           dataToSubmit.upsideDownMode = formData.upsideDownMode;
           dataToSubmit.maxRedirects = formData.maxRedirects;
           dataToSubmit.tags = formData.tags;
-          dataToSubmit.monitoringVisibility = formData.monitoringVisibility;
+          dataToSubmit.expectedStatusCodes = formData.expectedStatusCodes;
+          dataToSubmit.performanceBudgetMs = formData.performanceBudgetMs;
+          dataToSubmit.sizeBudgetKb = formData.sizeBudgetKb;
 
           if (formData.headers) {
             try {
@@ -289,7 +297,9 @@ export const HttpMonitorEditModal: React.FC<HttpMonitorEditModalProps> = ({ isOp
           maxRedirects: 10,
           description: '',
           tags: '',
-          monitoringVisibility: 'internal',
+          expectedStatusCodes: '200',
+          performanceBudgetMs: null,
+          sizeBudgetKb: null,
         });
         toggle();
         onSave?.();
@@ -309,44 +319,52 @@ export const HttpMonitorEditModal: React.FC<HttpMonitorEditModalProps> = ({ isOp
           <Button close onClick={toggle} />
         </div>
         <Form onSubmit={handleSubmit}>
-          <FormGroup>
-            <Label for="type">Type *</Label>
-            <Input type="select" name="type" id="type" value={formData.type} onChange={handleChange} disabled={updating}>
-              <option value="">Select...</option>
-              <option value="HTTPS">HTTPS</option>
-              <option value="http-keyword">HTTPS - keyword</option>
-              <option value="http-json">HTTPS - json</option>
-              <option value="group">group</option>
-            </Input>
-          </FormGroup>
-          <FormGroup>
-            <Label for="name">Name *</Label>
-            <Input
-              type="text"
-              name="name"
-              id="name"
-              placeholder="Enter monitor name"
-              value={formData.name}
-              onChange={handleChange}
-              invalid={!!errors.name}
-              disabled={updating}
-            />
-            {errors.name && <div className="invalid-feedback d-block">{errors.name}</div>}
-          </FormGroup>
-          {!isGroupType && (
-            <FormGroup>
-              <Label for="method">Method *</Label>
-              <Input type="select" name="method" id="method" value={formData.method} onChange={handleChange} disabled={updating}>
-                <option value="GET">GET</option>
-                <option value="POST">POST</option>
-                <option value="PUT">PUT</option>
-                <option value="DELETE">DELETE</option>
-                <option value="PATCH">PATCH</option>
-                <option value="HEAD">HEAD</option>
-                <option value="OPTIONS">OPTIONS</option>
-              </Input>
-            </FormGroup>
-          )}
+          <div className="row">
+            <div className="col-4">
+              <FormGroup>
+                <Label for="name">Name *</Label>
+                <Input
+                  type="text"
+                  name="name"
+                  id="name"
+                  placeholder="Monitor name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  invalid={!!errors.name}
+                  disabled={updating}
+                />
+                {errors.name && <div className="invalid-feedback d-block">{errors.name}</div>}
+              </FormGroup>
+            </div>
+            <div className="col-4">
+              <FormGroup>
+                <Label for="type">Type *</Label>
+                <Input type="select" name="type" id="type" value={formData.type} onChange={handleChange} disabled={updating}>
+                  <option value="">Select...</option>
+                  <option value="HTTPS">HTTPS</option>
+                  <option value="http-keyword">HTTPS - keyword</option>
+                  <option value="http-json">HTTPS - json</option>
+                  <option value="group">group</option>
+                </Input>
+              </FormGroup>
+            </div>
+            {!isGroupType && (
+              <div className="col-4">
+                <FormGroup>
+                  <Label for="method">Method *</Label>
+                  <Input type="select" name="method" id="method" value={formData.method} onChange={handleChange} disabled={updating}>
+                    <option value="GET">GET</option>
+                    <option value="POST">POST</option>
+                    <option value="PUT">PUT</option>
+                    <option value="DELETE">DELETE</option>
+                    <option value="PATCH">PATCH</option>
+                    <option value="HEAD">HEAD</option>
+                    <option value="OPTIONS">OPTIONS</option>
+                  </Input>
+                </FormGroup>
+              </div>
+            )}
+          </div>
           {!isGroupType && (
             <>
               <FormGroup>
@@ -363,43 +381,22 @@ export const HttpMonitorEditModal: React.FC<HttpMonitorEditModalProps> = ({ isOp
                 />
                 {errors.url && <div className="invalid-feedback d-block">{errors.url}</div>}
               </FormGroup>
-              <div className="row mb-3">
-                <div className="col-6">
-                  <FormGroup>
-                    <Label for="monitoringVisibility">Monitoring Visibility *</Label>
-                    <Input
-                      type="select"
-                      name="monitoringVisibility"
-                      id="monitoringVisibility"
-                      value={formData.monitoringVisibility}
-                      onChange={handleChange}
-                      disabled={updating}
-                    >
-                      <option value="internal">Internal (Team Only)</option>
-                      <option value="external">External (Public Status Page)</option>
-                    </Input>
-                  </FormGroup>
+              <FormGroup>
+                <div className="form-check">
+                  <input
+                    className="form-check-input"
+                    type="checkbox"
+                    name="includeResponseBody"
+                    id="includeResponseBody"
+                    checked={formData.includeResponseBody}
+                    onChange={handleChange}
+                    disabled={updating}
+                  />
+                  <label className="form-check-label" htmlFor="includeResponseBody">
+                    Include Response Body
+                  </label>
                 </div>
-                <div className="col-6">
-                  <FormGroup>
-                    <Label>&nbsp;</Label>
-                    <div className="form-check" style={{ marginTop: '8px' }}>
-                      <input
-                        className="form-check-input"
-                        type="checkbox"
-                        name="includeResponseBody"
-                        id="includeResponseBody"
-                        checked={formData.includeResponseBody}
-                        onChange={handleChange}
-                        disabled={updating}
-                      />
-                      <label className="form-check-label" htmlFor="includeResponseBody">
-                        Include Response Body
-                      </label>
-                    </div>
-                  </FormGroup>
-                </div>
-              </div>
+              </FormGroup>
               {groupMonitors.length > 0 && (
                 <FormGroup>
                   <Label for="parentId">Parent Group (Optional)</Label>
@@ -493,9 +490,9 @@ export const HttpMonitorEditModal: React.FC<HttpMonitorEditModalProps> = ({ isOp
                     </div>
                   </div>
                   <div className="row mt-2">
-                    <div className="col-12">
+                    <div className="col-6">
                       <Label for="resendNotificationCount" style={{ fontSize: '0.85rem' }}>
-                        Resend Notification if Down X times (0 = disabled)
+                        Resend Notification Count
                       </Label>
                       <Input
                         type="number"
@@ -506,7 +503,22 @@ export const HttpMonitorEditModal: React.FC<HttpMonitorEditModalProps> = ({ isOp
                         disabled={updating}
                         min="0"
                       />
-                      <small className="form-text text-muted">Resend notification after X consecutive failures (0 to disable)</small>
+                      <small className="form-text text-muted">0 = disabled</small>
+                    </div>
+                    <div className="col-6">
+                      <Label for="expectedStatusCodes" style={{ fontSize: '0.85rem' }}>
+                        Expected Status Codes
+                      </Label>
+                      <Input
+                        type="text"
+                        name="expectedStatusCodes"
+                        id="expectedStatusCodes"
+                        placeholder="200,201,204"
+                        value={formData.expectedStatusCodes}
+                        onChange={handleChange}
+                        disabled={updating}
+                      />
+                      <small className="form-text text-muted">Comma-separated</small>
                     </div>
                   </div>
                 </div>
@@ -585,6 +597,38 @@ export const HttpMonitorEditModal: React.FC<HttpMonitorEditModalProps> = ({ isOp
                         min="0"
                         max="100"
                       />
+                    </div>
+                  </div>
+                  <div className="row mt-2">
+                    <div className="col-6">
+                      <Label for="performanceBudgetMs" style={{ fontSize: '0.85rem' }}>
+                        Performance Budget (ms)
+                      </Label>
+                      <Input
+                        type="number"
+                        name="performanceBudgetMs"
+                        id="performanceBudgetMs"
+                        placeholder="500"
+                        value={formData.performanceBudgetMs || ''}
+                        onChange={handleChange}
+                        disabled={updating}
+                      />
+                      <small className="form-text text-muted">Target goal (optional)</small>
+                    </div>
+                    <div className="col-6">
+                      <Label for="sizeBudgetKb" style={{ fontSize: '0.85rem' }}>
+                        Size Budget (KB)
+                      </Label>
+                      <Input
+                        type="number"
+                        name="sizeBudgetKb"
+                        id="sizeBudgetKb"
+                        placeholder="100"
+                        value={formData.sizeBudgetKb || ''}
+                        onChange={handleChange}
+                        disabled={updating}
+                      />
+                      <small className="form-text text-muted">Target goal (optional)</small>
                     </div>
                   </div>
                 </div>
@@ -707,6 +751,7 @@ export const HttpMonitorEditModal: React.FC<HttpMonitorEditModalProps> = ({ isOp
               )}
             </div>
           )}
+
           <FormGroup>
             <Label for="description">Description</Label>
             <Input

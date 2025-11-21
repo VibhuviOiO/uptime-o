@@ -128,22 +128,7 @@ class HttpMonitorGroupIT {
         assertThat(savedGroup.getType()).isEqualTo("group");
     }
 
-    @Test
-    @Transactional
-    void monitorVisibilityDefaultsToInternal() throws Exception {
-        HttpMonitor savedMonitor = httpMonitorRepository.saveAndFlush(childMonitor);
-        
-        assertThat(savedMonitor.getMonitoringVisibility()).isEqualTo("internal");
-    }
 
-    @Test
-    @Transactional
-    void externalMonitorVisibleOnStatusPage() throws Exception {
-        childMonitor.setMonitoringVisibility("external");
-        HttpMonitor savedMonitor = httpMonitorRepository.saveAndFlush(childMonitor);
-        
-        assertThat(savedMonitor.getMonitoringVisibility()).isEqualTo("external");
-    }
 
     @Test
     @Transactional

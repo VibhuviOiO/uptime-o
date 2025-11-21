@@ -79,8 +79,18 @@ export const HttpMetrics = () => {
 
   const formatLastChecked = (timestamp: string | null | undefined) => {
     if (!timestamp) return '-';
+    const now = new Date();
     const date = new Date(timestamp);
-    return date.toLocaleString();
+    const diffMs = now.getTime() - date.getTime();
+    const diffSecs = Math.floor(diffMs / 1000);
+    const diffMins = Math.floor(diffSecs / 60);
+    const diffHours = Math.floor(diffMins / 60);
+    const diffDays = Math.floor(diffHours / 24);
+
+    if (diffSecs < 60) return `${diffSecs}s ago`;
+    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffHours < 24) return `${diffHours}h ago`;
+    return `${diffDays}d ago`;
   };
 
   return (
@@ -152,124 +162,22 @@ export const HttpMetrics = () => {
             </div>
           </div>
 
-          {/* Advanced Filters */}
-          <div className="advanced-filters">
-            <div className="filters-content">
-              <Row className="g-2">
-                <Col md="3">
-                  <div className="filter-group">
-                    <label className="filter-label">Monitor</label>
-                    <Input
-                      type="text"
-                      placeholder="Search monitor name..."
-                      value={searchName}
-                      onChange={e => setSearchName(e.target.value)}
-                      bsSize="sm"
-                      className="filter-input"
-                    />
-                  </div>
-                </Col>
-                <Col md="3">
-                  <div className="filter-group">
-                    <label className="filter-label">Region</label>
-                    <div className="select-wrapper">
-                      <Input
-                        type="select"
-                        value={selectedRegion}
-                        onChange={e => setSelectedRegion(e.target.value)}
-                        bsSize="sm"
-                        className="filter-select"
-                      >
-                        <option value="">All Regions</option>
-                        {regions.map(region => (
-                          <option key={region} value={region}>
-                            {region}
-                          </option>
-                        ))}
-                      </Input>
-                      <FontAwesomeIcon icon={faChevronDown} className="select-icon" />
-                    </div>
-                  </div>
-                </Col>
-                <Col md="3">
-                  <div className="filter-group">
-                    <label className="filter-label">Datacenter</label>
-                    <div className="select-wrapper">
-                      <Input
-                        type="select"
-                        value={selectedDatacenter}
-                        onChange={e => setSelectedDatacenter(e.target.value)}
-                        bsSize="sm"
-                        className="filter-select"
-                      >
-                        <option value="">All Datacenters</option>
-                        {datacenters.map(datacenter => (
-                          <option key={datacenter} value={datacenter}>
-                            {datacenter}
-                          </option>
-                        ))}
-                      </Input>
-                      <FontAwesomeIcon icon={faChevronDown} className="select-icon" />
-                    </div>
-                  </div>
-                </Col>
-                <Col md="3">
-                  <div className="filter-group">
-                    <label className="filter-label">Agent</label>
-                    <div className="select-wrapper">
-                      <Input
-                        type="select"
-                        value={selectedAgent}
-                        onChange={e => setSelectedAgent(e.target.value)}
-                        bsSize="sm"
-                        className="filter-select"
-                      >
-                        <option value="">All Agents</option>
-                        {agents.map(agent => (
-                          <option key={agent} value={agent}>
-                            {agent}
-                          </option>
-                        ))}
-                      </Input>
-                      <FontAwesomeIcon icon={faChevronDown} className="select-icon" />
-                    </div>
-                  </div>
-                </Col>
-              </Row>
-              <Row className="g-2 mt-0">
-                <Col xs="auto">
-                  <Button onClick={handleSearch} disabled={loading} className="btn-apply">
-                    <FontAwesomeIcon icon={faSearch} /> Apply Filters
-                  </Button>
-                </Col>
-                <Col xs="auto">
-                  <Button onClick={handleReset} outline className="btn-reset-filter">
-                    <FontAwesomeIcon icon={faRotateRight} /> Reset
-                  </Button>
-                </Col>
-              </Row>
-            </div>
-          </div>
-
           {/* Metrics Table */}
           <div className="metrics-table-wrapper">
             <div className="table-responsive">
               <Table className="metrics-table">
                 <thead>
                   <tr>
-                    <th className="col-monitor">Monitor Name</th>
-                    <th className="col-status">Status</th>
-                    <th className="col-agents">Agents</th>
-                    <th className="col-region">Region</th>
-                    <th className="col-datacenter">Datacenter</th>
-                    <th className="col-latency">Latency</th>
-                    <th className="col-last-checked">Last Checked</th>
+                    <th>Monitor Name</th>
+                    <th>Status</th>
+                    <th>Latency</th>
+                    <th>Last Checked</th>
                   </tr>
                 </thead>
                 <tbody>
                   {loading ? (
                     <tr className="loading-row">
-                      <td colSpan={7}>
+                      <td colSpan={4}>
                         <div className="loading-spinner">
                           <div className="spinner"></div>
                           <p>Loading metrics...</p>
@@ -278,7 +186,7 @@ export const HttpMetrics = () => {
                     </tr>
                   ) : filteredMetrics.length === 0 ? (
                     <tr className="empty-row">
-                      <td colSpan={7}>
+                      <td colSpan={4}>
                         <div className="empty-state">
                           <div className="empty-icon">📭</div>
                           <p className="empty-title">No metrics found</p>
@@ -289,7 +197,7 @@ export const HttpMetrics = () => {
                   ) : (
                     filteredMetrics.map(metric => (
                       <tr key={metric.monitorId} className="metric-row">
-                        <td className="col-monitor">
+                        <td>
                           <div className="monitor-info">
                             <div className={`status-indicator ${metric.lastSuccess ? 'up' : 'down'}`}></div>
                             <div className="monitor-details">
@@ -300,31 +208,19 @@ export const HttpMetrics = () => {
                               >
                                 {metric.monitorName}
                               </div>
-                              <div className="monitor-type">HTTP Monitor</div>
                             </div>
                           </div>
                         </td>
-                        <td className="col-status">
+                        <td>
                           <div className={`status-badge ${metric.lastSuccess ? 'up' : 'down'}`}>
                             <div className="badge-dot"></div>
                             <span>{metric.lastSuccess ? 'UP' : 'DOWN'}</span>
                           </div>
                         </td>
-                        <td className="col-agents">
-                          <div className="agents-count">
-                            <Badge className="count-badge">{metric.agentCount}</Badge>
-                          </div>
-                        </td>
-                        <td className="col-region">
-                          <span className="cell-value">{metric.regionName || '-'}</span>
-                        </td>
-                        <td className="col-datacenter">
-                          <span className="cell-value">{metric.datacenterName || '-'}</span>
-                        </td>
-                        <td className="col-latency">
+                        <td>
                           <span className="latency-badge">{metric.lastLatencyMs || 0}ms</span>
                         </td>
-                        <td className="col-last-checked">
+                        <td>
                           <span className="last-checked">{formatLastChecked(metric.lastCheckedTime)}</span>
                         </td>
                       </tr>

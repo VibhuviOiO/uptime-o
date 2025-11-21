@@ -109,11 +109,17 @@ public class HttpMonitor implements Serializable {
     @Column(name = "tags")
     private String tags;
 
-    @Column(name = "monitoring_visibility")
-    private String monitoringVisibility;
-
     @Column(name = "enabled")
     private Boolean enabled;
+
+    @Column(name = "expected_status_codes")
+    private String expectedStatusCodes;
+
+    @Column(name = "performance_budget_ms")
+    private Integer performanceBudgetMs;
+
+    @Column(name = "size_budget_kb")
+    private Integer sizeBudgetKb;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
@@ -521,19 +527,6 @@ public class HttpMonitor implements Serializable {
         this.tags = tags;
     }
 
-    public String getMonitoringVisibility() {
-        return this.monitoringVisibility;
-    }
-
-    public HttpMonitor monitoringVisibility(String monitoringVisibility) {
-        this.setMonitoringVisibility(monitoringVisibility);
-        return this;
-    }
-
-    public void setMonitoringVisibility(String monitoringVisibility) {
-        this.monitoringVisibility = monitoringVisibility;
-    }
-
     public Boolean getEnabled() {
         return this.enabled;
     }
@@ -589,6 +582,45 @@ public class HttpMonitor implements Serializable {
         this.children.remove(child);
         child.setParent(null);
         return this;
+    }
+
+    public String getExpectedStatusCodes() {
+        return this.expectedStatusCodes;
+    }
+
+    public HttpMonitor expectedStatusCodes(String expectedStatusCodes) {
+        this.setExpectedStatusCodes(expectedStatusCodes);
+        return this;
+    }
+
+    public void setExpectedStatusCodes(String expectedStatusCodes) {
+        this.expectedStatusCodes = expectedStatusCodes;
+    }
+
+    public Integer getPerformanceBudgetMs() {
+        return this.performanceBudgetMs;
+    }
+
+    public HttpMonitor performanceBudgetMs(Integer performanceBudgetMs) {
+        this.setPerformanceBudgetMs(performanceBudgetMs);
+        return this;
+    }
+
+    public void setPerformanceBudgetMs(Integer performanceBudgetMs) {
+        this.performanceBudgetMs = performanceBudgetMs;
+    }
+
+    public Integer getSizeBudgetKb() {
+        return this.sizeBudgetKb;
+    }
+
+    public HttpMonitor sizeBudgetKb(Integer sizeBudgetKb) {
+        this.setSizeBudgetKb(sizeBudgetKb);
+        return this;
+    }
+
+    public void setSizeBudgetKb(Integer sizeBudgetKb) {
+        this.sizeBudgetKb = sizeBudgetKb;
     }
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here

@@ -119,21 +119,21 @@
             <column name="enabled" valueBoolean="true"/>
         </insert>
 
-        <!-- Regions -->
+        <!-- Regions (ID 1 reserved for Global Agent) -->
         <insert tableName="regions">
-            <column name="id" valueNumeric="1"/>
+            <column name="id" valueNumeric="2"/>
             <column name="name" value="Home Network"/>
             <column name="region_code" value="home-1"/>
             <column name="group_name" value="HOME"/>
         </insert>
         <insert tableName="regions">
-            <column name="id" valueNumeric="2"/>
+            <column name="id" valueNumeric="3"/>
             <column name="name" value="US East"/>
             <column name="region_code" value="us-east-1"/>
             <column name="group_name" value="US"/>
         </insert>
         <insert tableName="regions">
-            <column name="id" valueNumeric="3"/>
+            <column name="id" valueNumeric="4"/>
             <column name="name" value="US West"/>
             <column name="region_code" value="us-west-1"/>
             <column name="group_name" value="US"/>
@@ -144,19 +144,19 @@
             <column name="id" valueNumeric="1"/>
             <column name="code" value="home"/>
             <column name="name" value="Home Lab"/>
-            <column name="region_id" valueNumeric="1"/>
+            <column name="region_id" valueNumeric="2"/>
         </insert>
         <insert tableName="datacenters">
             <column name="id" valueNumeric="2"/>
             <column name="code" value="va"/>
             <column name="name" value="Virginia"/>
-            <column name="region_id" valueNumeric="2"/>
+            <column name="region_id" valueNumeric="3"/>
         </insert>
         <insert tableName="datacenters">
             <column name="id" valueNumeric="3"/>
             <column name="code" value="sf"/>
             <column name="name" value="San Francisco"/>
-            <column name="region_id" valueNumeric="3"/>
+            <column name="region_id" valueNumeric="4"/>
         </insert>
 
         <!-- Real Machine Instances -->

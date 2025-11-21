@@ -81,6 +81,67 @@
             <column name="raw_response_body" type="jsonb">
                 <constraints nullable="true"/>
             </column>
+            <!-- Phase 2 Enhancement Fields -->
+            <column name="dns_details" type="jsonb">
+                <constraints nullable="true"/>
+            </column>
+            <column name="tls_details" type="jsonb">
+                <constraints nullable="true"/>
+            </column>
+            <column name="http_version" type="varchar(10)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="content_encoding" type="varchar(20)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="compression_ratio" type="float">
+                <constraints nullable="true"/>
+            </column>
+            <column name="transfer_encoding" type="varchar(20)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="response_body_hash" type="varchar(64)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="response_body_sample" type="text">
+                <constraints nullable="true"/>
+            </column>
+            <column name="response_body_valid" type="boolean">
+                <constraints nullable="true"/>
+            </column>
+            <column name="response_body_uncompressed_bytes" type="integer">
+                <constraints nullable="true"/>
+            </column>
+            <column name="redirect_details" type="jsonb">
+                <constraints nullable="true"/>
+            </column>
+            <column name="cache_control" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="etag" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="cache_age" type="integer">
+                <constraints nullable="true"/>
+            </column>
+            <column name="cdn_provider" type="varchar(50)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="cdn_pop" type="varchar(10)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="rate_limit_details" type="jsonb">
+                <constraints nullable="true"/>
+            </column>
+            <column name="network_path" type="jsonb">
+                <constraints nullable="true"/>
+            </column>
+            <column name="agent_metrics" type="jsonb">
+                <constraints nullable="true"/>
+            </column>
+            <column name="phase_latencies" type="jsonb">
+                <constraints nullable="true"/>
+            </column>
             <column name="monitor_id" type="bigint">
                 <constraints nullable="true"/>
             </column>

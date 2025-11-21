@@ -24,9 +24,11 @@ export interface IHttpMonitor {
   maxRedirects?: number | null;
   description?: string | null;
   tags?: string | null;
-  monitoringVisibility?: string | null;
   enabled?: boolean | null;
   parentId?: number | null;
+  expectedStatusCodes?: string | null;
+  performanceBudgetMs?: number | null;
+  sizeBudgetKb?: number | null;
 }
 
 export const defaultValue: Readonly<IHttpMonitor> = {
@@ -48,6 +50,8 @@ export const defaultValue: Readonly<IHttpMonitor> = {
   maxRedirects: 10,
   description: '',
   tags: '',
-  monitoringVisibility: 'internal',
   enabled: true,
+  expectedStatusCodes: '200',
+  performanceBudgetMs: null,
+  sizeBudgetKb: null,
 };

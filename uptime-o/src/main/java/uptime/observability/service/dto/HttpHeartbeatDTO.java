@@ -69,6 +69,36 @@ public class HttpHeartbeatDTO implements Serializable {
 
     private JsonNode rawResponseBody;
 
+    // Phase 2 Enhancement Fields
+    private JsonNode dnsDetails;
+    private JsonNode tlsDetails;
+    @Size(max = 10)
+    private String httpVersion;
+    @Size(max = 20)
+    private String contentEncoding;
+    private Float compressionRatio;
+    @Size(max = 20)
+    private String transferEncoding;
+    @Size(max = 64)
+    private String responseBodyHash;
+    private String responseBodySample;
+    private Boolean responseBodyValid;
+    private Integer responseBodyUncompressedBytes;
+    private JsonNode redirectDetails;
+    @Size(max = 255)
+    private String cacheControl;
+    @Size(max = 255)
+    private String etag;
+    private Integer cacheAge;
+    @Size(max = 50)
+    private String cdnProvider;
+    @Size(max = 10)
+    private String cdnPop;
+    private JsonNode rateLimitDetails;
+    private JsonNode networkPath;
+    private JsonNode agentMetrics;
+    private JsonNode phaseLatencies;
+
     private HttpMonitorDTO monitor;
 
     private AgentDTO agent;
@@ -287,6 +317,167 @@ public class HttpHeartbeatDTO implements Serializable {
 
     public void setAgent(AgentDTO agent) {
         this.agent = agent;
+    }
+
+    // Phase 2 Enhancement Getters and Setters
+    public JsonNode getDnsDetails() {
+        return dnsDetails;
+    }
+
+    public void setDnsDetails(JsonNode dnsDetails) {
+        this.dnsDetails = dnsDetails;
+    }
+
+    public JsonNode getTlsDetails() {
+        return tlsDetails;
+    }
+
+    public void setTlsDetails(JsonNode tlsDetails) {
+        this.tlsDetails = tlsDetails;
+    }
+
+    public String getHttpVersion() {
+        return httpVersion;
+    }
+
+    public void setHttpVersion(String httpVersion) {
+        this.httpVersion = httpVersion;
+    }
+
+    public String getContentEncoding() {
+        return contentEncoding;
+    }
+
+    public void setContentEncoding(String contentEncoding) {
+        this.contentEncoding = contentEncoding;
+    }
+
+    public Float getCompressionRatio() {
+        return compressionRatio;
+    }
+
+    public void setCompressionRatio(Float compressionRatio) {
+        this.compressionRatio = compressionRatio;
+    }
+
+    public String getTransferEncoding() {
+        return transferEncoding;
+    }
+
+    public void setTransferEncoding(String transferEncoding) {
+        this.transferEncoding = transferEncoding;
+    }
+
+    public String getResponseBodyHash() {
+        return responseBodyHash;
+    }
+
+    public void setResponseBodyHash(String responseBodyHash) {
+        this.responseBodyHash = responseBodyHash;
+    }
+
+    public String getResponseBodySample() {
+        return responseBodySample;
+    }
+
+    public void setResponseBodySample(String responseBodySample) {
+        this.responseBodySample = responseBodySample;
+    }
+
+    public Boolean getResponseBodyValid() {
+        return responseBodyValid;
+    }
+
+    public void setResponseBodyValid(Boolean responseBodyValid) {
+        this.responseBodyValid = responseBodyValid;
+    }
+
+    public Integer getResponseBodyUncompressedBytes() {
+        return responseBodyUncompressedBytes;
+    }
+
+    public void setResponseBodyUncompressedBytes(Integer responseBodyUncompressedBytes) {
+        this.responseBodyUncompressedBytes = responseBodyUncompressedBytes;
+    }
+
+    public JsonNode getRedirectDetails() {
+        return redirectDetails;
+    }
+
+    public void setRedirectDetails(JsonNode redirectDetails) {
+        this.redirectDetails = redirectDetails;
+    }
+
+    public String getCacheControl() {
+        return cacheControl;
+    }
+
+    public void setCacheControl(String cacheControl) {
+        this.cacheControl = cacheControl;
+    }
+
+    public String getEtag() {
+        return etag;
+    }
+
+    public void setEtag(String etag) {
+        this.etag = etag;
+    }
+
+    public Integer getCacheAge() {
+        return cacheAge;
+    }
+
+    public void setCacheAge(Integer cacheAge) {
+        this.cacheAge = cacheAge;
+    }
+
+    public String getCdnProvider() {
+        return cdnProvider;
+    }
+
+    public void setCdnProvider(String cdnProvider) {
+        this.cdnProvider = cdnProvider;
+    }
+
+    public String getCdnPop() {
+        return cdnPop;
+    }
+
+    public void setCdnPop(String cdnPop) {
+        this.cdnPop = cdnPop;
+    }
+
+    public JsonNode getRateLimitDetails() {
+        return rateLimitDetails;
+    }
+
+    public void setRateLimitDetails(JsonNode rateLimitDetails) {
+        this.rateLimitDetails = rateLimitDetails;
+    }
+
+    public JsonNode getNetworkPath() {
+        return networkPath;
+    }
+
+    public void setNetworkPath(JsonNode networkPath) {
+        this.networkPath = networkPath;
+    }
+
+    public JsonNode getAgentMetrics() {
+        return agentMetrics;
+    }
+
+    public void setAgentMetrics(JsonNode agentMetrics) {
+        this.agentMetrics = agentMetrics;
+    }
+
+    public JsonNode getPhaseLatencies() {
+        return phaseLatencies;
+    }
+
+    public void setPhaseLatencies(JsonNode phaseLatencies) {
+        this.phaseLatencies = phaseLatencies;
     }
 
     @Override

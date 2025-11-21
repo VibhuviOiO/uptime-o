@@ -72,52 +72,59 @@ public class HttpMetricsService {
         }
 
         // Get latest heartbeat for this monitor
-        HttpHeartbeat latestHeartbeat = httpHeartbeatRepository
-            .findByMonitorIdOrderByExecutedAtDesc(monitor.getId())
-            .stream()
-            .findFirst()
-            .orElse(null);
+        List<HttpHeartbeat> heartbeats = httpHeartbeatRepository.findByMonitorIdOrderByExecutedAtDesc(monitor.getId());
+        if (heartbeats.isEmpty()) {
+            LOG.debug("No heartbeats found for monitor {}", monitor.getName());
+            return null;
+        }
+        HttpHeartbeat latestHeartbeat = heartbeats.get(0);
 
         if (latestHeartbeat == null) {
             return null;
         }
 
-        // Get agent's datacenter and region information
+        // Get agent information (may be null for old heartbeats)
         Agent agent = latestHeartbeat.getAgent();
-        if (agent == null) {
-            return null;
+        String agentNameValue = agent != null ? agent.getName() : "Unknown";
+        String regionNameValue = null;
+        
+        if (agent != null) {
+            Region region = agent.getRegion();
+            regionNameValue = region != null ? region.getName() : null;
         }
-
-        Region region = agent.getRegion();
 
         // Filter by region
         if (regionName != null && !regionName.isEmpty()) {
-            if (region == null || !region.getName().equalsIgnoreCase(regionName)) {
+            if (regionNameValue == null || !regionNameValue.equalsIgnoreCase(regionName)) {
                 return null;
             }
         }
 
-
-
         // Filter by agent
         if (agentName != null && !agentName.isEmpty()) {
-            if (!agent.getName().toLowerCase().contains(agentName.toLowerCase())) {
+            if (agent == null || !agent.getName().toLowerCase().contains(agentName.toLowerCase())) {
                 return null;
             }
+        }
+
+        // Datacenter filter is not applicable since Agent doesn't have datacenter relationship
+        // If datacenterName filter is provided, skip this record
+        if (datacenterName != null && !datacenterName.isEmpty()) {
+            return null;
         }
 
         // Count unique agents checking this monitor
         Integer agentCount = httpHeartbeatRepository.countDistinctAgentsByMonitorId(monitor.getId());
 
-        // Build DTO
+        // Build DTO - datacenterName set to null since Agent doesn't have datacenter
         HttpMetricsDTO dto = new HttpMetricsDTO(
             monitor.getId(),
             monitor.getName(),
             latestHeartbeat.getSuccess(),
             agentCount != null ? agentCount : 0,
-            region != null ? region.getName() : "-",
-            region != null ? region.getName() : "-",
-            agent.getName(),
+            regionNameValue,
+            null, // datacenterName - not applicable
+            agentNameValue,
             latestHeartbeat.getExecutedAt(),
             latestHeartbeat.getResponseTimeMs() != null ? latestHeartbeat.getResponseTimeMs() : 0
         );

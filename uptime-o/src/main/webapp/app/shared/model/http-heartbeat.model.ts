@@ -28,6 +28,27 @@ export interface IHttpHeartbeat {
   rawRequestHeaders?: string | null;
   rawResponseHeaders?: string | null;
   rawResponseBody?: string | null;
+  // Phase 2 Enhancement Fields
+  dnsDetails?: string | null;
+  tlsDetails?: string | null;
+  httpVersion?: string | null;
+  contentEncoding?: string | null;
+  compressionRatio?: number | null;
+  transferEncoding?: string | null;
+  responseBodyHash?: string | null;
+  responseBodySample?: string | null;
+  responseBodyValid?: boolean | null;
+  responseBodyUncompressedBytes?: number | null;
+  redirectDetails?: string | null;
+  cacheControl?: string | null;
+  etag?: string | null;
+  cacheAge?: number | null;
+  cdnProvider?: string | null;
+  cdnPop?: string | null;
+  rateLimitDetails?: string | null;
+  networkPath?: string | null;
+  agentMetrics?: string | null;
+  phaseLatencies?: string | null;
   monitor?: IHttpMonitor | null;
   agent?: IAgent | null;
 }

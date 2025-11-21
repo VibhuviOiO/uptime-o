@@ -106,6 +106,82 @@ public class HttpHeartbeat implements Serializable {
     @Type(JsonNodeType.class)
     private JsonNode rawResponseBody;
 
+    // Phase 2 Enhancement Fields
+    @Column(name = "dns_details", columnDefinition = "jsonb")
+    @Type(JsonNodeType.class)
+    private JsonNode dnsDetails;
+
+    @Column(name = "tls_details", columnDefinition = "jsonb")
+    @Type(JsonNodeType.class)
+    private JsonNode tlsDetails;
+
+    @Size(max = 10)
+    @Column(name = "http_version", length = 10)
+    private String httpVersion;
+
+    @Size(max = 20)
+    @Column(name = "content_encoding", length = 20)
+    private String contentEncoding;
+
+    @Column(name = "compression_ratio")
+    private Float compressionRatio;
+
+    @Size(max = 20)
+    @Column(name = "transfer_encoding", length = 20)
+    private String transferEncoding;
+
+    @Size(max = 64)
+    @Column(name = "response_body_hash", length = 64)
+    private String responseBodyHash;
+
+    @Column(name = "response_body_sample", columnDefinition = "text")
+    private String responseBodySample;
+
+    @Column(name = "response_body_valid")
+    private Boolean responseBodyValid;
+
+    @Column(name = "response_body_uncompressed_bytes")
+    private Integer responseBodyUncompressedBytes;
+
+    @Column(name = "redirect_details", columnDefinition = "jsonb")
+    @Type(JsonNodeType.class)
+    private JsonNode redirectDetails;
+
+    @Size(max = 255)
+    @Column(name = "cache_control", length = 255)
+    private String cacheControl;
+
+    @Size(max = 255)
+    @Column(name = "etag", length = 255)
+    private String etag;
+
+    @Column(name = "cache_age")
+    private Integer cacheAge;
+
+    @Size(max = 50)
+    @Column(name = "cdn_provider", length = 50)
+    private String cdnProvider;
+
+    @Size(max = 10)
+    @Column(name = "cdn_pop", length = 10)
+    private String cdnPop;
+
+    @Column(name = "rate_limit_details", columnDefinition = "jsonb")
+    @Type(JsonNodeType.class)
+    private JsonNode rateLimitDetails;
+
+    @Column(name = "network_path", columnDefinition = "jsonb")
+    @Type(JsonNodeType.class)
+    private JsonNode networkPath;
+
+    @Column(name = "agent_metrics", columnDefinition = "jsonb")
+    @Type(JsonNodeType.class)
+    private JsonNode agentMetrics;
+
+    @Column(name = "phase_latencies", columnDefinition = "jsonb")
+    @Type(JsonNodeType.class)
+    private JsonNode phaseLatencies;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnoreProperties(value = { "apiHeartbeats", "agentMonitors", "schedule" }, allowSetters = true)
     private HttpMonitor monitor;
@@ -465,6 +541,267 @@ public class HttpHeartbeat implements Serializable {
     public HttpHeartbeat agent(Agent agent) {
         this.setAgent(agent);
         return this;
+    }
+
+    // Phase 2 Enhancement Getters and Setters
+    public JsonNode getDnsDetails() {
+        return this.dnsDetails;
+    }
+
+    public HttpHeartbeat dnsDetails(JsonNode dnsDetails) {
+        this.setDnsDetails(dnsDetails);
+        return this;
+    }
+
+    public void setDnsDetails(JsonNode dnsDetails) {
+        this.dnsDetails = dnsDetails;
+    }
+
+    public JsonNode getTlsDetails() {
+        return this.tlsDetails;
+    }
+
+    public HttpHeartbeat tlsDetails(JsonNode tlsDetails) {
+        this.setTlsDetails(tlsDetails);
+        return this;
+    }
+
+    public void setTlsDetails(JsonNode tlsDetails) {
+        this.tlsDetails = tlsDetails;
+    }
+
+    public String getHttpVersion() {
+        return this.httpVersion;
+    }
+
+    public HttpHeartbeat httpVersion(String httpVersion) {
+        this.setHttpVersion(httpVersion);
+        return this;
+    }
+
+    public void setHttpVersion(String httpVersion) {
+        this.httpVersion = httpVersion;
+    }
+
+    public String getContentEncoding() {
+        return this.contentEncoding;
+    }
+
+    public HttpHeartbeat contentEncoding(String contentEncoding) {
+        this.setContentEncoding(contentEncoding);
+        return this;
+    }
+
+    public void setContentEncoding(String contentEncoding) {
+        this.contentEncoding = contentEncoding;
+    }
+
+    public Float getCompressionRatio() {
+        return this.compressionRatio;
+    }
+
+    public HttpHeartbeat compressionRatio(Float compressionRatio) {
+        this.setCompressionRatio(compressionRatio);
+        return this;
+    }
+
+    public void setCompressionRatio(Float compressionRatio) {
+        this.compressionRatio = compressionRatio;
+    }
+
+    public String getTransferEncoding() {
+        return this.transferEncoding;
+    }
+
+    public HttpHeartbeat transferEncoding(String transferEncoding) {
+        this.setTransferEncoding(transferEncoding);
+        return this;
+    }
+
+    public void setTransferEncoding(String transferEncoding) {
+        this.transferEncoding = transferEncoding;
+    }
+
+    public String getResponseBodyHash() {
+        return this.responseBodyHash;
+    }
+
+    public HttpHeartbeat responseBodyHash(String responseBodyHash) {
+        this.setResponseBodyHash(responseBodyHash);
+        return this;
+    }
+
+    public void setResponseBodyHash(String responseBodyHash) {
+        this.responseBodyHash = responseBodyHash;
+    }
+
+    public String getResponseBodySample() {
+        return this.responseBodySample;
+    }
+
+    public HttpHeartbeat responseBodySample(String responseBodySample) {
+        this.setResponseBodySample(responseBodySample);
+        return this;
+    }
+
+    public void setResponseBodySample(String responseBodySample) {
+        this.responseBodySample = responseBodySample;
+    }
+
+    public Boolean getResponseBodyValid() {
+        return this.responseBodyValid;
+    }
+
+    public HttpHeartbeat responseBodyValid(Boolean responseBodyValid) {
+        this.setResponseBodyValid(responseBodyValid);
+        return this;
+    }
+
+    public void setResponseBodyValid(Boolean responseBodyValid) {
+        this.responseBodyValid = responseBodyValid;
+    }
+
+    public Integer getResponseBodyUncompressedBytes() {
+        return this.responseBodyUncompressedBytes;
+    }
+
+    public HttpHeartbeat responseBodyUncompressedBytes(Integer responseBodyUncompressedBytes) {
+        this.setResponseBodyUncompressedBytes(responseBodyUncompressedBytes);
+        return this;
+    }
+
+    public void setResponseBodyUncompressedBytes(Integer responseBodyUncompressedBytes) {
+        this.responseBodyUncompressedBytes = responseBodyUncompressedBytes;
+    }
+
+    public JsonNode getRedirectDetails() {
+        return this.redirectDetails;
+    }
+
+    public HttpHeartbeat redirectDetails(JsonNode redirectDetails) {
+        this.setRedirectDetails(redirectDetails);
+        return this;
+    }
+
+    public void setRedirectDetails(JsonNode redirectDetails) {
+        this.redirectDetails = redirectDetails;
+    }
+
+    public String getCacheControl() {
+        return this.cacheControl;
+    }
+
+    public HttpHeartbeat cacheControl(String cacheControl) {
+        this.setCacheControl(cacheControl);
+        return this;
+    }
+
+    public void setCacheControl(String cacheControl) {
+        this.cacheControl = cacheControl;
+    }
+
+    public String getEtag() {
+        return this.etag;
+    }
+
+    public HttpHeartbeat etag(String etag) {
+        this.setEtag(etag);
+        return this;
+    }
+
+    public void setEtag(String etag) {
+        this.etag = etag;
+    }
+
+    public Integer getCacheAge() {
+        return this.cacheAge;
+    }
+
+    public HttpHeartbeat cacheAge(Integer cacheAge) {
+        this.setCacheAge(cacheAge);
+        return this;
+    }
+
+    public void setCacheAge(Integer cacheAge) {
+        this.cacheAge = cacheAge;
+    }
+
+    public String getCdnProvider() {
+        return this.cdnProvider;
+    }
+
+    public HttpHeartbeat cdnProvider(String cdnProvider) {
+        this.setCdnProvider(cdnProvider);
+        return this;
+    }
+
+    public void setCdnProvider(String cdnProvider) {
+        this.cdnProvider = cdnProvider;
+    }
+
+    public String getCdnPop() {
+        return this.cdnPop;
+    }
+
+    public HttpHeartbeat cdnPop(String cdnPop) {
+        this.setCdnPop(cdnPop);
+        return this;
+    }
+
+    public void setCdnPop(String cdnPop) {
+        this.cdnPop = cdnPop;
+    }
+
+    public JsonNode getRateLimitDetails() {
+        return this.rateLimitDetails;
+    }
+
+    public HttpHeartbeat rateLimitDetails(JsonNode rateLimitDetails) {
+        this.setRateLimitDetails(rateLimitDetails);
+        return this;
+    }
+
+    public void setRateLimitDetails(JsonNode rateLimitDetails) {
+        this.rateLimitDetails = rateLimitDetails;
+    }
+
+    public JsonNode getNetworkPath() {
+        return this.networkPath;
+    }
+
+    public HttpHeartbeat networkPath(JsonNode networkPath) {
+        this.setNetworkPath(networkPath);
+        return this;
+    }
+
+    public void setNetworkPath(JsonNode networkPath) {
+        this.networkPath = networkPath;
+    }
+
+    public JsonNode getAgentMetrics() {
+        return this.agentMetrics;
+    }
+
+    public HttpHeartbeat agentMetrics(JsonNode agentMetrics) {
+        this.setAgentMetrics(agentMetrics);
+        return this;
+    }
+
+    public void setAgentMetrics(JsonNode agentMetrics) {
+        this.agentMetrics = agentMetrics;
+    }
+
+    public JsonNode getPhaseLatencies() {
+        return this.phaseLatencies;
+    }
+
+    public HttpHeartbeat phaseLatencies(JsonNode phaseLatencies) {
+        this.setPhaseLatencies(phaseLatencies);
+        return this;
+    }
+
+    public void setPhaseLatencies(JsonNode phaseLatencies) {
+        this.phaseLatencies = phaseLatencies;
     }
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here

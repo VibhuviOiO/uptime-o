@@ -46,6 +46,15 @@ public class HttpHeartbeatService {
     public HttpHeartbeatDTO save(HttpHeartbeatDTO apiHeartbeatDTO) {
         LOG.debug("Request to save HttpHeartbeat : {}", apiHeartbeatDTO);
         HttpHeartbeat apiHeartbeat = apiHeartbeatMapper.toEntity(apiHeartbeatDTO);
+        
+        // If no agent specified, use Global Agent (ID 1) for standalone mode
+        if (apiHeartbeat.getAgent() == null || apiHeartbeat.getAgent().getId() == null) {
+            uptime.observability.domain.Agent globalAgent = new uptime.observability.domain.Agent();
+            globalAgent.setId(1L);
+            apiHeartbeat.setAgent(globalAgent);
+            LOG.debug("No agent specified, using Global Agent (ID 1) for standalone mode");
+        }
+        
         apiHeartbeat = apiHeartbeatRepository.save(apiHeartbeat);
         return apiHeartbeatMapper.toDto(apiHeartbeat);
     }

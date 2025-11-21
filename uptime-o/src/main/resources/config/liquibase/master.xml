@@ -27,6 +27,10 @@
     <include file="config/liquibase/changelog/20251109000003_create_agent_monitor.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20241210120000_added_entity_Branding.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-changelog - JHipster will add liquibase changelogs here -->
+    
+    <!-- Seed Global Agent for standalone mode -->
+    <include file="config/liquibase/changelog/20250101000000_seed_global_agent.xml" relativeToChangelogFile="false"/>
+    
     <include file="config/liquibase/changelog/20251025202839_added_entity_constraints_Datacenter.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20251025202840_added_entity_constraints_Agent.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20251025202842_added_entity_constraints_AuditLog.xml" relativeToChangelogFile="false"/>

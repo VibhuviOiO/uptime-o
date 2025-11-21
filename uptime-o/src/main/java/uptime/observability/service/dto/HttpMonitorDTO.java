@@ -77,9 +77,13 @@ public class HttpMonitorDTO implements Serializable {
 
     private String tags;
 
-    private String monitoringVisibility;
-
     private Boolean enabled;
+
+    private String expectedStatusCodes;
+
+    private Integer performanceBudgetMs;
+
+    private Integer sizeBudgetKb;
 
     public Long getId() {
         return id;
@@ -281,14 +285,6 @@ public class HttpMonitorDTO implements Serializable {
         this.tags = tags;
     }
 
-    public String getMonitoringVisibility() {
-        return monitoringVisibility;
-    }
-
-    public void setMonitoringVisibility(String monitoringVisibility) {
-        this.monitoringVisibility = monitoringVisibility;
-    }
-
     public Boolean getEnabled() {
         return enabled;
     }
@@ -303,6 +299,30 @@ public class HttpMonitorDTO implements Serializable {
 
     public void setParentId(Long parentId) {
         this.parentId = parentId;
+    }
+
+    public String getExpectedStatusCodes() {
+        return expectedStatusCodes;
+    }
+
+    public void setExpectedStatusCodes(String expectedStatusCodes) {
+        this.expectedStatusCodes = expectedStatusCodes;
+    }
+
+    public Integer getPerformanceBudgetMs() {
+        return performanceBudgetMs;
+    }
+
+    public void setPerformanceBudgetMs(Integer performanceBudgetMs) {
+        this.performanceBudgetMs = performanceBudgetMs;
+    }
+
+    public Integer getSizeBudgetKb() {
+        return sizeBudgetKb;
+    }
+
+    public void setSizeBudgetKb(Integer sizeBudgetKb) {
+        this.sizeBudgetKb = sizeBudgetKb;
     }
 
     @Override

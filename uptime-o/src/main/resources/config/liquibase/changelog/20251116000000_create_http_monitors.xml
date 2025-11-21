@@ -81,10 +81,16 @@
             <column name="tags" type="varchar(500)">
                 <constraints nullable="true"/>
             </column>
-            <column name="monitoring_visibility" type="varchar(20)" defaultValue="internal">
+            <column name="enabled" type="boolean" defaultValueBoolean="true">
                 <constraints nullable="true"/>
             </column>
-            <column name="enabled" type="boolean" defaultValueBoolean="true">
+            <column name="expected_status_codes" type="varchar(100)" defaultValue="200">
+                <constraints nullable="true"/>
+            </column>
+            <column name="performance_budget_ms" type="integer">
+                <constraints nullable="true"/>
+            </column>
+            <column name="size_budget_kb" type="integer">
                 <constraints nullable="true"/>
             </column>
             <column name="parent_id" type="bigint">
