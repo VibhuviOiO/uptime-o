@@ -7,6 +7,7 @@ import LoadingBar from 'react-redux-loading-bar';
 
 import { AccountMenu, AdminMenu } from '../menus';
 import { MonitoringMenu } from '../menus/monitoring';
+import { StatusPageMenu } from '../menus/status-page';
 import { Brand } from './header-components';
 
 export interface IHeaderProps {
@@ -41,6 +42,7 @@ const Header = (props: IHeaderProps) => {
         <Collapse isOpen={menuOpen} navbar>
           <Nav id="header-tabs" className="ms-auto" navbar>
             {props.isAuthenticated && <MonitoringMenu />}
+            {props.isAuthenticated && <StatusPageMenu />}
             {props.isAuthenticated && props.isAdmin && <AdminMenu showOpenAPI={props.isOpenAPIEnabled} />}
             <AccountMenu isAuthenticated={props.isAuthenticated} />
           </Nav>

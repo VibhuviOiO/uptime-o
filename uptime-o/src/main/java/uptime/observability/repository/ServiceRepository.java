@@ -7,4 +7,5 @@ import uptime.observability.domain.Service;
 @Repository
 public interface ServiceRepository extends JpaRepository<Service, Long> {
     java.util.List<Service> findByMonitoringEnabledTrueAndIsActiveTrue();
+    java.util.List<Service> findByIsActiveTrue();
 }

@@ -13,6 +13,8 @@ import AuditLog from './audit-log';
 
 import InstanceHeartbeat from './instance-heartbeat';
 import ServiceHeartbeat from './service-heartbeat';
+import StatusPage from './status-page';
+// import StatusDependency from './status-dependency';
 /* jhipster-needle-add-route-import - JHipster will add routes here */
 
 export default () => {
@@ -31,6 +33,8 @@ export default () => {
 
         <Route path="instance-heartbeat/*" element={<InstanceHeartbeat />} />
         <Route path="service-heartbeat/*" element={<ServiceHeartbeat />} />
+        <Route path="status-page/*" element={<StatusPage />} />
+        {/* <Route path="status-dependency/*" element={<StatusDependency />} /> */}
         {/* jhipster-needle-add-route-path - JHipster will add routes here */}
       </ErrorBoundaryRoutes>
     </div>

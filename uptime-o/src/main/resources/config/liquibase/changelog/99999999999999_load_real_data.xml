@@ -34,6 +34,90 @@
             <column name="response_time_critical_ms" valueNumeric="1000"/>
             <column name="enabled" valueBoolean="true"/>
         </insert>
+        <insert tableName="http_monitors">
+            <column name="id" valueNumeric="3"/>
+            <column name="name" value="ISRO Customer Satellites"/>
+            <column name="method" value="GET"/>
+            <column name="type" value="HTTPS"/>
+            <column name="url" value="https://isro.vercel.app/api/customer_satellites"/>
+            <column name="interval_seconds" valueNumeric="60"/>
+            <column name="timeout_seconds" valueNumeric="30"/>
+            <column name="retry_count" valueNumeric="2"/>
+            <column name="retry_delay_seconds" valueNumeric="5"/>
+            <column name="response_time_warning_ms" valueNumeric="500"/>
+            <column name="response_time_critical_ms" valueNumeric="1000"/>
+            <column name="enabled" valueBoolean="true"/>
+        </insert>
+        <insert tableName="http_monitors">
+            <column name="id" valueNumeric="4"/>
+            <column name="name" value="Aviation Weather METAR"/>
+            <column name="method" value="GET"/>
+            <column name="type" value="HTTPS"/>
+            <column name="url" value="https://aviationweather.gov/api/data/metar?ids=KMCI&amp;format=json"/>
+            <column name="interval_seconds" valueNumeric="60"/>
+            <column name="timeout_seconds" valueNumeric="30"/>
+            <column name="retry_count" valueNumeric="2"/>
+            <column name="retry_delay_seconds" valueNumeric="5"/>
+            <column name="response_time_warning_ms" valueNumeric="500"/>
+            <column name="response_time_critical_ms" valueNumeric="1000"/>
+            <column name="enabled" valueBoolean="true"/>
+        </insert>
+        <insert tableName="http_monitors">
+            <column name="id" valueNumeric="5"/>
+            <column name="name" value="NHTSA Vehicle API"/>
+            <column name="method" value="GET"/>
+            <column name="type" value="HTTPS"/>
+            <column name="url" value="https://vpic.nhtsa.dot.gov/api/vehicles/decodevinvaluesextended/5UXWX7C5*BA?format=json&amp;modelyear=2011"/>
+            <column name="interval_seconds" valueNumeric="60"/>
+            <column name="timeout_seconds" valueNumeric="30"/>
+            <column name="retry_count" valueNumeric="2"/>
+            <column name="retry_delay_seconds" valueNumeric="5"/>
+            <column name="response_time_warning_ms" valueNumeric="500"/>
+            <column name="response_time_critical_ms" valueNumeric="1000"/>
+            <column name="enabled" valueBoolean="true"/>
+        </insert>
+        <insert tableName="http_monitors">
+            <column name="id" valueNumeric="6"/>
+            <column name="name" value="Squiggle AFL Teams"/>
+            <column name="method" value="GET"/>
+            <column name="type" value="HTTPS"/>
+            <column name="url" value="https://api.squiggle.com.au/?q=teams"/>
+            <column name="interval_seconds" valueNumeric="60"/>
+            <column name="timeout_seconds" valueNumeric="30"/>
+            <column name="retry_count" valueNumeric="2"/>
+            <column name="retry_delay_seconds" valueNumeric="5"/>
+            <column name="response_time_warning_ms" valueNumeric="500"/>
+            <column name="response_time_critical_ms" valueNumeric="1000"/>
+            <column name="enabled" valueBoolean="true"/>
+        </insert>
+        <insert tableName="http_monitors">
+            <column name="id" valueNumeric="7"/>
+            <column name="name" value="NVD Schema"/>
+            <column name="method" value="GET"/>
+            <column name="type" value="HTTPS"/>
+            <column name="url" value="https://csrc.nist.gov/schema/nvd/feed/1.0/nvd_cve_feed_json_1.0.schema"/>
+            <column name="interval_seconds" valueNumeric="60"/>
+            <column name="timeout_seconds" valueNumeric="30"/>
+            <column name="retry_count" valueNumeric="2"/>
+            <column name="retry_delay_seconds" valueNumeric="5"/>
+            <column name="response_time_warning_ms" valueNumeric="500"/>
+            <column name="response_time_critical_ms" valueNumeric="1000"/>
+            <column name="enabled" valueBoolean="true"/>
+        </insert>
+        <insert tableName="http_monitors">
+            <column name="id" valueNumeric="8"/>
+            <column name="name" value="JSONPlaceholder Posts"/>
+            <column name="method" value="GET"/>
+            <column name="type" value="HTTPS"/>
+            <column name="url" value="https://jsonplaceholder.typicode.com/posts/1"/>
+            <column name="interval_seconds" valueNumeric="60"/>
+            <column name="timeout_seconds" valueNumeric="30"/>
+            <column name="retry_count" valueNumeric="2"/>
+            <column name="retry_delay_seconds" valueNumeric="5"/>
+            <column name="response_time_warning_ms" valueNumeric="500"/>
+            <column name="response_time_critical_ms" valueNumeric="1000"/>
+            <column name="enabled" valueBoolean="true"/>
+        </insert>
 
         <!-- Regions -->
         <insert tableName="regions">
@@ -42,6 +126,18 @@
             <column name="region_code" value="home-1"/>
             <column name="group_name" value="HOME"/>
         </insert>
+        <insert tableName="regions">
+            <column name="id" valueNumeric="2"/>
+            <column name="name" value="US East"/>
+            <column name="region_code" value="us-east-1"/>
+            <column name="group_name" value="US"/>
+        </insert>
+        <insert tableName="regions">
+            <column name="id" valueNumeric="3"/>
+            <column name="name" value="US West"/>
+            <column name="region_code" value="us-west-1"/>
+            <column name="group_name" value="US"/>
+        </insert>
 
         <!-- Datacenters -->
         <insert tableName="datacenters">
@@ -49,6 +145,18 @@
             <column name="code" value="home"/>
             <column name="name" value="Home Lab"/>
             <column name="region_id" valueNumeric="1"/>
+        </insert>
+        <insert tableName="datacenters">
+            <column name="id" valueNumeric="2"/>
+            <column name="code" value="va"/>
+            <column name="name" value="Virginia"/>
+            <column name="region_id" valueNumeric="2"/>
+        </insert>
+        <insert tableName="datacenters">
+            <column name="id" valueNumeric="3"/>
+            <column name="code" value="sf"/>
+            <column name="name" value="San Francisco"/>
+            <column name="region_id" valueNumeric="3"/>
         </insert>
 
         <!-- Real Machine Instances -->

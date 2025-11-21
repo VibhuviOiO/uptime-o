@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <changeSet id="20251117000600-1" author="jhipster">
+        <!-- Create dependency_type enum -->
+        <sql>
+            CREATE TYPE dependency_type AS ENUM ('SERVICE', 'HTTP', 'INSTANCE');
+        </sql>
+    </changeSet>
+
+    <changeSet id="20251117000600-2" author="jhipster">
+        <createTable tableName="status_dependency">
+            <column name="id" type="bigint" autoIncrement="true" startWith="1">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="parent_type" type="dependency_type">
+                <constraints nullable="false"/>
+            </column>
+            <column name="parent_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="child_type" type="dependency_type">
+                <constraints nullable="false"/>
+            </column>
+            <column name="child_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="metadata" type="jsonb"/>
+            <column name="status_page_id" type="bigint">
+                <constraints nullable="true"/>
+            </column>
+            <column name="created_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20251117000600-3" author="jhipster">
+        <!-- Prevent self-references -->
+        <sql>
+            ALTER TABLE status_dependency 
+            ADD CONSTRAINT no_self_dependency 
+            CHECK (NOT (parent_type = child_type AND parent_id = child_id));
+        </sql>
+    </changeSet>
+
+    <changeSet id="20251117000600-4" author="jhipster">
+        <!-- Prevent duplicate dependencies -->
+        <addUniqueConstraint 
+            tableName="status_dependency" 
+            columnNames="parent_type, parent_id, child_type, child_id" 
+            constraintName="unique_dependency"/>
+    </changeSet>
+
+    <changeSet id="20251117000600-5" author="jhipster">
+        <!-- Indexes for performance -->
+        <createIndex tableName="status_dependency" indexName="idx_status_dependency_parent">
+            <column name="parent_type"/>
+            <column name="parent_id"/>
+        </createIndex>
+        
+        <createIndex tableName="status_dependency" indexName="idx_status_dependency_child">
+            <column name="child_type"/>
+            <column name="child_id"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

@@ -107,7 +107,7 @@ export const StatusPage = () => {
     return <div className="status-page-loading">Loading status...</div>;
   }
 
-  if (!statusData || statusData.apis.length === 0) {
+  if (!statusData || !statusData.apis || statusData.apis.length === 0) {
     return (
       <div className="status-page-empty">
         <h2>No monitoring data available</h2>
@@ -180,7 +180,7 @@ export const StatusPage = () => {
           <thead>
             <tr>
               <th className="api-column">Service</th>
-              {statusData.regions.map(region => (
+              {statusData.regions?.map(region => (
                 <th key={region} className="region-column">
                   {region}
                 </th>
@@ -191,7 +191,7 @@ export const StatusPage = () => {
             {statusData.apis.map(api => (
               <tr key={api.monitorId}>
                 <td className="api-name">{api.apiName}</td>
-                {statusData.regions.map(region => {
+                {statusData.regions?.map(region => {
                   const health = api.regionHealth[region];
                   return (
                     <td key={region} className="region-status">

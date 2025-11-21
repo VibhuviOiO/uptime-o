@@ -36,6 +36,10 @@
     <include file="config/liquibase/changelog/20251116000100_create_services.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20251116000101_create_service_instances.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20251116000102_create_service_heartbeats.xml" relativeToChangelogFile="false"/>
+    
+    <!-- Status page tables -->
+    <include file="config/liquibase/changelog/20251117000600_create_status_dependency.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20251117000700_create_status_page.xml" relativeToChangelogFile="false"/>
 
     <!-- jhipster-needle-liquibase-add-constraints-changelog - JHipster will add liquibase constraints changelogs here -->
     <!-- jhipster-needle-liquibase-add-incremental-changelog - JHipster will add incremental liquibase changelogs here -->

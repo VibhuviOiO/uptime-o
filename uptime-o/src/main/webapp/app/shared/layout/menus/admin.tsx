@@ -23,6 +23,12 @@ const adminMenuItems = () => (
     <MenuItem icon="file-pdf" to="/audit-log" data-cy="audit-log">
       Audit Logs
     </MenuItem>
+    <MenuItem icon="chart-bar" to="/status-page" data-cy="status-page">
+      Status Pages
+    </MenuItem>
+    <MenuItem icon="project-diagram" to="/status-dependency" data-cy="status-dependency">
+      Status Dependencies
+    </MenuItem>
     {/* jhipster-needle-add-element-to-admin-menu - JHipster will add entities to the admin menu here */}
   </>
 );

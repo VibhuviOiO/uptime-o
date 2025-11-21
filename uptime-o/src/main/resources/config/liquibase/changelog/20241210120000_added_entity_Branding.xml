@@ -10,11 +10,8 @@
         Added the entity Branding.
     -->
     <changeSet id="20241210120000-1" author="jhipster">
-        <preConditions onFail="MARK_RAN">
-            <sqlCheck expectedResult="true">SELECT '${application.branding.enabled:false}' = 'true'</sqlCheck>
-        </preConditions>
         <createTable tableName="branding">
-            <column name="id" type="bigint">
+            <column name="id" type="bigint" autoIncrement="true" startWith="1">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="title" type="varchar(200)">
@@ -54,6 +51,27 @@
                 <constraints nullable="true" />
             </column>
         </createTable>
+    </changeSet>
+
+    <changeSet id="20241210120000-2" author="jhipster">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">SELECT COUNT(*) FROM branding WHERE id = 1</sqlCheck>
+        </preConditions>
+        <insert tableName="branding">
+            <column name="id" valueNumeric="1"/>
+            <column name="title" value="UptimeO"/>
+            <column name="description" value="Enterprise uptime monitoring platform"/>
+            <column name="keywords" value="monitoring,uptime,observability"/>
+            <column name="author" value="UptimeO Team"/>
+            <column name="favicon_path" value="/favicon.ico"/>
+            <column name="logo_path" value="/content/images/logo.png"/>
+            <column name="logo_width" valueNumeric="220"/>
+            <column name="logo_height" valueNumeric="55"/>
+            <column name="footer_title" value="Powered by UptimeO"/>
+            <column name="is_active" valueBoolean="true"/>
+            <column name="created_at" valueComputed="CURRENT_TIMESTAMP"/>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
     </changeSet>
 
 </databaseChangeLog>
