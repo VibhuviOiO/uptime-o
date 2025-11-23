@@ -10,11 +10,16 @@ import uptime.observability.service.dto.DependencyTreeDTO;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @Service
 public class StatusDependencyService {
 
     private static final Logger LOG = LoggerFactory.getLogger(StatusDependencyService.class);
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
+        .registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule())
+        .registerModule(new com.fasterxml.jackson.datatype.hibernate6.Hibernate6Module());
 
     private final StatusDependencyRepository statusDependencyRepository;
     private final uptime.observability.repository.HttpHeartbeatRepository httpHeartbeatRepository;
@@ -65,6 +70,7 @@ public class StatusDependencyService {
 
         // Fetch all items using repositories
         Map<String, String> itemMap = new HashMap<>();
+        Map<String, uptime.observability.domain.Instance> instanceMap = new HashMap<>();
         if (!httpIds.isEmpty()) {
             httpMonitorRepository.findAllById(httpIds).forEach(m -> 
                 itemMap.put("HTTP-" + m.getId(), m.getName()));
@@ -74,12 +80,14 @@ public class StatusDependencyService {
                 itemMap.put("SERVICE-" + s.getId(), s.getName()));
         }
         if (!instanceIds.isEmpty()) {
-            instanceRepository.findAllById(instanceIds).forEach(i -> 
-                itemMap.put("INSTANCE-" + i.getId(), i.getName()));
+            instanceRepository.findAllById(instanceIds).forEach(i -> {
+                itemMap.put("INSTANCE-" + i.getId(), i.getName());
+                instanceMap.put("INSTANCE-" + i.getId(), i);
+            });
         }
 
         // Fetch latest heartbeats for status
-        Map<String, HeartbeatInfo> heartbeatMap = fetchLatestHeartbeats(httpIds, serviceIds, instanceIds);
+        Map<String, HeartbeatInfo> heartbeatMap = fetchLatestHeartbeats(httpIds, serviceIds, instanceIds, instanceMap);
 
         // Build child map
         Map<String, List<String>> childMap = new HashMap<>();
@@ -108,7 +116,7 @@ public class StatusDependencyService {
             .collect(Collectors.toList());
     }
 
-    private Map<String, HeartbeatInfo> fetchLatestHeartbeats(Set<Long> httpIds, Set<Long> serviceIds, Set<Long> instanceIds) {
+    private Map<String, HeartbeatInfo> fetchLatestHeartbeats(Set<Long> httpIds, Set<Long> serviceIds, Set<Long> instanceIds, Map<String, uptime.observability.domain.Instance> instanceMap) {
         Map<String, HeartbeatInfo> heartbeatMap = new HashMap<>();
         
         if (!httpIds.isEmpty()) {
@@ -156,13 +164,27 @@ public class StatusDependencyService {
             instanceIds.forEach(instanceId -> {
                 instanceHeartbeatRepository.findFirstByInstanceIdOrderByExecutedAtDesc(instanceId).ifPresent(hb -> {
                     String key = "INSTANCE-" + instanceId;
-                    heartbeatMap.put(key, new HeartbeatInfo(
-                        hb.getSuccess() ? "UP" : "DOWN",
-                        hb.getExecutedAt().toString(),
-                        hb.getResponseTimeMs(),
-                        hb.getErrorMessage(),
-                        null
-                    ));
+                    uptime.observability.domain.Instance instance = instanceMap.get(key);
+                    
+                    try {
+                        ObjectNode metadata = OBJECT_MAPPER.createObjectNode();
+                        
+                        if (instance != null) {
+                            metadata.set("instance", OBJECT_MAPPER.valueToTree(instance));
+                        }
+                        
+                        metadata.set("heartbeat", OBJECT_MAPPER.valueToTree(hb));
+                        
+                        heartbeatMap.put(key, new HeartbeatInfo(
+                            hb.getSuccess() ? "UP" : "DOWN",
+                            hb.getExecutedAt().toString(),
+                            hb.getResponseTimeMs(),
+                            hb.getErrorMessage(),
+                            OBJECT_MAPPER.writeValueAsString(metadata)
+                        ));
+                    } catch (Exception e) {
+                        LOG.error("Failed to serialize instance metadata for instance {}", instanceId, e);
+                    }
                 });
             });
         }
@@ -185,10 +207,13 @@ public class StatusDependencyService {
         DependencyTreeDTO node = new DependencyTreeDTO(key, name, type, id, hb.status, hb.lastChecked, hb.responseTimeMs, hb.errorMessage, hb.metadata);
 
         List<String> childKeys = childMap.getOrDefault(key, Collections.emptyList());
-        List<DependencyTreeDTO> children = childKeys.stream()
-            .map(childKey -> buildNode(childKey, itemMap, heartbeatMap, childMap, new HashSet<>(visited)))
-            .filter(Objects::nonNull)
-            .collect(Collectors.toList());
+        List<DependencyTreeDTO> children = new ArrayList<>(childKeys.size());
+        for (String childKey : childKeys) {
+            DependencyTreeDTO child = buildNode(childKey, itemMap, heartbeatMap, childMap, visited);
+            if (child != null) {
+                children.add(child);
+            }
+        }
         
         node.setChildren(children);
         return node;

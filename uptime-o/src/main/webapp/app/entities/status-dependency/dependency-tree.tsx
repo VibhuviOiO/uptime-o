@@ -76,14 +76,20 @@ const DependencyTree = () => {
     return dayjs(timestamp).fromNow();
   };
 
-  const parseMetadata = (metadata: string | undefined) => {
-    if (!metadata) return null;
-    try {
-      return JSON.parse(metadata);
-    } catch {
-      return null;
-    }
-  };
+  const parseMetadata = React.useMemo(() => {
+    const cache = new Map<string, any>();
+    return (metadata: string | undefined) => {
+      if (!metadata) return null;
+      if (cache.has(metadata)) return cache.get(metadata);
+      try {
+        const parsed = JSON.parse(metadata);
+        cache.set(metadata, parsed);
+        return parsed;
+      } catch {
+        return null;
+      }
+    };
+  }, []);
 
   const renderHttpMetadata = (meta: any) => {
     if (!meta) return null;
@@ -149,27 +155,94 @@ const DependencyTree = () => {
     );
   };
 
-  const renderNode = (node: TreeNode, level = 0) => {
-    const meta = parseMetadata(node.metadata);
+  const renderInstanceMetadata = (meta: any) => {
+    if (!meta) return null;
+
+    const instance = meta.instance;
+    const heartbeat = meta.heartbeat;
+
+    if (!instance || !heartbeat) return null;
+
+    const hasHardware =
+      heartbeat.cpuUsage !== undefined ||
+      heartbeat.memoryUsage !== undefined ||
+      heartbeat.diskUsage !== undefined ||
+      heartbeat.loadAverage !== undefined;
+    const hasPing = heartbeat.responseTimeMs !== undefined && heartbeat.responseTimeMs !== null;
 
     return (
-      <div key={node.id} className="dependency-node" style={{ marginLeft: `${level * 30}px` }}>
-        <div className="node-content d-flex align-items-center gap-2">
-          {getStatusIcon(node.status)}
-          <Badge color={getTypeBadgeColor(node.type)}>{node.type}</Badge>
-          <strong>{node.name}</strong>
-          {node.responseTimeMs !== null && node.responseTimeMs !== undefined && (
-            <span className="text-muted small">({node.responseTimeMs}ms)</span>
+      <div className="node-metadata ms-4 mt-2 p-2 border-start border-2 border-info small">
+        <div className="mb-1">
+          {instance.hostname && (
+            <span>
+              <strong>Host:</strong> {instance.hostname}
+            </span>
           )}
-          {node.lastChecked && <span className="text-muted small ms-auto">{getTimeAgo(node.lastChecked)}</span>}
+          {instance.privateIpAddress && (
+            <span className="ms-2">
+              <strong>IP:</strong> {instance.privateIpAddress}
+            </span>
+          )}
+          {instance.instanceType && (
+            <span className="ms-2">
+              <strong>Type:</strong> {instance.instanceType}
+            </span>
+          )}
         </div>
-        {node.type === DependencyType.HTTP && renderHttpMetadata(meta)}
-        {node.type === DependencyType.SERVICE && renderServiceMetadata(meta)}
-        {node.errorMessage && <div className="node-error ms-4 mt-1 small text-danger">{node.errorMessage}</div>}
-        {node.children.length > 0 && <div className="node-children mt-2">{node.children.map(child => renderNode(child, level + 1))}</div>}
+        {hasPing && (
+          <div className="mb-1">
+            <strong>Ping Uptime:</strong> <span className="ms-2">{heartbeat.responseTimeMs}ms</span>
+            {heartbeat.packetLoss !== undefined && heartbeat.packetLoss !== null && (
+              <span className="ms-2">Loss: {heartbeat.packetLoss.toFixed(1)}%</span>
+            )}
+          </div>
+        )}
+        {hasHardware && (
+          <div>
+            <strong>Hardware metrics:</strong>
+            {heartbeat.cpuUsage !== undefined && heartbeat.cpuUsage !== null && (
+              <span className="ms-2">CPU: {heartbeat.cpuUsage.toFixed(1)}%</span>
+            )}
+            {heartbeat.memoryUsage !== undefined && heartbeat.memoryUsage !== null && (
+              <span className="ms-2">Memory: {heartbeat.memoryUsage.toFixed(1)}%</span>
+            )}
+            {heartbeat.diskUsage !== undefined && heartbeat.diskUsage !== null && (
+              <span className="ms-2">Disk: {heartbeat.diskUsage.toFixed(1)}%</span>
+            )}
+            {heartbeat.loadAverage !== undefined && heartbeat.loadAverage !== null && (
+              <span className="ms-2">Load: {heartbeat.loadAverage.toFixed(2)}</span>
+            )}
+          </div>
+        )}
       </div>
     );
   };
+
+  const renderNode = React.useCallback(
+    (node: TreeNode, level = 0) => {
+      const meta = parseMetadata(node.metadata);
+
+      return (
+        <div key={node.id} className="dependency-node" style={{ marginLeft: `${level * 30}px` }}>
+          <div className="node-content d-flex align-items-center gap-2">
+            {getStatusIcon(node.status)}
+            <Badge color={getTypeBadgeColor(node.type)}>{node.type}</Badge>
+            <strong>{node.name}</strong>
+            {node.responseTimeMs !== null && node.responseTimeMs !== undefined && (
+              <span className="text-muted small">({node.responseTimeMs}ms)</span>
+            )}
+            {node.lastChecked && <span className="text-muted small ms-auto">{getTimeAgo(node.lastChecked)}</span>}
+          </div>
+          {node.type === DependencyType.HTTP && renderHttpMetadata(meta)}
+          {node.type === DependencyType.SERVICE && renderServiceMetadata(meta)}
+          {node.type === DependencyType.INSTANCE && renderInstanceMetadata(meta)}
+          {node.errorMessage && <div className="node-error ms-4 mt-1 small text-danger">{node.errorMessage}</div>}
+          {node.children.length > 0 && <div className="node-children mt-2">{node.children.map(child => renderNode(child, level + 1))}</div>}
+        </div>
+      );
+    },
+    [parseMetadata],
+  );
 
   if (loading) {
     return (

@@ -97,13 +97,7 @@ public class LocalHttpMonitoringService {
             heartbeat.setTcpConnectMs(10); // Simplified - Java HttpClient doesn't expose this
             heartbeat.setTlsHandshakeMs(uri.getScheme().equalsIgnoreCase("https") ? 20 : 0);
             
-            // Thresholds from monitor
-            if (monitor.getWarningThresholdMs() != null) {
-                heartbeat.setWarningThresholdMs(monitor.getWarningThresholdMs());
-            }
-            if (monitor.getCriticalThresholdMs() != null) {
-                heartbeat.setCriticalThresholdMs(monitor.getCriticalThresholdMs());
-            }
+
             
             // HTTP Protocol details
             heartbeat.setHttpVersion(response.version().toString());
