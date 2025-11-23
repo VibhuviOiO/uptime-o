@@ -63,15 +63,6 @@ public class StatusDependencyResource {
     }
 
     /**
-     * GET /status-pages/:statusPageId/dependencies : get dependencies for a status page.
-     */
-    @GetMapping("/status-pages/{statusPageId}/dependencies")
-    public ResponseEntity<List<StatusDependency>> getDependenciesByStatusPage(@PathVariable Long statusPageId) {
-        List<StatusDependency> dependencies = statusDependencyRepository.findByStatusPageId(statusPageId);
-        return ResponseEntity.ok().body(dependencies);
-    }
-
-    /**
      * GET /status-dependencies/tree : get dependency tree with status.
      */
     @GetMapping("/status-dependencies/tree")

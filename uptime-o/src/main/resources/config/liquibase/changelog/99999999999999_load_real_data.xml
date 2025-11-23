@@ -317,4 +317,138 @@
         </insert>
     </changeSet>
 
+    <!-- Default Status Page -->
+    <changeSet id="99999999999999-status-page" author="system" context="realdata">
+        <insert tableName="status_pages">
+            <column name="id" valueNumeric="1"/>
+            <column name="name" value="Global Status Page"/>
+            <column name="slug" value="global-status-page"/>
+            <column name="description" value="Real-time status of all monitored services"/>
+            <column name="is_public" valueBoolean="true"/>
+            <column name="is_active" valueBoolean="true"/>
+            <column name="is_home_page" valueBoolean="true"/>
+            <column name="show_response_times" valueBoolean="true"/>
+            <column name="show_uptime_percentage" valueBoolean="true"/>
+            <column name="auto_refresh_seconds" valueNumeric="30"/>
+        </insert>
+    </changeSet>
+
+    <!-- Add all HTTP monitors to status page -->
+    <changeSet id="99999999999999-status-page-items" author="system" context="realdata">
+        <insert tableName="status_page_items">
+            <column name="status_page_id" valueNumeric="1"/>
+            <column name="item_type" value="HTTP"/>
+            <column name="item_id" valueNumeric="1"/>
+            <column name="display_order" valueNumeric="1"/>
+        </insert>
+        <insert tableName="status_page_items">
+            <column name="status_page_id" valueNumeric="1"/>
+            <column name="item_type" value="HTTP"/>
+            <column name="item_id" valueNumeric="2"/>
+            <column name="display_order" valueNumeric="2"/>
+        </insert>
+        <insert tableName="status_page_items">
+            <column name="status_page_id" valueNumeric="1"/>
+            <column name="item_type" value="HTTP"/>
+            <column name="item_id" valueNumeric="3"/>
+            <column name="display_order" valueNumeric="3"/>
+        </insert>
+        <insert tableName="status_page_items">
+            <column name="status_page_id" valueNumeric="1"/>
+            <column name="item_type" value="HTTP"/>
+            <column name="item_id" valueNumeric="4"/>
+            <column name="display_order" valueNumeric="4"/>
+        </insert>
+        <insert tableName="status_page_items">
+            <column name="status_page_id" valueNumeric="1"/>
+            <column name="item_type" value="HTTP"/>
+            <column name="item_id" valueNumeric="5"/>
+            <column name="display_order" valueNumeric="5"/>
+        </insert>
+        <insert tableName="status_page_items">
+            <column name="status_page_id" valueNumeric="1"/>
+            <column name="item_type" value="HTTP"/>
+            <column name="item_id" valueNumeric="6"/>
+            <column name="display_order" valueNumeric="6"/>
+        </insert>
+        <insert tableName="status_page_items">
+            <column name="status_page_id" valueNumeric="1"/>
+            <column name="item_type" value="HTTP"/>
+            <column name="item_id" valueNumeric="7"/>
+            <column name="display_order" valueNumeric="7"/>
+        </insert>
+        <insert tableName="status_page_items">
+            <column name="status_page_id" valueNumeric="1"/>
+            <column name="item_type" value="HTTP"/>
+            <column name="item_id" valueNumeric="8"/>
+            <column name="display_order" valueNumeric="8"/>
+        </insert>
+    </changeSet>
+
+    <!-- Private Status Page with Dependencies -->
+    <changeSet id="99999999999999-private-status-page" author="system" context="realdata">
+        <insert tableName="status_pages">
+            <column name="id" valueNumeric="2"/>
+            <column name="name" value="Home Lab Infrastructure"/>
+            <column name="slug" value="home-lab"/>
+            <column name="description" value="Complete infrastructure monitoring with dependencies"/>
+            <column name="is_public" valueBoolean="false"/>
+            <column name="is_active" valueBoolean="true"/>
+            <column name="is_home_page" valueBoolean="false"/>
+            <column name="show_response_times" valueBoolean="true"/>
+            <column name="show_uptime_percentage" valueBoolean="true"/>
+            <column name="auto_refresh_seconds" valueNumeric="30"/>
+        </insert>
+    </changeSet>
+
+    <!-- Status Dependencies -->
+    <changeSet id="99999999999999-status-dependencies" author="system" context="realdata">
+        <!-- Redis Cluster depends on swagup-machine instance -->
+        <insert tableName="status_dependency">
+            <column name="parent_type" value="SERVICE"/>
+            <column name="parent_id" valueNumeric="1"/>
+            <column name="child_type" value="INSTANCE"/>
+            <column name="child_id" valueNumeric="2"/>
+        </insert>
+        
+        <!-- Portainer depends on rp4 instance -->
+        <insert tableName="status_dependency">
+            <column name="parent_type" value="SERVICE"/>
+            <column name="parent_id" valueNumeric="2"/>
+            <column name="child_type" value="INSTANCE"/>
+            <column name="child_id" valueNumeric="1"/>
+        </insert>
+        
+        <!-- Komodo depends on rp4 instance -->
+        <insert tableName="status_dependency">
+            <column name="parent_type" value="SERVICE"/>
+            <column name="parent_id" valueNumeric="3"/>
+            <column name="child_type" value="INSTANCE"/>
+            <column name="child_id" valueNumeric="1"/>
+        </insert>
+    </changeSet>
+
+    <!-- Private Status Page Items -->
+    <changeSet id="99999999999999-private-status-page-items" author="system" context="realdata">
+        <!-- Add root services (they have children) -->
+        <insert tableName="status_page_items">
+            <column name="status_page_id" valueNumeric="2"/>
+            <column name="item_type" value="SERVICE"/>
+            <column name="item_id" valueNumeric="1"/>
+            <column name="display_order" valueNumeric="1"/>
+        </insert>
+        <insert tableName="status_page_items">
+            <column name="status_page_id" valueNumeric="2"/>
+            <column name="item_type" value="SERVICE"/>
+            <column name="item_id" valueNumeric="2"/>
+            <column name="display_order" valueNumeric="2"/>
+        </insert>
+        <insert tableName="status_page_items">
+            <column name="status_page_id" valueNumeric="2"/>
+            <column name="item_type" value="SERVICE"/>
+            <column name="item_id" valueNumeric="3"/>
+            <column name="display_order" valueNumeric="3"/>
+        </insert>
+    </changeSet>
+
 </databaseChangeLog>

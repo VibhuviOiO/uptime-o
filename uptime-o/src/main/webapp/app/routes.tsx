@@ -18,8 +18,8 @@ import ErrorBoundaryRoutes from 'app/shared/error/error-boundary-routes';
 import PageNotFound from 'app/shared/error/page-not-found';
 import { AUTHORITIES } from 'app/config/constants';
 import { sendActivity } from 'app/config/websocket-middleware';
-import PublicStatusPage from 'app/modules/home/components/PublicStatusPage';
-import PrivateStatusPage from 'app/modules/home/components/PrivateStatusPage';
+import PublicStatusPageView from 'app/entities/status-page/public-status-page-view';
+import PrivateStatusPageView from 'app/entities/status-page/private-status-page-view';
 
 const loading = <div>loading ...</div>;
 
@@ -41,7 +41,7 @@ const AppRoutes = () => {
     <div className="view-routes">
       <ErrorBoundaryRoutes>
         <Route index element={<Home />} />
-        <Route path="status/:slug" element={<PublicStatusPage />} />
+        <Route path="public-status/:slug" element={<PublicStatusPageView />} />
         <Route path="login" element={<Login />} />
         <Route path="logout" element={<Logout />} />
         <Route path="account">
@@ -69,10 +69,10 @@ const AppRoutes = () => {
           }
         />
         <Route
-          path="private-status/:slug"
+          path="status-page-view/:slug"
           element={
             <PrivateRoute hasAnyAuthorities={[AUTHORITIES.USER]}>
-              <PrivateStatusPage />
+              <PrivateStatusPageView />
             </PrivateRoute>
           }
         />

@@ -28,6 +28,7 @@ public class StatusDependencyService {
     private final uptime.observability.repository.HttpMonitorRepository httpMonitorRepository;
     private final uptime.observability.repository.ServiceRepository serviceRepository;
     private final uptime.observability.repository.InstanceRepository instanceRepository;
+    private final uptime.observability.repository.StatusPageItemRepository statusPageItemRepository;
 
     public StatusDependencyService(
         StatusDependencyRepository statusDependencyRepository,
@@ -36,7 +37,8 @@ public class StatusDependencyService {
         uptime.observability.repository.InstanceHeartbeatRepository instanceHeartbeatRepository,
         uptime.observability.repository.HttpMonitorRepository httpMonitorRepository,
         uptime.observability.repository.ServiceRepository serviceRepository,
-        uptime.observability.repository.InstanceRepository instanceRepository
+        uptime.observability.repository.InstanceRepository instanceRepository,
+        uptime.observability.repository.StatusPageItemRepository statusPageItemRepository
     ) {
         this.statusDependencyRepository = statusDependencyRepository;
         this.httpHeartbeatRepository = httpHeartbeatRepository;
@@ -45,9 +47,20 @@ public class StatusDependencyService {
         this.httpMonitorRepository = httpMonitorRepository;
         this.serviceRepository = serviceRepository;
         this.instanceRepository = instanceRepository;
+        this.statusPageItemRepository = statusPageItemRepository;
+    }
+
+    private Set<String> getStatusPageItemKeys(Long statusPageId) {
+        return statusPageItemRepository.findByStatusPageIdOrderByDisplayOrder(statusPageId).stream()
+            .map(item -> item.getItemType() + "-" + item.getItemId())
+            .collect(Collectors.toSet());
     }
 
     public List<DependencyTreeDTO> getDependencyTree() {
+        return getDependencyTree(null);
+    }
+
+    public List<DependencyTreeDTO> getDependencyTree(Long statusPageId) {
         List<StatusDependency> dependencies = statusDependencyRepository.findAll();
         if (dependencies.isEmpty()) {
             return Collections.emptyList();
@@ -97,7 +110,7 @@ public class StatusDependencyService {
             childMap.computeIfAbsent(parentKey, k -> new ArrayList<>()).add(childKey);
         });
 
-        // Find root nodes (parents that are not children)
+        // Find root nodes
         Set<String> allParents = dependencies.stream()
             .map(dep -> dep.getParentType() + "-" + dep.getParentId())
             .collect(Collectors.toSet());
@@ -108,6 +121,16 @@ public class StatusDependencyService {
         Set<String> roots = allParents.stream()
             .filter(parent -> !allChildren.contains(parent))
             .collect(Collectors.toSet());
+
+        // Filter by status page items if statusPageId provided
+        if (statusPageId != null) {
+            Set<String> statusPageItemKeys = getStatusPageItemKeys(statusPageId);
+            if (!statusPageItemKeys.isEmpty()) {
+                roots = roots.stream()
+                    .filter(statusPageItemKeys::contains)
+                    .collect(Collectors.toSet());
+            }
+        }
 
         // Build tree from roots
         return roots.stream()

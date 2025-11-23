@@ -76,6 +76,38 @@ public class PublicMonitorResource {
         return ResponseEntity.ok(monitors);
     }
 
+    /**
+     * {@code GET /api/public/monitors/{id}} : Get a single monitor by ID (public endpoint).
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity<MonitorResponse> getMonitorById(@PathVariable Long id) {
+        LOG.debug("Public request to get monitor: {}", id);
+        
+        List<AgentMonitor> agentMonitors = agentMonitorRepository.findAll().stream()
+            .filter(am -> am.getMonitor() != null && am.getMonitor().getId().equals(id))
+            .toList();
+            
+        if (agentMonitors.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        
+        HttpMonitor monitor = agentMonitors.get(0).getMonitor();
+        MonitorResponse response = new MonitorResponse();
+        response.setId(monitor.getId());
+        response.setName(monitor.getName());
+        response.setMethod(monitor.getMethod());
+        response.setType(monitor.getType());
+        response.setUrl(monitor.getUrl());
+        response.setHeaders(monitor.getHeaders());
+        response.setBody(monitor.getBody());
+        response.setIntervalSeconds(monitor.getIntervalSeconds());
+        response.setTimeoutSeconds(monitor.getTimeoutSeconds());
+        response.setRetryCount(monitor.getRetryCount());
+        response.setRetryDelaySeconds(monitor.getRetryDelaySeconds());
+        
+        return ResponseEntity.ok(response);
+    }
+
     // DTOs
 
     public static class MonitorResponse {

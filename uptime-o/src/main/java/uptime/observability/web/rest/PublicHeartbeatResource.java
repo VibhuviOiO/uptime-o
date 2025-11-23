@@ -94,4 +94,26 @@ public class PublicHeartbeatResource {
             .headers(HeaderUtil.createAlert(applicationName, "Batch heartbeat submission successful", String.valueOf(heartbeats.size())))
             .build();
     }
+
+    /**
+     * {@code GET /api/public/heartbeats} : Get heartbeats with filters (public endpoint).
+     */
+    @GetMapping("")
+    public ResponseEntity<java.util.List<HttpHeartbeatDTO>> getHeartbeats(
+        @RequestParam(required = false) Long monitorId,
+        @org.springdoc.core.annotations.ParameterObject org.springframework.data.domain.Pageable pageable
+    ) {
+        LOG.debug("Public request to get heartbeats for monitor: {}", monitorId);
+        
+        org.springframework.data.domain.Page<HttpHeartbeatDTO> page = httpHeartbeatService.findAll(pageable);
+        java.util.List<HttpHeartbeatDTO> content = page.getContent();
+        
+        if (monitorId != null) {
+            content = content.stream()
+                .filter(dto -> dto.getMonitor() != null && dto.getMonitor().getId().equals(monitorId))
+                .collect(java.util.stream.Collectors.toList());
+        }
+        
+        return ResponseEntity.ok(content);
+    }
 }

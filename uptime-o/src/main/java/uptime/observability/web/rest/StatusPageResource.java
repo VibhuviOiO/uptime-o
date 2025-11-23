@@ -32,10 +32,19 @@ public class StatusPageResource {
 
     private final StatusPageRepository statusPageRepository;
     private final StatusPageService statusPageService;
+    private final uptime.observability.service.StatusDependencyService statusDependencyService;
+    private final uptime.observability.repository.StatusPageItemRepository statusPageItemRepository;
 
-    public StatusPageResource(StatusPageRepository statusPageRepository, StatusPageService statusPageService) {
+    public StatusPageResource(
+        StatusPageRepository statusPageRepository, 
+        StatusPageService statusPageService, 
+        uptime.observability.service.StatusDependencyService statusDependencyService,
+        uptime.observability.repository.StatusPageItemRepository statusPageItemRepository
+    ) {
         this.statusPageRepository = statusPageRepository;
         this.statusPageService = statusPageService;
+        this.statusDependencyService = statusDependencyService;
+        this.statusPageItemRepository = statusPageItemRepository;
     }
 
     /**
@@ -65,6 +74,20 @@ public class StatusPageResource {
     public ResponseEntity<StatusPage> getPublicStatusPageBySlug(@PathVariable("slug") String slug) {
         Optional<StatusPage> statusPage = statusPageRepository.findBySlug(slug);
         return ResponseUtil.wrapOrNotFound(statusPage);
+    }
+
+    /**
+     * GET /public/status-page/:slug/items : Get items for a public status page by slug
+     */
+    @GetMapping("/public/status-page/{slug}/items")
+    public ResponseEntity<List<uptime.observability.domain.StatusPageItem>> getPublicStatusPageItemsBySlug(@PathVariable("slug") String slug) {
+        Optional<StatusPage> statusPage = statusPageRepository.findBySlug(slug);
+        if (statusPage.isEmpty() || !statusPage.get().getIsPublic()) {
+            return ResponseEntity.notFound().build();
+        }
+        List<uptime.observability.domain.StatusPageItem> items = 
+            statusPageItemRepository.findByStatusPageIdOrderByDisplayOrder(statusPage.get().getId());
+        return ResponseEntity.ok(items);
     }
 
     /**
@@ -141,5 +164,57 @@ public class StatusPageResource {
         return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .build();
+    }
+
+    /**
+     * GET /status-pages/:id/dependencies : Get dependency tree for a status page
+     */
+    @GetMapping("/status-pages/{id}/dependencies")
+    public ResponseEntity<List<uptime.observability.service.dto.DependencyTreeDTO>> getStatusPageDependencies(@PathVariable("id") Long id) {
+        List<uptime.observability.service.dto.DependencyTreeDTO> dependencies = statusDependencyService.getDependencyTree(id);
+        return ResponseEntity.ok(dependencies);
+    }
+
+    /**
+     * GET /status-pages/by-slug/:slug/items : Get items for a status page by slug
+     */
+    @GetMapping("/status-pages/by-slug/{slug}/items")
+    public ResponseEntity<List<uptime.observability.domain.StatusPageItem>> getStatusPageItemsBySlug(@PathVariable("slug") String slug) {
+        Optional<StatusPage> statusPage = statusPageRepository.findBySlug(slug);
+        if (statusPage.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        List<uptime.observability.domain.StatusPageItem> items = 
+            statusPageItemRepository.findByStatusPageIdOrderByDisplayOrder(statusPage.get().getId());
+        return ResponseEntity.ok(items);
+    }
+
+    /**
+     * POST /status-pages/:id/set-homepage : Set a status page as homepage
+     */
+    @PostMapping("/status-pages/{id}/set-homepage")
+    public ResponseEntity<Void> setHomePage(@PathVariable("id") Long id) {
+        if (!statusPageRepository.existsById(id)) {
+            throw new BadRequestAlertException("Entity not found", "statusPage", "idnotfound");
+        }
+        statusPageRepository.findAll().forEach(page -> {
+            page.setIsHomePage(false);
+            statusPageRepository.save(page);
+        });
+        StatusPage statusPage = statusPageRepository.findById(id).get();
+        statusPage.setIsHomePage(true);
+        statusPageRepository.save(statusPage);
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * GET /public/status-page/homepage : Get homepage status page
+     */
+    @GetMapping("/public/status-page/homepage")
+    public ResponseEntity<StatusPage> getHomePageStatusPage() {
+        Optional<StatusPage> homePage = statusPageRepository.findAll().stream()
+            .filter(page -> Boolean.TRUE.equals(page.getIsHomePage()) && Boolean.TRUE.equals(page.getIsPublic()))
+            .findFirst();
+        return ResponseUtil.wrapOrNotFound(homePage);
     }
 }

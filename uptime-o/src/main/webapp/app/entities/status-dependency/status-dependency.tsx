@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Table, Spinner, Card, CardBody, Badge, Nav, NavItem, NavLink, TabContent, TabPane } from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faTrash, faProjectDiagram, faList, faSitemap } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faTrash, faProjectDiagram, faList, faSitemap, faPencil } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { IStatusDependency, DependencyType } from 'app/shared/model/status-dependency.model';
@@ -19,6 +19,7 @@ const StatusDependency = () => {
   const [httpMonitors, setHttpMonitors] = useState([]);
   const [services, setServices] = useState([]);
   const [instances, setInstances] = useState([]);
+  const [statusPages, setStatusPages] = useState([]);
 
   useEffect(() => {
     loadDependencies();
@@ -39,14 +40,16 @@ const StatusDependency = () => {
 
   const loadAvailableItems = async () => {
     try {
-      const [httpRes, servicesRes, instancesRes] = await Promise.all([
+      const [httpRes, servicesRes, instancesRes, statusPagesRes] = await Promise.all([
         axios.get('/api/http-monitors'),
         axios.get('/api/services'),
         axios.get('/api/instances'),
+        axios.get('/api/status-pages'),
       ]);
       setHttpMonitors(httpRes.data);
       setServices(servicesRes.data);
       setInstances(instancesRes.data);
+      setStatusPages(statusPagesRes.data);
     } catch (error) {
       console.error('Failed to load available items', error);
     }
@@ -184,6 +187,18 @@ const StatusDependency = () => {
                           <Button
                             color="link"
                             size="sm"
+                            onClick={() => {
+                              setSelectedDependency(dependency);
+                              setEditModalOpen(true);
+                            }}
+                            title="Edit"
+                            style={{ padding: 0, marginRight: '0.5rem' }}
+                          >
+                            <FontAwesomeIcon icon={faPencil} />
+                          </Button>
+                          <Button
+                            color="link"
+                            size="sm"
                             onClick={() => handleDelete(dependency)}
                             title="Delete"
                             style={{ padding: 0, color: '#dc3545' }}
@@ -214,6 +229,7 @@ const StatusDependency = () => {
             httpMonitors={httpMonitors}
             services={services}
             instances={instances}
+            statusPages={statusPages}
           />
         </div>
       )}

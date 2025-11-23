@@ -4,6 +4,7 @@ export interface IStatusPage {
   slug?: string;
   description?: string | null;
   isPublic?: boolean;
+  isHomePage?: boolean;
   customDomain?: string | null;
   logoUrl?: string | null;
   faviconUrl?: string | null;
@@ -15,4 +16,5 @@ export interface IStatusPage {
 
 export const defaultValue: Readonly<IStatusPage> = {
   isPublic: false,
+  isHomePage: false,
 };

@@ -69,6 +69,9 @@ public class StatusPage implements Serializable {
     @Column(name = "is_active")
     private Boolean isActive;
 
+    @Column(name = "is_home_page")
+    private Boolean isHomePage;
+
     @Column(name = "created_at")
     private Instant createdAt;
 
@@ -81,6 +84,7 @@ public class StatusPage implements Serializable {
         updatedAt = Instant.now();
         if (isActive == null) isActive = true;
         if (isPublic == null) isPublic = false;
+        if (isHomePage == null) isHomePage = false;
         if (showResponseTimes == null) showResponseTimes = true;
         if (showUptimePercentage == null) showUptimePercentage = true;
         if (autoRefreshSeconds == null) autoRefreshSeconds = 30;
@@ -140,6 +144,10 @@ public class StatusPage implements Serializable {
 
     public Boolean getIsActive() { return isActive; }
     public void setIsActive(Boolean isActive) { this.isActive = isActive; }
+
+    public Boolean getIsHomePage() { return isHomePage; }
+    public void setIsHomePage(Boolean isHomePage) { this.isHomePage = isHomePage; }
+    public StatusPage isHomePage(Boolean isHomePage) { this.setIsHomePage(isHomePage); return this; }
 
     public Instant getCreatedAt() { return createdAt; }
     public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }

@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Table, Spinner, Card, CardBody } from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPencil, faTrash, faPlus, faChartBar, faEye, faLock } from '@fortawesome/free-solid-svg-icons';
+import { faPencil, faTrash, faPlus, faChartBar, faEye, faLock, faProjectDiagram, faList, faHome } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { IStatusPage } from 'app/shared/model/status-page.model';
 import { StatusPageEditModal } from './status-page-edit-modal';
+import { StatusPageItemsModal } from './status-page-items-modal';
 
 const StatusPage = () => {
   const [statusPages, setStatusPages] = useState<IStatusPage[]>([]);
   const [loading, setLoading] = useState(true);
   const [editModalOpen, setEditModalOpen] = useState(false);
+  const [itemsModalOpen, setItemsModalOpen] = useState(false);
   const [selectedStatusPage, setSelectedStatusPage] = useState<IStatusPage | null>(null);
 
   useEffect(() => {
@@ -44,6 +46,16 @@ const StatusPage = () => {
     setSelectedStatusPage(null);
   };
 
+  const handleManageItems = (statusPage: IStatusPage) => {
+    setSelectedStatusPage(statusPage);
+    setItemsModalOpen(true);
+  };
+
+  const handleCloseItemsModal = () => {
+    setItemsModalOpen(false);
+    setSelectedStatusPage(null);
+  };
+
   const handleEditSuccess = () => {
     loadStatusPages();
   };
@@ -57,6 +69,16 @@ const StatusPage = () => {
       } catch (error) {
         toast.error('Failed to delete status page');
       }
+    }
+  };
+
+  const handleSetHomePage = async (id: number) => {
+    try {
+      await axios.post(`/api/status-pages/${id}/set-homepage`);
+      toast.success('Homepage set successfully');
+      loadStatusPages();
+    } catch (error) {
+      toast.error('Failed to set homepage');
     }
   };
 
@@ -129,8 +151,17 @@ const StatusPage = () => {
                           <Button
                             color="link"
                             size="sm"
-                            onClick={() => window.open(`/status/${statusPage.slug}`, '_blank')}
-                            title="View Public Status Page"
+                            onClick={() => {
+                              const url = statusPage.isPublic
+                                ? `/public-status/${statusPage.slug}`
+                                : `/status-page-view/${statusPage.slug}`;
+                              if (statusPage.isPublic) {
+                                window.open(url, '_blank');
+                              } else {
+                                window.location.href = url;
+                              }
+                            }}
+                            title="View Status Page"
                             style={{ padding: 0, marginRight: '0.5rem' }}
                           >
                             <FontAwesomeIcon icon={faEye} />
@@ -138,11 +169,11 @@ const StatusPage = () => {
                           <Button
                             color="link"
                             size="sm"
-                            onClick={() => window.open(`/private-status/${statusPage.slug}`, '_blank')}
-                            title="View Private Status Page"
-                            style={{ padding: 0, marginRight: '0.5rem', color: '#6f42c1' }}
+                            onClick={() => handleManageItems(statusPage)}
+                            title="Manage Items"
+                            style={{ padding: 0, marginRight: '0.5rem', color: '#28a745' }}
                           >
-                            <FontAwesomeIcon icon={faLock} />
+                            <FontAwesomeIcon icon={faList} />
                           </Button>
                           <Button
                             color="link"
@@ -153,6 +184,18 @@ const StatusPage = () => {
                           >
                             <FontAwesomeIcon icon={faPencil} />
                           </Button>
+                          {statusPage.isPublic && (
+                            <Button
+                              color="link"
+                              size="sm"
+                              onClick={() => handleSetHomePage(statusPage.id)}
+                              title={statusPage.isHomePage ? 'Current Homepage' : 'Set as Homepage'}
+                              style={{ padding: 0, marginRight: '0.5rem', color: statusPage.isHomePage ? '#28a745' : '#6c757d' }}
+                              disabled={statusPage.isHomePage}
+                            >
+                              <FontAwesomeIcon icon={faHome} />
+                            </Button>
+                          )}
                           <Button
                             color="link"
                             size="sm"
@@ -179,6 +222,11 @@ const StatusPage = () => {
               statusPage={selectedStatusPage}
               onSave={handleEditSuccess}
             />
+          </div>
+        )}
+        {itemsModalOpen && selectedStatusPage && (
+          <div className="col-md-6">
+            <StatusPageItemsModal statusPage={selectedStatusPage} toggle={handleCloseItemsModal} />
           </div>
         )}
       </div>

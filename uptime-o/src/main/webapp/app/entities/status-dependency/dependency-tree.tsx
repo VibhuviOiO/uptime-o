@@ -24,7 +24,11 @@ interface TreeNode {
   children: TreeNode[];
 }
 
-const DependencyTree = () => {
+interface DependencyTreeProps {
+  statusPageId?: number;
+}
+
+const DependencyTree: React.FC<DependencyTreeProps> = ({ statusPageId }) => {
   const [loading, setLoading] = useState(true);
   const [tree, setTree] = useState<TreeNode[]>([]);
 
@@ -32,12 +36,13 @@ const DependencyTree = () => {
     loadData();
     const interval = setInterval(loadData, 30000);
     return () => clearInterval(interval);
-  }, []);
+  }, [statusPageId]);
 
   const loadData = async () => {
     setLoading(true);
     try {
-      const response = await axios.get<TreeNode[]>('/api/status-dependencies/tree');
+      const url = statusPageId ? `/api/status-pages/${statusPageId}/dependencies` : '/api/status-dependencies/tree';
+      const response = await axios.get<TreeNode[]>(url);
       setTree(response.data);
     } catch (error) {
       toast.error('Failed to load dependency tree');
@@ -262,7 +267,9 @@ const DependencyTree = () => {
         </h5>
 
         {tree.length === 0 ? (
-          <div className="alert alert-info">No dependencies configured yet.</div>
+          <div className="alert alert-info">
+            {statusPageId ? 'No items added to this status page yet.' : 'No dependencies configured yet.'}
+          </div>
         ) : (
           <div className="dependency-tree">{tree.map(node => renderNode(node))}</div>
         )}

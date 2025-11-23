@@ -69,6 +69,11 @@ public class LoggingAspect {
      */
     @AfterThrowing(pointcut = "applicationPackagePointcut() && springBeanPointcut()", throwing = "e")
     public void logAfterThrowing(JoinPoint joinPoint, Throwable e) {
+        // Skip logging for BadRequestAlertException (expected validation errors)
+        if (e.getClass().getSimpleName().equals("BadRequestAlertException")) {
+            return;
+        }
+        
         if (env.acceptsProfiles(Profiles.of(JHipsterConstants.SPRING_PROFILE_DEVELOPMENT))) {
             logger(joinPoint).error(
                 "Exception in {}() with cause = '{}' and exception = '{}'",

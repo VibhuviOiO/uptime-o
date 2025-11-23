@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="20251123000000-1" author="jhipster">
+        <createTable tableName="status_page_items">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="status_page_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="item_type" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="item_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="display_order" type="integer" defaultValue="0"/>
+            <column name="created_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP"/>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="status_page_items"
+                                 baseColumnNames="status_page_id"
+                                 constraintName="fk_status_page_items_status_page_id"
+                                 referencedTableName="status_pages"
+                                 referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+
+        <createIndex indexName="idx_status_page_items_page_id" tableName="status_page_items">
+            <column name="status_page_id"/>
+        </createIndex>
+
+        <addUniqueConstraint tableName="status_page_items"
+                             columnNames="status_page_id, item_type, item_id"
+                             constraintName="uk_status_page_items_unique"/>
+    </changeSet>
+</databaseChangeLog>
