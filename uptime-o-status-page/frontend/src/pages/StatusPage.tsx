@@ -15,16 +15,10 @@ const formatTimeAgo = (date: Date): string => {
 
 const getStatusTitle = (status: string): string => {
   switch (status) {
-    case 'UP':
-      return 'Available - Normal latency';
-    case 'WARNING':
-      return 'Available - Elevated latency';
-    case 'CRITICAL':
-      return 'Available - High latency';
     case 'DOWN':
       return 'Service disruption';
     default:
-      return 'Unknown status';
+      return 'Available';
   }
 };
 
@@ -165,7 +159,7 @@ export const StatusPage = () => {
           <p className="status-description">
             This page provides status information on the services that are part of <a href={config.companyWebsite} target="_blank" rel="noopener noreferrer" className="company-link">{config.companyName || 'our platform'}</a>. 
             Check back here to view the current status of the services listed below. 
-            If you are experiencing an issue not listed here, please <a href={`mailto:${config.supportEmail}`} className="support-link">contact support</a>.
+            If you are experiencing an issue not listed here, please email support@richrelevance.com or call the hotline.
           </p>
         </div>
 
@@ -183,31 +177,12 @@ export const StatusPage = () => {
             <div className="legend-item">
               <div className="legend-icon">
                 <svg width="16" height="16" viewBox="0 0 16 16">
-                  <circle cx="8" cy="8" r="8" fill="#fbbc04" />
-                  <path d="M8 4v5M8 11v1" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
-                </svg>
-              </div>
-              <span>Elevated latency</span>
-            </div>
-            <div className="legend-item">
-              <div className="legend-icon">
-                <svg width="16" height="16" viewBox="0 0 16 16">
-                  <circle cx="8" cy="8" r="8" fill="#ff6d00" />
-                  <path d="M8 4v5M8 11v1" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
-                </svg>
-              </div>
-              <span>High latency</span>
-            </div>
-            <div className="legend-item">
-              <div className="legend-icon">
-                <svg width="16" height="16" viewBox="0 0 16 16">
                   <circle cx="8" cy="8" r="8" fill="#ea4335" />
                   <path d="M5 5l6 6M11 5l-6 6" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
                 </svg>
               </div>
               <span>Service disruption</span>
             </div>
-
           </div>
           {lastUpdate && (
             <div className="last-update-text">
@@ -237,8 +212,18 @@ export const StatusPage = () => {
                     return (
                       <td key={region} className="region-status">
                         {health ? (
-                          <div className={`status-indicator ${health.status.toLowerCase()}`} title={getStatusTitle(health.status)}>
-                            {health.status === 'UP' ? (
+                          <div className={`status-indicator ${health.status === 'DOWN' ? 'down' : 'up'}`} title={health.status === 'DOWN' ? 'Service disruption' : 'Available'}>
+                            {health.status === 'DOWN' ? (
+                              <>
+                                <div className="status-icon status-icon-down">
+                                  <svg width="16" height="16" viewBox="0 0 16 16">
+                                    <circle cx="8" cy="8" r="8" fill="#ea4335" />
+                                    <path d="M5 5l6 6M11 5l-6 6" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+                                  </svg>
+                                </div>
+                                <span className="response-time error-text">Error</span>
+                              </>
+                            ) : (
                               <>
                                 <div className="status-icon status-icon-up">
                                   <svg width="16" height="16" viewBox="0 0 16 16">
@@ -253,37 +238,6 @@ export const StatusPage = () => {
                                     />
                                   </svg>
                                 </div>
-                                <span className="response-time">{health.responseTimeMs}ms</span>
-                              </>
-                            ) : health.status === 'WARNING' ? (
-                              <>
-                                <div className="status-icon status-icon-warning">
-                                  <svg width="16" height="16" viewBox="0 0 16 16">
-                                    <circle cx="8" cy="8" r="8" fill="#fbbc04" />
-                                    <path d="M8 4v5M8 11v1" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
-                                  </svg>
-                                </div>
-                                <span className="response-time">{health.responseTimeMs}ms</span>
-                              </>
-                            ) : health.status === 'CRITICAL' ? (
-                              <>
-                                <div className="status-icon status-icon-critical">
-                                  <svg width="16" height="16" viewBox="0 0 16 16">
-                                    <circle cx="8" cy="8" r="8" fill="#ff6d00" />
-                                    <path d="M8 4v5M8 11v1" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
-                                  </svg>
-                                </div>
-                                <span className="response-time">{health.responseTimeMs}ms</span>
-                              </>
-                            ) : (
-                              <>
-                                <div className="status-icon status-icon-down">
-                                  <svg width="16" height="16" viewBox="0 0 16 16">
-                                    <circle cx="8" cy="8" r="8" fill="#ea4335" />
-                                    <path d="M5 5l6 6M11 5l-6 6" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
-                                  </svg>
-                                </div>
-                                <span className="response-time error-text">Error</span>
                               </>
                             )}
                           </div>
