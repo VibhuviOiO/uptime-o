@@ -96,7 +96,36 @@ public class StatusPageResource {
     @GetMapping("/status-pages/by-slug/{slug}")
     public ResponseEntity<StatusPage> getStatusPageBySlug(@PathVariable("slug") String slug) {
         Optional<StatusPage> statusPage = statusPageRepository.findBySlug(slug);
-        return ResponseUtil.wrapOrNotFound(statusPage);
+        
+        if (statusPage.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        
+        StatusPage page = statusPage.get();
+        if (!Boolean.TRUE.equals(page.getIsPublic()) && page.getAllowedRoles() != null) {
+            org.springframework.security.core.Authentication auth = 
+                org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+            
+            if (auth == null || !auth.isAuthenticated()) {
+                return ResponseEntity.status(403).build();
+            }
+            
+            boolean hasAccess = auth.getAuthorities().stream()
+                .map(org.springframework.security.core.GrantedAuthority::getAuthority)
+                .anyMatch(role -> {
+                    try {
+                        return page.getAllowedRoles().toString().contains(role);
+                    } catch (Exception e) {
+                        return false;
+                    }
+                });
+            
+            if (!hasAccess) {
+                return ResponseEntity.status(403).build();
+            }
+        }
+        
+        return ResponseEntity.ok(page);
     }
 
     /**
@@ -106,6 +135,15 @@ public class StatusPageResource {
     public ResponseEntity<StatusPage> createStatusPage(@Valid @RequestBody StatusPage statusPage) throws URISyntaxException {
         if (statusPage.getId() != null) {
             throw new BadRequestAlertException("A new statusPage cannot already have an ID", ENTITY_NAME, "idexists");
+        }
+        if (Boolean.TRUE.equals(statusPage.getIsHomePage()) && statusPage.getAllowedRoles() != null) {
+            String rolesJson = statusPage.getAllowedRoles().toString();
+            statusPageRepository.findAll().stream()
+                .filter(page -> page.getAllowedRoles() != null && page.getAllowedRoles().toString().equals(rolesJson))
+                .forEach(page -> {
+                    page.setIsHomePage(false);
+                    statusPageRepository.save(page);
+                });
         }
         StatusPage result = statusPageRepository.save(statusPage);
         return ResponseEntity.created(new URI("/api/status-pages/" + result.getId()))
@@ -148,6 +186,16 @@ public class StatusPageResource {
         }
         if (!statusPageRepository.existsById(id)) {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
+        }
+        if (Boolean.TRUE.equals(statusPage.getIsHomePage()) && statusPage.getAllowedRoles() != null) {
+            String rolesJson = statusPage.getAllowedRoles().toString();
+            statusPageRepository.findAll().stream()
+                .filter(page -> !page.getId().equals(id) && page.getAllowedRoles() != null && 
+                               page.getAllowedRoles().toString().equals(rolesJson))
+                .forEach(page -> {
+                    page.setIsHomePage(false);
+                    statusPageRepository.save(page);
+                });
         }
         StatusPage result = statusPageRepository.save(statusPage);
         return ResponseEntity.ok()
@@ -208,13 +256,45 @@ public class StatusPageResource {
     }
 
     /**
-     * GET /public/status-page/homepage : Get homepage status page
+     * GET /public/status-page/homepage : Get homepage status page for current user's role
      */
     @GetMapping("/public/status-page/homepage")
     public ResponseEntity<StatusPage> getHomePageStatusPage() {
+        org.springframework.security.core.Authentication auth = 
+            org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+        
+        if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getPrincipal())) {
+            Optional<StatusPage> publicHomePage = statusPageRepository.findAll().stream()
+                .filter(page -> Boolean.TRUE.equals(page.getIsHomePage()) && 
+                               Boolean.TRUE.equals(page.getIsPublic()) &&
+                               page.getAllowedRoles() == null)
+                .findFirst();
+            return ResponseUtil.wrapOrNotFound(publicHomePage);
+        }
+        
+        java.util.Set<String> userAuthorities = auth.getAuthorities().stream()
+            .map(org.springframework.security.core.GrantedAuthority::getAuthority)
+            .collect(java.util.stream.Collectors.toSet());
+        
         Optional<StatusPage> homePage = statusPageRepository.findAll().stream()
-            .filter(page -> Boolean.TRUE.equals(page.getIsHomePage()) && Boolean.TRUE.equals(page.getIsPublic()))
+            .filter(page -> Boolean.TRUE.equals(page.getIsHomePage()))
+            .filter(page -> {
+                if (page.getAllowedRoles() == null || page.getAllowedRoles().isNull()) {
+                    return Boolean.TRUE.equals(page.getIsPublic());
+                }
+                try {
+                    com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+                    java.util.List<String> allowedRoles = mapper.convertValue(
+                        page.getAllowedRoles(), 
+                        new com.fasterxml.jackson.core.type.TypeReference<java.util.List<String>>() {}
+                    );
+                    return allowedRoles.stream().anyMatch(userAuthorities::contains);
+                } catch (Exception e) {
+                    return false;
+                }
+            })
             .findFirst();
+        
         return ResponseUtil.wrapOrNotFound(homePage);
     }
 }

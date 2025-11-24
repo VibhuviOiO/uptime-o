@@ -5,6 +5,7 @@ export interface IStatusPage {
   description?: string | null;
   isPublic?: boolean;
   isHomePage?: boolean;
+  allowedRoles?: string[] | null;
   customDomain?: string | null;
   logoUrl?: string | null;
   faviconUrl?: string | null;

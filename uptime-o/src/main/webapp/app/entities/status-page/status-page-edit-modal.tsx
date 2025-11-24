@@ -46,8 +46,10 @@ export const StatusPageEditModal: React.FC<StatusPageEditModalProps> = ({ isOpen
     setError(null);
   }, [statusPage, isOpen]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target;
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const target = e.target;
+    const { name, value, type } = target;
+    const checked = 'checked' in target ? target.checked : false;
     setFormData(prev => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value,
@@ -141,6 +143,44 @@ export const StatusPageEditModal: React.FC<StatusPageEditModalProps> = ({ isOpen
               Public Status Page
             </Label>
           </FormGroup>
+
+          <FormGroup check>
+            <Label check>
+              <Input type="checkbox" name="isHomePage" checked={formData.isHomePage || false} onChange={handleInputChange} />
+              Set as Home Page
+            </Label>
+            <small className="form-text text-muted">Only one status page per role set can be home page</small>
+          </FormGroup>
+
+          {(formData.isHomePage || !formData.isPublic) && (
+            <FormGroup>
+              <Label for="allowedRoles">{formData.isHomePage ? 'Home Page Roles' : 'Allowed Roles (Private Page)'}</Label>
+              <Input
+                type="select"
+                name="allowedRoles"
+                id="allowedRoles"
+                multiple
+                value={formData.allowedRoles || []}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  const target = e.target as unknown as HTMLSelectElement;
+                  const selected = Array.from(target.selectedOptions, (option: HTMLOptionElement) => option.value);
+                  setFormData(prev => ({ ...prev, allowedRoles: selected }));
+                }}
+                style={{ height: '120px' }}
+              >
+                <option value="ROLE_ADMIN">Admin</option>
+                <option value="ROLE_USER">User</option>
+                <option value="ROLE_SUPPORT">Support</option>
+                <option value="ROLE_INFRA_TEAM">Infrastructure Team</option>
+                <option value="ROLE_SUPER_ADMIN">Super Admin</option>
+              </Input>
+              <small className="form-text text-muted">
+                {formData.isHomePage
+                  ? 'Select roles that see this as home page. Leave empty for unauthenticated users (public only).'
+                  : 'Hold Ctrl/Cmd to select multiple roles. Leave empty for all authenticated users.'}
+              </small>
+            </FormGroup>
+          )}
 
           <FormGroup>
             <Label for="customDomain">Custom Domain</Label>

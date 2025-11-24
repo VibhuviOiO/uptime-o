@@ -317,16 +317,17 @@
         </insert>
     </changeSet>
 
-    <!-- Default Status Page -->
+    <!-- Public Status Page (No Auth Required) -->
     <changeSet id="99999999999999-status-page" author="system" context="realdata">
         <insert tableName="status_pages">
             <column name="id" valueNumeric="1"/>
-            <column name="name" value="Global Status Page"/>
-            <column name="slug" value="global-status-page"/>
-            <column name="description" value="Real-time status of all monitored services"/>
+            <column name="name" value="Public Status Page"/>
+            <column name="slug" value="public-status"/>
+            <column name="description" value="Public service status - no authentication required"/>
             <column name="is_public" valueBoolean="true"/>
             <column name="is_active" valueBoolean="true"/>
             <column name="is_home_page" valueBoolean="true"/>
+            <column name="allowed_roles" valueComputed="NULL"/>
             <column name="show_response_times" valueBoolean="true"/>
             <column name="show_uptime_percentage" valueBoolean="true"/>
             <column name="auto_refresh_seconds" valueNumeric="30"/>
@@ -385,16 +386,17 @@
         </insert>
     </changeSet>
 
-    <!-- Private Status Page with Dependencies -->
-    <changeSet id="99999999999999-private-status-page" author="system" context="realdata">
+    <!-- Admin Status Page with Dependencies -->
+    <changeSet id="99999999999999-admin-status-page" author="system" context="realdata">
         <insert tableName="status_pages">
             <column name="id" valueNumeric="2"/>
-            <column name="name" value="Home Lab Infrastructure"/>
-            <column name="slug" value="home-lab"/>
-            <column name="description" value="Complete infrastructure monitoring with dependencies"/>
+            <column name="name" value="Admin Infrastructure Dashboard"/>
+            <column name="slug" value="admin-infra"/>
+            <column name="description" value="Complete infrastructure with service dependencies"/>
             <column name="is_public" valueBoolean="false"/>
             <column name="is_active" valueBoolean="true"/>
-            <column name="is_home_page" valueBoolean="false"/>
+            <column name="is_home_page" valueBoolean="true"/>
+            <column name="allowed_roles" valueComputed="'[&quot;ROLE_ADMIN&quot;]'::jsonb"/>
             <column name="show_response_times" valueBoolean="true"/>
             <column name="show_uptime_percentage" valueBoolean="true"/>
             <column name="auto_refresh_seconds" valueNumeric="30"/>
@@ -428,8 +430,8 @@
         </insert>
     </changeSet>
 
-    <!-- Private Status Page Items -->
-    <changeSet id="99999999999999-private-status-page-items" author="system" context="realdata">
+    <!-- Admin Status Page Items -->
+    <changeSet id="99999999999999-admin-status-page-items" author="system" context="realdata">
         <!-- Add root services (they have children) -->
         <insert tableName="status_page_items">
             <column name="status_page_id" valueNumeric="2"/>
@@ -448,6 +450,137 @@
             <column name="item_type" value="SERVICE"/>
             <column name="item_id" valueNumeric="3"/>
             <column name="display_order" valueNumeric="3"/>
+        </insert>
+    </changeSet>
+
+    <!-- Support Status Page -->
+    <changeSet id="99999999999999-support-status-page" author="system" context="realdata">
+        <insert tableName="status_pages">
+            <column name="id" valueNumeric="3"/>
+            <column name="name" value="Support Dashboard"/>
+            <column name="slug" value="support-dashboard"/>
+            <column name="description" value="API monitoring for support team"/>
+            <column name="is_public" valueBoolean="false"/>
+            <column name="is_active" valueBoolean="true"/>
+            <column name="is_home_page" valueBoolean="true"/>
+            <column name="allowed_roles" valueComputed="'[&quot;ROLE_SUPPORT&quot;]'::jsonb"/>
+            <column name="show_response_times" valueBoolean="true"/>
+            <column name="show_uptime_percentage" valueBoolean="true"/>
+            <column name="auto_refresh_seconds" valueNumeric="30"/>
+        </insert>
+    </changeSet>
+
+    <!-- Infra Team Status Page -->
+    <changeSet id="99999999999999-infra-status-page" author="system" context="realdata">
+        <insert tableName="status_pages">
+            <column name="id" valueNumeric="4"/>
+            <column name="name" value="Infrastructure Dashboard"/>
+            <column name="slug" value="infra-dashboard"/>
+            <column name="description" value="Infrastructure services monitoring"/>
+            <column name="is_public" valueBoolean="false"/>
+            <column name="is_active" valueBoolean="true"/>
+            <column name="is_home_page" valueBoolean="true"/>
+            <column name="allowed_roles" valueComputed="'[&quot;ROLE_INFRA_TEAM&quot;]'::jsonb"/>
+            <column name="show_response_times" valueBoolean="true"/>
+            <column name="show_uptime_percentage" valueBoolean="true"/>
+            <column name="auto_refresh_seconds" valueNumeric="30"/>
+        </insert>
+    </changeSet>
+
+    <!-- Support Status Page Items -->
+    <changeSet id="99999999999999-support-status-page-items" author="system" context="realdata">
+        <insert tableName="status_page_items">
+            <column name="status_page_id" valueNumeric="3"/>
+            <column name="item_type" value="HTTP"/>
+            <column name="item_id" valueNumeric="1"/>
+            <column name="display_order" valueNumeric="1"/>
+        </insert>
+        <insert tableName="status_page_items">
+            <column name="status_page_id" valueNumeric="3"/>
+            <column name="item_type" value="HTTP"/>
+            <column name="item_id" valueNumeric="2"/>
+            <column name="display_order" valueNumeric="2"/>
+        </insert>
+        <insert tableName="status_page_items">
+            <column name="status_page_id" valueNumeric="3"/>
+            <column name="item_type" value="HTTP"/>
+            <column name="item_id" valueNumeric="3"/>
+            <column name="display_order" valueNumeric="3"/>
+        </insert>
+        <insert tableName="status_page_items">
+            <column name="status_page_id" valueNumeric="3"/>
+            <column name="item_type" value="HTTP"/>
+            <column name="item_id" valueNumeric="4"/>
+            <column name="display_order" valueNumeric="4"/>
+        </insert>
+    </changeSet>
+
+    <!-- Infra Status Page Items -->
+    <changeSet id="99999999999999-infra-status-page-items" author="system" context="realdata">
+        <insert tableName="status_page_items">
+            <column name="status_page_id" valueNumeric="4"/>
+            <column name="item_type" value="SERVICE"/>
+            <column name="item_id" valueNumeric="1"/>
+            <column name="display_order" valueNumeric="1"/>
+        </insert>
+        <insert tableName="status_page_items">
+            <column name="status_page_id" valueNumeric="4"/>
+            <column name="item_type" value="SERVICE"/>
+            <column name="item_id" valueNumeric="2"/>
+            <column name="display_order" valueNumeric="2"/>
+        </insert>
+        <insert tableName="status_page_items">
+            <column name="status_page_id" valueNumeric="4"/>
+            <column name="item_type" value="SERVICE"/>
+            <column name="item_id" valueNumeric="3"/>
+            <column name="display_order" valueNumeric="3"/>
+        </insert>
+    </changeSet>
+
+    <!-- Create New Authorities -->
+    <changeSet id="99999999999999-authorities" author="system" context="realdata">
+        <insert tableName="jhi_authority">
+            <column name="name" value="ROLE_SUPPORT"/>
+        </insert>
+        <insert tableName="jhi_authority">
+            <column name="name" value="ROLE_INFRA_TEAM"/>
+        </insert>
+    </changeSet>
+
+    <!-- Test Users with Roles -->
+    <changeSet id="99999999999999-test-users" author="system" context="realdata">
+        <!-- Support User -->
+        <insert tableName="jhi_user">
+            <column name="id" valueNumeric="1001"/>
+            <column name="login" value="support"/>
+            <column name="password_hash" value="$2a$10$VEjxo0jq2YG9Rbk2HmX9S.k1uZBGYUHdUcid3g/vfiEl7lwWgOH/K"/>
+            <column name="first_name" value="Support"/>
+            <column name="last_name" value="User"/>
+            <column name="email" value="support@localhost"/>
+            <column name="activated" valueBoolean="true"/>
+            <column name="lang_key" value="en"/>
+            <column name="created_by" value="system"/>
+        </insert>
+        <insert tableName="jhi_user_authority">
+            <column name="user_id" valueNumeric="1001"/>
+            <column name="authority_name" value="ROLE_SUPPORT"/>
+        </insert>
+
+        <!-- Infra User -->
+        <insert tableName="jhi_user">
+            <column name="id" valueNumeric="1002"/>
+            <column name="login" value="infra"/>
+            <column name="password_hash" value="$2a$10$VEjxo0jq2YG9Rbk2HmX9S.k1uZBGYUHdUcid3g/vfiEl7lwWgOH/K"/>
+            <column name="first_name" value="Infrastructure"/>
+            <column name="last_name" value="Team"/>
+            <column name="email" value="infra@localhost"/>
+            <column name="activated" valueBoolean="true"/>
+            <column name="lang_key" value="en"/>
+            <column name="created_by" value="system"/>
+        </insert>
+        <insert tableName="jhi_user_authority">
+            <column name="user_id" valueNumeric="1002"/>
+            <column name="authority_name" value="ROLE_INFRA_TEAM"/>
         </insert>
     </changeSet>
 

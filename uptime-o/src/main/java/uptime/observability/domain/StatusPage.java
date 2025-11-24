@@ -72,6 +72,10 @@ public class StatusPage implements Serializable {
     @Column(name = "is_home_page")
     private Boolean isHomePage;
 
+    @Column(name = "allowed_roles", columnDefinition = "jsonb")
+    @Type(JsonNodeType.class)
+    private JsonNode allowedRoles;
+
     @Column(name = "created_at")
     private Instant createdAt;
 
@@ -148,6 +152,10 @@ public class StatusPage implements Serializable {
     public Boolean getIsHomePage() { return isHomePage; }
     public void setIsHomePage(Boolean isHomePage) { this.isHomePage = isHomePage; }
     public StatusPage isHomePage(Boolean isHomePage) { this.setIsHomePage(isHomePage); return this; }
+
+    public JsonNode getAllowedRoles() { return allowedRoles; }
+    public void setAllowedRoles(JsonNode allowedRoles) { this.allowedRoles = allowedRoles; }
+    public StatusPage allowedRoles(JsonNode allowedRoles) { this.setAllowedRoles(allowedRoles); return this; }
 
     public Instant getCreatedAt() { return createdAt; }
     public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }

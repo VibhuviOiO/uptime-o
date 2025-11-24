@@ -155,11 +155,7 @@ const StatusPage = () => {
                               const url = statusPage.isPublic
                                 ? `/public-status/${statusPage.slug}`
                                 : `/status-page-view/${statusPage.slug}`;
-                              if (statusPage.isPublic) {
-                                window.open(url, '_blank');
-                              } else {
-                                window.location.href = url;
-                              }
+                              window.location.href = url;
                             }}
                             title="View Status Page"
                             style={{ padding: 0, marginRight: '0.5rem' }}

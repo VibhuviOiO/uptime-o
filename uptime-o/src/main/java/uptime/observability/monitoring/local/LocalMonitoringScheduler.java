@@ -58,11 +58,15 @@ public class LocalMonitoringScheduler {
         this.kafkaClusterMonitoringService = kafkaClusterMonitoringService;
     }
 
-    @Scheduled(fixedDelay = 10000) // Check every 10 seconds
+    @Scheduled(fixedDelay = 10000, initialDelay = 30000) // Check every 10 seconds, start after 30s
     public void scheduleMonitors() {
-        scheduleHttpMonitors();
-        scheduleInstanceMonitors();
-        scheduleServiceMonitors();
+        try {
+            scheduleHttpMonitors();
+            scheduleInstanceMonitors();
+            scheduleServiceMonitors();
+        } catch (Exception e) {
+            LOG.warn("Scheduler not ready: {}", e.getMessage());
+        }
     }
     
     private void scheduleHttpMonitors() {

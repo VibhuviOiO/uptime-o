@@ -20,6 +20,28 @@ In the project root, JHipster generates configuration files for tools like git, 
   JHipster installs Node and npm locally using the build tool by default. This wrapper makes sure npm is installed locally and uses it avoiding some differences different versions can cause. By using `./npmw` instead of the traditional `npm` you can configure a Node-less environment to develop or test your application.
 - `/src/main/docker` - Docker configurations for the application and services that the application depends on
 
+## Default Users
+
+The application comes with pre-configured users for testing different roles:
+
+| Username | Password | Role | Homepage |
+|----------|----------|------|----------|
+| `admin` | `admin` | ROLE_ADMIN | Admin Infrastructure Dashboard |
+| `user` | `user` | ROLE_USER | Public Status Page |
+| `support` | `admin` | ROLE_SUPPORT | Support Dashboard |
+| `infra` | `admin` | ROLE_INFRA_TEAM | Infrastructure Dashboard |
+
+**Note:** Change these default passwords in production environments.
+
+### Role-Based Homepage
+
+The application displays different homepages based on user roles:
+- **Not logged in**: Public Status Page (8 HTTP monitors)
+- **ROLE_ADMIN**: Admin Infrastructure Dashboard (3 Services with dependencies)
+- **ROLE_SUPPORT**: Support Dashboard (4 HTTP monitors)
+- **ROLE_INFRA_TEAM**: Infrastructure Dashboard (3 Services)
+- **ROLE_USER**: Public Status Page
+
 ## Development
 
 ### Doing API-First development using openapi-generator-cli

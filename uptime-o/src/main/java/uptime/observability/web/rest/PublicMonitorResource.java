@@ -13,6 +13,7 @@ import uptime.observability.domain.AgentMonitor;
 import uptime.observability.domain.HttpMonitor;
 
 import uptime.observability.repository.AgentMonitorRepository;
+import uptime.observability.repository.HttpMonitorRepository;
 
 /**
  * Public REST controller for agents to fetch their assigned monitors.
@@ -25,9 +26,11 @@ public class PublicMonitorResource {
     private static final Logger LOG = LoggerFactory.getLogger(PublicMonitorResource.class);
 
     private final AgentMonitorRepository agentMonitorRepository;
+    private final HttpMonitorRepository httpMonitorRepository;
 
-    public PublicMonitorResource(AgentMonitorRepository agentMonitorRepository) {
+    public PublicMonitorResource(AgentMonitorRepository agentMonitorRepository, HttpMonitorRepository httpMonitorRepository) {
         this.agentMonitorRepository = agentMonitorRepository;
+        this.httpMonitorRepository = httpMonitorRepository;
     }
 
     /**
@@ -83,29 +86,23 @@ public class PublicMonitorResource {
     public ResponseEntity<MonitorResponse> getMonitorById(@PathVariable Long id) {
         LOG.debug("Public request to get monitor: {}", id);
         
-        List<AgentMonitor> agentMonitors = agentMonitorRepository.findAll().stream()
-            .filter(am -> am.getMonitor() != null && am.getMonitor().getId().equals(id))
-            .toList();
-            
-        if (agentMonitors.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-        
-        HttpMonitor monitor = agentMonitors.get(0).getMonitor();
-        MonitorResponse response = new MonitorResponse();
-        response.setId(monitor.getId());
-        response.setName(monitor.getName());
-        response.setMethod(monitor.getMethod());
-        response.setType(monitor.getType());
-        response.setUrl(monitor.getUrl());
-        response.setHeaders(monitor.getHeaders());
-        response.setBody(monitor.getBody());
-        response.setIntervalSeconds(monitor.getIntervalSeconds());
-        response.setTimeoutSeconds(monitor.getTimeoutSeconds());
-        response.setRetryCount(monitor.getRetryCount());
-        response.setRetryDelaySeconds(monitor.getRetryDelaySeconds());
-        
-        return ResponseEntity.ok(response);
+        return httpMonitorRepository.findById(id)
+            .map(monitor -> {
+                MonitorResponse response = new MonitorResponse();
+                response.setId(monitor.getId());
+                response.setName(monitor.getName());
+                response.setMethod(monitor.getMethod());
+                response.setType(monitor.getType());
+                response.setUrl(monitor.getUrl());
+                response.setHeaders(monitor.getHeaders());
+                response.setBody(monitor.getBody());
+                response.setIntervalSeconds(monitor.getIntervalSeconds());
+                response.setTimeoutSeconds(monitor.getTimeoutSeconds());
+                response.setRetryCount(monitor.getRetryCount());
+                response.setRetryDelaySeconds(monitor.getRetryDelaySeconds());
+                return ResponseEntity.ok(response);
+            })
+            .orElse(ResponseEntity.notFound().build());
     }
 
     // DTOs

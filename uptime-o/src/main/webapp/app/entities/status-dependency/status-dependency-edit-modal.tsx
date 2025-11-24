@@ -27,64 +27,65 @@ export const StatusDependencyEditModal: React.FC<StatusDependencyEditModalProps>
   instances,
   statusPages,
 }) => {
-  const [formData, setFormData] = useState<IStatusDependency>({
-    parentType: DependencyType.HTTP,
-    parentId: undefined,
-    childType: DependencyType.SERVICE,
-    childId: undefined,
-  });
+  const [parentType, setParentType] = useState<DependencyType>(DependencyType.SERVICE);
+  const [parentId, setParentId] = useState<number | undefined>(undefined);
+  const [childType, setChildType] = useState<DependencyType>(DependencyType.INSTANCE);
+  const [selectedChildren, setSelectedChildren] = useState<number[]>([]);
   const [saving, setSaving] = useState(false);
-  const [selectedStatusPage, setSelectedStatusPage] = useState<any>(null);
-  const [isPublicPage, setIsPublicPage] = useState(false);
 
   useEffect(() => {
     if (dependency) {
-      setFormData(dependency);
-      if (dependency.statusPageId) {
-        const page = statusPages.find((p: any) => p.id === dependency.statusPageId);
-        setSelectedStatusPage(page);
-        setIsPublicPage(page?.isPublic || false);
-      }
+      setParentType(dependency.parentType);
+      setParentId(dependency.parentId);
+      setChildType(dependency.childType);
+      setSelectedChildren(dependency.childId ? [dependency.childId] : []);
     } else {
-      setFormData({
-        parentType: DependencyType.HTTP,
-        parentId: undefined,
-        childType: DependencyType.SERVICE,
-        childId: undefined,
-      });
+      setParentType(DependencyType.SERVICE);
+      setParentId(undefined);
+      setChildType(DependencyType.INSTANCE);
+      setSelectedChildren([]);
     }
-  }, [dependency, statusPages]);
+  }, [dependency]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (isPublicPage) {
-      if (!formData.parentId) {
-        toast.error('Please select an HTTP monitor');
-        return;
-      }
-      formData.childType = DependencyType.HTTP;
-      formData.childId = formData.parentId;
-    } else {
-      if (!formData.parentId || !formData.childId) {
-        toast.error('Please select both parent and child items');
-        return;
-      }
+    if (!parentId) {
+      toast.error('Please select a parent item');
+      return;
+    }
+
+    if (selectedChildren.length === 0) {
+      toast.error('Please select at least one child item');
+      return;
     }
 
     setSaving(true);
     try {
       if (dependency?.id) {
-        await axios.put(`/api/status-dependencies/${dependency.id}`, formData);
+        await axios.put(`/api/status-dependencies/${dependency.id}`, {
+          parentType,
+          parentId,
+          childType,
+          childId: selectedChildren[0],
+        });
         toast.success('Dependency updated successfully');
       } else {
-        await axios.post('/api/status-dependencies', formData);
-        toast.success('Dependency created successfully');
+        const promises = selectedChildren.map(childId =>
+          axios.post('/api/status-dependencies', {
+            parentType,
+            parentId,
+            childType,
+            childId,
+          }),
+        );
+        await Promise.all(promises);
+        toast.success(`${selectedChildren.length} dependencies created successfully`);
       }
       onSave();
       toggle();
     } catch (error) {
-      toast.error('Failed to save dependency');
+      toast.error('Failed to save dependencies');
     } finally {
       setSaving(false);
     }
@@ -110,77 +111,88 @@ export const StatusDependencyEditModal: React.FC<StatusDependencyEditModalProps>
       </CardHeader>
       <CardBody>
         <Form onSubmit={handleSubmit}>
-          {selectedStatusPage && (
-            <>
-              <FormGroup>
-                <Label for="parentType">Parent Type (Depends On)</Label>
-                <Input
-                  type="select"
-                  id="parentType"
-                  value={formData.parentType}
-                  onChange={e => setFormData({ ...formData, parentType: e.target.value as DependencyType, parentId: undefined })}
-                  required
-                >
-                  <option value={DependencyType.HTTP}>HTTP Monitor</option>
-                  <option value={DependencyType.SERVICE}>Service</option>
-                  <option value={DependencyType.INSTANCE}>Instance</option>
-                </Input>
-              </FormGroup>
+          <FormGroup>
+            <Label for="parentType">Parent Type</Label>
+            <Input
+              type="select"
+              id="parentType"
+              value={parentType}
+              onChange={e => {
+                setParentType(e.target.value as DependencyType);
+                setParentId(undefined);
+              }}
+              required
+              disabled={!!dependency}
+            >
+              <option value={DependencyType.HTTP}>HTTP Monitor</option>
+              <option value={DependencyType.SERVICE}>Service</option>
+              <option value={DependencyType.INSTANCE}>Instance</option>
+            </Input>
+          </FormGroup>
 
-              <FormGroup>
-                <Label for="parentId">Parent Item</Label>
-                <Input
-                  type="select"
-                  id="parentId"
-                  value={formData.parentId || ''}
-                  onChange={e => setFormData({ ...formData, parentId: Number(e.target.value) })}
-                  required
-                >
-                  <option value="">Select {formData.parentType}...</option>
-                  {getAvailableItems(formData.parentType).map((item: any) => (
-                    <option key={item.id} value={item.id}>
-                      {item.name}
-                    </option>
-                  ))}
-                </Input>
-              </FormGroup>
+          <FormGroup>
+            <Label for="parentId">Parent Item</Label>
+            <Input
+              type="select"
+              id="parentId"
+              value={parentId || ''}
+              onChange={e => setParentId(Number(e.target.value))}
+              required
+              disabled={!!dependency}
+            >
+              <option value="">Select {parentType}...</option>
+              {getAvailableItems(parentType).map((item: any) => (
+                <option key={item.id} value={item.id}>
+                  {item.name}
+                </option>
+              ))}
+            </Input>
+          </FormGroup>
 
-              <hr />
+          <hr />
 
-              <FormGroup>
-                <Label for="childType">Child Type (Dependency)</Label>
-                <Input
-                  type="select"
-                  id="childType"
-                  value={formData.childType}
-                  onChange={e => setFormData({ ...formData, childType: e.target.value as DependencyType, childId: undefined })}
-                  required
-                >
-                  <option value={DependencyType.HTTP}>HTTP Monitor</option>
-                  <option value={DependencyType.SERVICE}>Service</option>
-                  <option value={DependencyType.INSTANCE}>Instance</option>
-                </Input>
-              </FormGroup>
+          <FormGroup>
+            <Label for="childType">Child Type (Dependencies)</Label>
+            <Input
+              type="select"
+              id="childType"
+              value={childType}
+              onChange={e => {
+                setChildType(e.target.value as DependencyType);
+                setSelectedChildren([]);
+              }}
+              required
+              disabled={!!dependency}
+            >
+              <option value={DependencyType.HTTP}>HTTP Monitor</option>
+              <option value={DependencyType.SERVICE}>Service</option>
+              <option value={DependencyType.INSTANCE}>Instance</option>
+            </Input>
+          </FormGroup>
 
-              <FormGroup>
-                <Label for="childId">Child Item</Label>
-                <Input
-                  type="select"
-                  id="childId"
-                  value={formData.childId || ''}
-                  onChange={e => setFormData({ ...formData, childId: Number(e.target.value) })}
-                  required
-                >
-                  <option value="">Select {formData.childType}...</option>
-                  {getAvailableItems(formData.childType).map((item: any) => (
-                    <option key={item.id} value={item.id}>
-                      {item.name}
-                    </option>
-                  ))}
-                </Input>
-              </FormGroup>
-            </>
-          )}
+          <FormGroup>
+            <Label for="childIds">Child Items (Select Multiple)</Label>
+            <Input
+              type="select"
+              id="childIds"
+              multiple
+              value={selectedChildren.map(String)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                const target = e.target as unknown as HTMLSelectElement;
+                const selected = Array.from(target.selectedOptions, (option: HTMLOptionElement) => Number(option.value));
+                setSelectedChildren(selected);
+              }}
+              style={{ height: '150px' }}
+              required
+            >
+              {getAvailableItems(childType).map((item: any) => (
+                <option key={item.id} value={item.id}>
+                  {item.name}
+                </option>
+              ))}
+            </Input>
+            <small className="form-text text-muted">Hold Ctrl/Cmd to select multiple items</small>
+          </FormGroup>
 
           <div className="d-flex justify-content-end gap-2">
             <Button color="secondary" onClick={toggle} disabled={saving}>

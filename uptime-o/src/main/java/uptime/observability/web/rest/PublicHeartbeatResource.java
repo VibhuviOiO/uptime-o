@@ -105,15 +105,17 @@ public class PublicHeartbeatResource {
     ) {
         LOG.debug("Public request to get heartbeats for monitor: {}", monitorId);
         
-        org.springframework.data.domain.Page<HttpHeartbeatDTO> page = httpHeartbeatService.findAll(pageable);
-        java.util.List<HttpHeartbeatDTO> content = page.getContent();
-        
         if (monitorId != null) {
-            content = content.stream()
+            org.springframework.data.domain.Pageable largePageable = org.springframework.data.domain.PageRequest.of(
+                0, 1000, pageable.getSort()
+            );
+            java.util.List<HttpHeartbeatDTO> heartbeats = httpHeartbeatService.findAll(largePageable).getContent().stream()
                 .filter(dto -> dto.getMonitor() != null && dto.getMonitor().getId().equals(monitorId))
+                .limit(pageable.getPageSize())
                 .collect(java.util.stream.Collectors.toList());
+            return ResponseEntity.ok(heartbeats);
         }
         
-        return ResponseEntity.ok(content);
+        return ResponseEntity.ok(httpHeartbeatService.findAll(pageable).getContent());
     }
 }

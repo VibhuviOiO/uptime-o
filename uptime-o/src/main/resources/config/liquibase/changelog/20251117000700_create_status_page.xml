@@ -32,6 +32,7 @@
             <column name="monitor_selection" type="jsonb"/>
             <column name="is_active" type="boolean"/>
             <column name="is_home_page" type="boolean" defaultValueBoolean="false"/>
+            <column name="allowed_roles" type="jsonb"/>
             <column name="created_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
                 <constraints nullable="false"/>
             </column>
