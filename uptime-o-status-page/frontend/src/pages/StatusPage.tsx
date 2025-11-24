@@ -159,7 +159,7 @@ export const StatusPage = () => {
           <p className="status-description">
             This page provides status information on the services that are part of <a href={config.companyWebsite} target="_blank" rel="noopener noreferrer" className="company-link">{config.companyName || 'our platform'}</a>. 
             Check back here to view the current status of the services listed below. 
-            If you are experiencing an issue not listed here, please email support@richrelevance.com or call the hotline.
+            If you are experiencing an issue not listed here, please email <span className="support-email-container"><span className="support-email" onClick={() => navigator.clipboard.writeText(config.supportEmail)}>{config.supportEmail}</span><button className="copy-icon" onClick={() => navigator.clipboard.writeText(config.supportEmail)} title="Copy email to clipboard"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></button></span> or call the hotline
           </p>
         </div>
 
