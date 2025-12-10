@@ -21,6 +21,11 @@ const router = Router();
 router.get('/', async (req, res) => {
   const filters: StatusFilters = req.query;
   const timeWindow = parseWindow(filters.window);
+  
+  const warnThreshold = parseInt(process.env.INDICATOR_WARN_THRESHOLD || '500');
+  const dangerThreshold = parseInt(process.env.INDICATOR_DANGER_THRESHOLD || '1000');
+  const successThresholdHigh = parseFloat(process.env.SUCCESS_THRESHOLD_HIGH || '0.8');
+  const successThresholdLow = parseFloat(process.env.SUCCESS_THRESHOLD_LOW || '0.6');
 
   const params: any[] = [];
   let whereClauses = [`executed_at >= NOW() - INTERVAL '${timeWindow}'`];
@@ -69,11 +74,13 @@ router.get('/', async (req, res) => {
     // Get latest success for each monitor/datacenter combination
     const result = await Promise.all(rows.map(async (row: any) => {
       let status = "operational";
-      if (row.success_rate < 0.95) {
+      if (row.success_rate < successThresholdLow) {
         status = "down";
-      } else if (row.avg_latency > row.critical_threshold) {
+      } else if (row.success_rate < successThresholdHigh) {
+        status = "degraded-orange";
+      } else if (row.avg_latency > dangerThreshold) {
         status = "degraded-red";
-      } else if (row.avg_latency > row.warning_threshold) {
+      } else if (row.avg_latency > warnThreshold) {
         status = "degraded-orange";
       }
 

@@ -214,32 +214,63 @@ func (c *APIHeartbeatCollector) Start() {
 			logrus.Warnf("Schedule not found for monitor %d", mon.ID)
 			continue
 		}
-		go func(mon models.Monitor, schedule models.Schedule) {
-			defer func() {
-				if r := recover(); r != nil {
-					logrus.Errorf("Panic in monitor %d (%s): %v", mon.ID, mon.Name, r)
-				}
-			}()
-			ticker := time.NewTicker(time.Duration(schedule.Interval) * time.Second)
-			defer ticker.Stop()
-			for {
-				select {
-				case <-ticker.C:
-					hb, err := monitor.ExecuteHttpMonitor(c.Agent, mon, schedule)
-					if err != nil {
-						logrus.Errorf("Monitor execution failed for monitor %d (%s): %v", mon.ID, mon.Name, err)
-						if hb != nil {
-							// Still submit the failed heartbeat (with error info)
-							c.submitHeartbeatWithFallback(hb)
-						}
-						continue
+		
+		// Collect all URLs to monitor (primary + additional)
+		urls := []string{mon.URL}
+		if len(mon.AdditionalUrls) > 0 {
+			urls = append(urls, mon.AdditionalUrls...)
+		}
+		
+		// Start monitoring for each URL
+		logrus.Infof("Starting monitor %d (%s) for %d URLs (interval: %ds, calls: %dx)", mon.ID, mon.Name, len(urls), schedule.Interval, mon.CallsPerInterval)
+		for _, targetUrl := range urls {
+			go func(mon models.Monitor, schedule models.Schedule, url string) {
+				defer func() {
+					if r := recover(); r != nil {
+						logrus.Errorf("Panic in monitor %d (%s) for URL %s: %v", mon.ID, mon.Name, url, r)
 					}
-					c.submitHeartbeatWithFallback(hb)
-				case <-c.Ctx.Done():
-					return
+				}()
+				ticker := time.NewTicker(time.Duration(schedule.Interval) * time.Second)
+				defer ticker.Stop()
+				for {
+					select {
+					case <-ticker.C:
+						// Use monitor-level callsPerInterval if set, otherwise use schedule-level
+						callsPerInterval := mon.CallsPerInterval
+						if callsPerInterval <= 0 {
+							callsPerInterval = schedule.CallsPerInterval
+						}
+						if callsPerInterval <= 0 {
+							callsPerInterval = 1
+						}
+						
+						for i := 0; i < callsPerInterval; i++ {
+							go func() {
+								defer func() {
+									if r := recover(); r != nil {
+										logrus.Errorf("Panic in monitor call %d (%s) for URL %s: %v", mon.ID, mon.Name, url, r)
+									}
+								}()
+								// Create a copy of monitor with the target URL
+								monCopy := mon
+								monCopy.URL = url
+								hb, err := monitor.ExecuteHttpMonitor(c.Agent, monCopy, schedule)
+								if err != nil {
+									logrus.Errorf("Monitor execution failed for monitor %d (%s) URL %s: %v", mon.ID, mon.Name, url, err)
+									if hb != nil {
+										c.submitHeartbeatWithFallback(hb)
+									}
+									return
+								}
+								c.submitHeartbeatWithFallback(hb)
+							}()
+						}
+					case <-c.Ctx.Done():
+						return
+					}
 				}
-			}
-		}(mon, *schedule)
+			}(mon, *schedule, targetUrl)
+		}
 	}
 	<-c.Ctx.Done()
 }

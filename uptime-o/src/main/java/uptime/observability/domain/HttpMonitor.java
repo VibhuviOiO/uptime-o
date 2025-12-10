@@ -43,6 +43,10 @@ public class HttpMonitor implements Serializable {
     @Column(name = "url", nullable = false, columnDefinition = "text")
     private String url;
 
+    @Column(name = "additional_urls", columnDefinition = "jsonb")
+    @Type(JsonNodeType.class)
+    private JsonNode additionalUrls;
+
     @Column(name = "headers", columnDefinition = "jsonb")
     @Type(JsonNodeType.class)
     private JsonNode headers;
@@ -50,6 +54,9 @@ public class HttpMonitor implements Serializable {
     @Column(name = "body", columnDefinition = "jsonb")
     @Type(JsonNodeType.class)
     private JsonNode body;
+
+    @Column(name = "calls_per_interval")
+    private Integer callsPerInterval;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "monitor")
     @JsonIgnoreProperties(value = { "monitor", "agent" }, allowSetters = true)
@@ -130,6 +137,19 @@ public class HttpMonitor implements Serializable {
         this.url = url;
     }
 
+    public JsonNode getAdditionalUrls() {
+        return this.additionalUrls;
+    }
+
+    public HttpMonitor additionalUrls(JsonNode additionalUrls) {
+        this.setAdditionalUrls(additionalUrls);
+        return this;
+    }
+
+    public void setAdditionalUrls(JsonNode additionalUrls) {
+        this.additionalUrls = additionalUrls;
+    }
+
     public JsonNode getHeaders() {
         return this.headers;
     }
@@ -154,6 +174,19 @@ public class HttpMonitor implements Serializable {
 
     public void setBody(JsonNode body) {
         this.body = body;
+    }
+
+    public Integer getCallsPerInterval() {
+        return this.callsPerInterval;
+    }
+
+    public HttpMonitor callsPerInterval(Integer callsPerInterval) {
+        this.setCallsPerInterval(callsPerInterval);
+        return this;
+    }
+
+    public void setCallsPerInterval(Integer callsPerInterval) {
+        this.callsPerInterval = callsPerInterval;
     }
 
     public Set<HttpHeartbeat> getHttpHeartbeats() {
@@ -259,6 +292,7 @@ public class HttpMonitor implements Serializable {
             ", method='" + getMethod() + "'" +
             ", type='" + getType() + "'" +
             ", url='" + getUrl() + "'" +
+            ", additionalUrls='" + getAdditionalUrls() + "'" +
             ", headers='" + getHeaders() + "'" +
             ", body='" + getBody() + "'" +
             "}";

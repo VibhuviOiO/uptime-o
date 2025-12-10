@@ -5,21 +5,41 @@ const router = Router();
 
 router.get('/', async (req, res) => {
   try {
+    const warnThreshold = parseInt(process.env.INDICATOR_WARN_THRESHOLD || '500');
+    const dangerThreshold = parseInt(process.env.INDICATOR_DANGER_THRESHOLD || '1000');
+    const sampleSize = parseInt(process.env.STATUS_SAMPLE_SIZE || '20');
+    const successThresholdHigh = parseFloat(process.env.SUCCESS_THRESHOLD_HIGH || '0.8');
+    const successThresholdLow = parseFloat(process.env.SUCCESS_THRESHOLD_LOW || '0.6');
+
     const sql = `
       WITH latest_heartbeats AS (
-        SELECT DISTINCT ON (h.monitor_id, d.region_id)
+        SELECT
           h.monitor_id,
           d.region_id,
           h.success,
           (COALESCE(h.response_time_ms, 0) + COALESCE(h.dns_lookup_ms, 0) + COALESCE(h.tcp_connect_ms, 0) + COALESCE(h.tls_handshake_ms, 0)) AS total_latency_ms,
           h.warning_threshold_ms,
           h.critical_threshold_ms,
-          h.executed_at
+          h.executed_at,
+          ROW_NUMBER() OVER (PARTITION BY h.monitor_id, d.region_id ORDER BY h.executed_at DESC) as rn
         FROM api_heartbeats h
         JOIN agents a ON h.agent_id = a.id
         JOIN datacenters d ON a.datacenter_id = d.id
-        WHERE h.executed_at >= NOW() - INTERVAL '1 hour'
-        ORDER BY h.monitor_id, d.region_id, h.executed_at DESC
+        WHERE h.executed_at >= NOW() - INTERVAL '10 minutes'
+      ),
+      aggregated_heartbeats AS (
+        SELECT
+          monitor_id,
+          region_id,
+          COUNT(*) as total_calls,
+          SUM(CASE WHEN success THEN 1 ELSE 0 END) as successful_calls,
+          AVG(total_latency_ms) as avg_latency_ms,
+          MAX(executed_at) as latest_executed_at,
+          MIN(warning_threshold_ms) as warning_threshold,
+          MIN(critical_threshold_ms) as critical_threshold
+        FROM latest_heartbeats
+        WHERE rn <= ${sampleSize}
+        GROUP BY monitor_id, region_id
       ),
       active_regions AS (
         SELECT DISTINCT r.id, r.name
@@ -33,14 +53,15 @@ router.get('/', async (req, res) => {
         m.id AS monitor_id,
         m.name AS api_name,
         ar.name AS region,
-        lh.success,
-        lh.total_latency_ms,
-        lh.warning_threshold_ms,
-        lh.critical_threshold_ms,
-        lh.executed_at
+        ah.total_calls,
+        ah.successful_calls,
+        ah.avg_latency_ms,
+        ah.warning_threshold,
+        ah.critical_threshold,
+        ah.latest_executed_at
       FROM api_monitors m
       CROSS JOIN active_regions ar
-      LEFT JOIN latest_heartbeats lh ON lh.monitor_id = m.id AND lh.region_id = ar.id
+      LEFT JOIN aggregated_heartbeats ah ON ah.monitor_id = m.id AND ah.region_id = ar.id
       ORDER BY m.id, ar.name
     `;
 
@@ -62,20 +83,26 @@ router.get('/', async (req, res) => {
 
       const api = apisMap.get(row.monitor_id);
       
-      if (row.success !== null) {
+      if (row.total_calls !== null && row.total_calls > 0) {
+        const successRate = row.successful_calls / row.total_calls;
         let status = 'UP';
-        if (!row.success) {
+        
+        if (successRate < successThresholdLow) {
           status = 'DOWN';
-        } else if (row.total_latency_ms > row.critical_threshold_ms) {
+        } else if (successRate < successThresholdHigh) {
+          status = 'WARNING';
+        } else if (row.avg_latency_ms > dangerThreshold) {
           status = 'CRITICAL';
-        } else if (row.total_latency_ms > row.warning_threshold_ms) {
+        } else if (row.avg_latency_ms > warnThreshold) {
           status = 'WARNING';
         }
 
         api.regionHealth[row.region] = {
           status,
-          responseTimeMs: Math.round(row.total_latency_ms),
-          lastChecked: row.executed_at
+          responseTimeMs: Math.round(row.avg_latency_ms),
+          lastChecked: row.latest_executed_at,
+          successRate: Math.round(successRate * 100),
+          totalCalls: row.total_calls
         };
       }
     });

@@ -99,21 +99,31 @@ func Load(pool *pgxpool.Pool) (*models.Config, error) {
 
 	// Load monitors for each agent
 	for i := range cfg.Agents {
-		rows, err := pool.Query(context.Background(), "SELECT m.id, m.name, m.method, m.type, m.url, m.schedule_id, m.headers, m.body FROM api_monitors m JOIN agent_monitors am ON m.id = am.monitor_id WHERE am.agent_id = $1", cfg.Agents[i].ID)
+		rows, err := pool.Query(context.Background(), "SELECT m.id, m.name, m.method, m.type, m.url, m.additional_urls, m.calls_per_interval, m.schedule_id, m.headers, m.body FROM api_monitors m JOIN agent_monitors am ON m.id = am.monitor_id WHERE am.agent_id = $1", cfg.Agents[i].ID)
 		if err != nil {
 			return nil, err
 		}
 		defer rows.Close()
 		for rows.Next() {
 			var mon models.Monitor
-			var scheduleID *int
-			var headers, body []byte
-			if err := rows.Scan(&mon.ID, &mon.Name, &mon.Method, &mon.Type, &mon.URL, &scheduleID, &headers, &body); err != nil {
+			var scheduleID, callsPerInterval *int
+			var headers, body, additionalUrls []byte
+			if err := rows.Scan(&mon.ID, &mon.Name, &mon.Method, &mon.Type, &mon.URL, &additionalUrls, &callsPerInterval, &scheduleID, &headers, &body); err != nil {
 				return nil, err
 			}
 			// Handle NULL schedule_id
 			if scheduleID != nil {
 				mon.ScheduleID = *scheduleID
+			}
+			// Handle NULL calls_per_interval
+			if callsPerInterval != nil {
+				mon.CallsPerInterval = *callsPerInterval
+			}
+			// Parse JSONB additional_urls
+			if len(additionalUrls) > 0 {
+				if err := json.Unmarshal(additionalUrls, &mon.AdditionalUrls); err == nil {
+					// Successfully parsed additional URLs
+				}
 			}
 			// Parse JSONB headers into map[string]string
 			if len(headers) > 0 {

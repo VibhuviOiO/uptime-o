@@ -152,3 +152,5 @@ real_api_calls.txt
 /deploy/
 node/
 node_tmp/
+.amazonq/
+statuspage/

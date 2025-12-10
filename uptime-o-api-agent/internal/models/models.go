@@ -41,20 +41,23 @@ type Schedule struct {
 	ID                  int    `yaml:"id"`
 	Name                string `yaml:"name"`
 	Interval            int    `yaml:"interval"`
+	CallsPerInterval    int    `yaml:"calls_per_interval"`
 	IncludeResponseBody bool   `yaml:"include_response_body"`
 	ThresholdsWarning   int    `yaml:"thresholds_warning,omitempty"`
 	ThresholdsCritical  int    `yaml:"thresholds_critical,omitempty"`
 }
 
 type Monitor struct {
-	ID         int               `yaml:"id"`
-	Name       string            `yaml:"name"`
-	Method     string            `yaml:"method"`
-	Type       string            `yaml:"type"`
-	URL        string            `yaml:"url"`
-	ScheduleID int               `yaml:"scheduleId"`
-	Headers    map[string]string `yaml:"headers,omitempty"`
-	Body       string            `yaml:"body,omitempty"`
+	ID               int               `yaml:"id"`
+	Name             string            `yaml:"name"`
+	Method           string            `yaml:"method"`
+	Type             string            `yaml:"type"`
+	URL              string            `yaml:"url"`
+	AdditionalUrls   []string          `yaml:"additionalUrls,omitempty"`
+	CallsPerInterval int               `yaml:"callsPerInterval,omitempty"`
+	ScheduleID       int               `yaml:"scheduleId"`
+	Headers          map[string]string `yaml:"headers,omitempty"`
+	Body             string            `yaml:"body,omitempty"`
 }
 
 type Heartbeat struct {

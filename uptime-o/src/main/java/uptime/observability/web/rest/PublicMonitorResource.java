@@ -62,6 +62,8 @@ public class PublicMonitorResource {
                 response.setMethod(monitor.getMethod());
                 response.setType(monitor.getType());
                 response.setUrl(monitor.getUrl());
+                response.setAdditionalUrls(monitor.getAdditionalUrls());
+                response.setCallsPerInterval(monitor.getCallsPerInterval());
                 response.setHeaders(monitor.getHeaders());
                 response.setBody(monitor.getBody());
 
@@ -93,6 +95,8 @@ public class PublicMonitorResource {
         private String method;
         private String type;
         private String url;
+        private JsonNode additionalUrls;
+        private Integer callsPerInterval;
         private JsonNode headers;
         private JsonNode body;
         private ScheduleResponse schedule;
@@ -138,6 +142,22 @@ public class PublicMonitorResource {
             this.url = url;
         }
 
+        public JsonNode getAdditionalUrls() {
+            return additionalUrls;
+        }
+
+        public void setAdditionalUrls(JsonNode additionalUrls) {
+            this.additionalUrls = additionalUrls;
+        }
+
+        public Integer getCallsPerInterval() {
+            return callsPerInterval;
+        }
+
+        public void setCallsPerInterval(Integer callsPerInterval) {
+            this.callsPerInterval = callsPerInterval;
+        }
+
         public JsonNode getHeaders() {
             return headers;
         }
@@ -168,6 +188,7 @@ public class PublicMonitorResource {
         private Long id;
         private String name;
         private Integer interval;
+        private Integer callsPerInterval;
         private Boolean includeResponseBody;
         private Integer thresholdsWarning;
         private Integer thresholdsCritical;
@@ -195,6 +216,14 @@ public class PublicMonitorResource {
 
         public void setInterval(Integer interval) {
             this.interval = interval;
+        }
+
+        public Integer getCallsPerInterval() {
+            return callsPerInterval;
+        }
+
+        public void setCallsPerInterval(Integer callsPerInterval) {
+            this.callsPerInterval = callsPerInterval;
         }
 
         public Boolean getIncludeResponseBody() {

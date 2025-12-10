@@ -1,9 +1,19 @@
 import { useState, useEffect } from 'react';
 
+export interface Indicator {
+  type: string;
+  enabled: boolean;
+  label: string;
+  color: string;
+  threshold?: number;
+}
+
 export interface RegionHealth {
   status: string;
   responseTimeMs: number;
   lastChecked: string;
+  successRate?: number;
+  totalCalls?: number;
 }
 
 export interface ApiStatus {
@@ -43,7 +53,7 @@ export function useStatus() {
   const [data, setData] = useState<StatusResponse>({ apis: [], regions: [] });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { ms: refreshInterval, display: refreshDisplay } = parseRefreshTime(import.meta.env.VITE_STATUS_PAGE_REFRESH_TIME || 30);
+  const { ms: refreshInterval, display: refreshDisplay } = parseRefreshTime(import.meta.env.VITE_STATUS_PAGE_REFRESH_TIME || '2m');
 
   useEffect(() => {
     async function fetchStatus() {

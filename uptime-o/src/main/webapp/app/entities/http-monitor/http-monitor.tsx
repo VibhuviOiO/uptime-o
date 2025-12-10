@@ -174,7 +174,9 @@ export const HttpMonitor = () => {
                 <tr>
                   <th>Name</th>
                   <th>URL</th>
+                  <th>Additional URLs</th>
                   <th>Schedule</th>
+                  <th>Calls/Interval</th>
                   <th>Headers</th>
                   <th>Body</th>
                   <th>Mapped Agents</th>
@@ -208,7 +210,29 @@ export const HttpMonitor = () => {
                         '-'
                       )}
                     </td>
+                    <td>
+                      {monitor.additionalUrls && monitor.additionalUrls.length > 0 ? (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                          {monitor.additionalUrls.map((url, idx) => (
+                            <a key={idx} href={url} target="_blank" rel="noopener noreferrer" title={url} style={{ fontSize: '0.85rem' }}>
+                              {url.length > 25 ? `${url.substring(0, 25)}...` : url}
+                            </a>
+                          ))}
+                        </div>
+                      ) : (
+                        <span className="text-muted">-</span>
+                      )}
+                    </td>
                     <td>{monitor.schedule?.name || '-'}</td>
+                    <td>
+                      {monitor.callsPerInterval ? (
+                        <span className="badge bg-primary" style={{ fontSize: '0.75rem' }}>
+                          {monitor.callsPerInterval}x
+                        </span>
+                      ) : (
+                        <span className="text-muted">1x</span>
+                      )}
+                    </td>
                     <td>
                       {monitor.headers ? (
                         <Button

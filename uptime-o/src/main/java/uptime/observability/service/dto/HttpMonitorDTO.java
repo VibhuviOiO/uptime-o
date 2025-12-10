@@ -30,6 +30,10 @@ public class HttpMonitorDTO implements Serializable {
     @Lob
     private String url;
 
+    private JsonNode additionalUrls;
+
+    private Integer callsPerInterval;
+
     private JsonNode headers;
 
     private JsonNode body;
@@ -74,6 +78,22 @@ public class HttpMonitorDTO implements Serializable {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public JsonNode getAdditionalUrls() {
+        return additionalUrls;
+    }
+
+    public void setAdditionalUrls(JsonNode additionalUrls) {
+        this.additionalUrls = additionalUrls;
+    }
+
+    public Integer getCallsPerInterval() {
+        return callsPerInterval;
+    }
+
+    public void setCallsPerInterval(Integer callsPerInterval) {
+        this.callsPerInterval = callsPerInterval;
     }
 
     public JsonNode getHeaders() {
@@ -130,6 +150,8 @@ public class HttpMonitorDTO implements Serializable {
             ", method='" + getMethod() + "'" +
             ", type='" + getType() + "'" +
             ", url='" + getUrl() + "'" +
+            ", additionalUrls='" + getAdditionalUrls() + "'" +
+            ", callsPerInterval=" + getCallsPerInterval() +
             ", headers='" + getHeaders() + "'" +
             ", body='" + getBody() + "'" +
             ", schedule=" + getSchedule() +

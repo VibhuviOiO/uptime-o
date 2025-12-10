@@ -6,6 +6,8 @@ export interface IHttpMonitor {
   method?: string;
   type?: string;
   url?: string;
+  additionalUrls?: string[];
+  callsPerInterval?: number;
   headers?: any;
   body?: any;
   schedule?: ISchedule | null;

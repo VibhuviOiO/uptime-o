@@ -150,6 +150,33 @@
   line-height: 1.6;
 }
 
+.support-contacts {
+  margin-top: 1rem;
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.contact-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: #5f6368;
+}
+
+.contact-value {
+  color: #1a73e8;
+  cursor: pointer;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.contact-value:hover {
+  color: #174ea6;
+  text-decoration: underline;
+}
+
 
 
 .status-legend-container {
@@ -336,6 +363,14 @@
   color: #5f6368;
   font-weight: 500;
   white-space: nowrap;
+}
+
+.status-indicator .success-rate {
+  font-size: 0.75rem;
+  color: #5f6368;
+  font-weight: 600;
+  white-space: nowrap;
+  margin-left: 0.25rem;
 }
 
 .status-indicator .error-text {

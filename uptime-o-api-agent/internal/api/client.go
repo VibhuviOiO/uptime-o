@@ -20,20 +20,23 @@ type Client struct {
 
 // MonitorResponse represents the API response for a monitor
 type MonitorResponse struct {
-	ID       int              `json:"id"`
-	Name     string           `json:"name"`
-	Method   string           `json:"method"`
-	Type     string           `json:"type"`
-	URL      string           `json:"url"`
-	Headers  *json.RawMessage `json:"headers"`
-	Body     *json.RawMessage `json:"body"`
-	Schedule ScheduleResponse `json:"schedule"`
+	ID               int              `json:"id"`
+	Name             string           `json:"name"`
+	Method           string           `json:"method"`
+	Type             string           `json:"type"`
+	URL              string           `json:"url"`
+	AdditionalUrls   *json.RawMessage `json:"additionalUrls"`
+	CallsPerInterval int              `json:"callsPerInterval"`
+	Headers          *json.RawMessage `json:"headers"`
+	Body             *json.RawMessage `json:"body"`
+	Schedule         ScheduleResponse `json:"schedule"`
 }
 
 type ScheduleResponse struct {
 	ID                  int    `json:"id"`
 	Name                string `json:"name"`
 	Interval            int    `json:"interval"`
+	CallsPerInterval    int    `json:"callsPerInterval"`
 	IncludeResponseBody bool   `json:"includeResponseBody"`
 	ThresholdsWarning   int    `json:"thresholdsWarning"`
 	ThresholdsCritical  int    `json:"thresholdsCritical"`
@@ -171,15 +174,25 @@ func (c *Client) GetMonitors(agentID int) ([]models.Monitor, []models.Schedule, 
 			}
 		}
 
+		// Parse additionalUrls if present
+		var additionalUrls []string
+		if apiMon.AdditionalUrls != nil {
+			if err := json.Unmarshal(*apiMon.AdditionalUrls, &additionalUrls); err != nil {
+				logrus.Warnf("Failed to parse additionalUrls for monitor %d: %v", apiMon.ID, err)
+			}
+		}
+
 		monitor := models.Monitor{
-			ID:         apiMon.ID,
-			Name:       apiMon.Name,
-			Method:     apiMon.Method,
-			Type:       apiMon.Type,
-			URL:        apiMon.URL,
-			ScheduleID: apiMon.Schedule.ID,
-			Headers:    headers,
-			Body:       body,
+			ID:               apiMon.ID,
+			Name:             apiMon.Name,
+			Method:           apiMon.Method,
+			Type:             apiMon.Type,
+			URL:              apiMon.URL,
+			AdditionalUrls:   additionalUrls,
+			CallsPerInterval: apiMon.CallsPerInterval,
+			ScheduleID:       apiMon.Schedule.ID,
+			Headers:          headers,
+			Body:             body,
 		}
 		monitors = append(monitors, monitor)
 
@@ -189,6 +202,7 @@ func (c *Client) GetMonitors(agentID int) ([]models.Monitor, []models.Schedule, 
 				ID:                  apiMon.Schedule.ID,
 				Name:                apiMon.Schedule.Name,
 				Interval:            apiMon.Schedule.Interval,
+				CallsPerInterval:    apiMon.Schedule.CallsPerInterval,
 				IncludeResponseBody: apiMon.Schedule.IncludeResponseBody,
 				ThresholdsWarning:   apiMon.Schedule.ThresholdsWarning,
 				ThresholdsCritical:  apiMon.Schedule.ThresholdsCritical,

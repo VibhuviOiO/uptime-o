@@ -17,6 +17,8 @@ export const HttpMonitorEditModal: React.FC<HttpMonitorEditModalProps> = ({ isOp
     method: 'GET',
     type: '',
     url: '',
+    additionalUrls: '',
+    callsPerInterval: '1',
     headers: '',
     body: '',
     scheduleId: '',
@@ -31,13 +33,25 @@ export const HttpMonitorEditModal: React.FC<HttpMonitorEditModalProps> = ({ isOp
     if (isOpen) {
       loadSchedules();
       if (isNew) {
-        setFormData({ name: '', method: 'GET', type: '', url: '', headers: '', body: '', scheduleId: '' });
+        setFormData({
+          name: '',
+          method: 'GET',
+          type: '',
+          url: '',
+          additionalUrls: '',
+          callsPerInterval: '1',
+          headers: '',
+          body: '',
+          scheduleId: '',
+        });
       } else if (monitor) {
         setFormData({
           name: monitor.name || '',
           method: monitor.method || 'GET',
           type: monitor.type || '',
           url: monitor.url || '',
+          additionalUrls: monitor.additionalUrls ? monitor.additionalUrls.join('\n') : '',
+          callsPerInterval: monitor.callsPerInterval ? String(monitor.callsPerInterval) : '1',
           headers: monitor.headers ? JSON.stringify(monitor.headers) : '',
           body: monitor.body ? JSON.stringify(monitor.body) : '',
           scheduleId: monitor.schedule?.id ? String(monitor.schedule.id) : '',
@@ -110,6 +124,20 @@ export const HttpMonitorEditModal: React.FC<HttpMonitorEditModalProps> = ({ isOp
           url: formData.url,
         };
 
+        if (formData.additionalUrls) {
+          const urls = formData.additionalUrls
+            .split('\n')
+            .map(u => u.trim())
+            .filter(u => u.length > 0);
+          if (urls.length > 0) {
+            dataToSubmit.additionalUrls = urls;
+          }
+        }
+
+        if (formData.callsPerInterval) {
+          dataToSubmit.callsPerInterval = parseInt(formData.callsPerInterval, 10);
+        }
+
         if (formData.headers) {
           try {
             dataToSubmit.headers = JSON.parse(formData.headers);
@@ -138,7 +166,17 @@ export const HttpMonitorEditModal: React.FC<HttpMonitorEditModalProps> = ({ isOp
           toast.success('Monitor updated successfully');
         }
 
-        setFormData({ name: '', method: 'GET', type: '', url: '', headers: '', body: '', scheduleId: '' });
+        setFormData({
+          name: '',
+          method: 'GET',
+          type: '',
+          url: '',
+          additionalUrls: '',
+          callsPerInterval: '1',
+          headers: '',
+          body: '',
+          scheduleId: '',
+        });
         toggle();
         onSave?.();
       } catch (error) {
@@ -169,18 +207,47 @@ export const HttpMonitorEditModal: React.FC<HttpMonitorEditModalProps> = ({ isOp
             {errors.name && <div className="invalid-feedback d-block">{errors.name}</div>}
           </FormGroup>
           <FormGroup>
-            <Label for="url">URL *</Label>
+            <Label for="url">Primary URL *</Label>
             <Input
               type="text"
               name="url"
               id="url"
-              placeholder="Enter monitor URL (e.g., https://example.com)"
+              placeholder="Enter primary monitor URL (e.g., https://find.example.com)"
               value={formData.url}
               onChange={handleChange}
               invalid={!!errors.url}
               disabled={updating}
             />
             {errors.url && <div className="invalid-feedback d-block">{errors.url}</div>}
+          </FormGroup>
+          <FormGroup>
+            <Label for="additionalUrls">Additional URLs (Optional)</Label>
+            <Input
+              type="textarea"
+              name="additionalUrls"
+              id="additionalUrls"
+              placeholder="Enter additional URLs (one per line):\nhttps://find-client1.example.com\nhttps://find-client2.example.com"
+              value={formData.additionalUrls}
+              onChange={handleChange}
+              disabled={updating}
+              rows={3}
+            />
+            <small className="form-text text-muted">Agent will monitor all URLs. Use this for client-specific endpoints.</small>
+          </FormGroup>
+          <FormGroup>
+            <Label for="callsPerInterval">Calls Per Interval</Label>
+            <Input
+              type="number"
+              name="callsPerInterval"
+              id="callsPerInterval"
+              placeholder="Number of concurrent calls per interval"
+              value={formData.callsPerInterval}
+              onChange={handleChange}
+              disabled={updating}
+              min="1"
+              max="100"
+            />
+            <small className="form-text text-muted">Number of concurrent HTTP calls to make per interval (for load testing).</small>
           </FormGroup>
           <FormGroup>
             <Label for="method">Method</Label>

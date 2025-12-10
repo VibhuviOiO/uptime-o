@@ -37,6 +37,8 @@ Centralized platform for managing agents and monitors.
 - ✅ **Connection Pooling** - Efficient database connections
 - ✅ **Resource Limits** - CPU and memory constraints
 - ✅ **Auto Partitioning** - Daily partitions for heartbeat data
+- ✅ **Multiple Concurrent Calls** - Configurable calls per interval for load testing
+- ✅ **Success Rate Monitoring** - Percentage-based availability calculation
 
 ## Architecture
 

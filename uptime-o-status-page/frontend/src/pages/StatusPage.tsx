@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useStatus } from '@/hooks/useStatus';
-import { useConfig } from '@/hooks/useConfig';
+import { useConfig, Indicator } from '@/hooks/useConfig';
 import '../styles/status-page.css';
 
 const formatTimeAgo = (date: Date): string => {
@@ -8,30 +8,49 @@ const formatTimeAgo = (date: Date): string => {
   if (seconds < 10) return 'just now';
   if (seconds < 60) return `${seconds}s ago`;
   const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes}m ago`;
+  const remainingSeconds = seconds % 60;
+  if (minutes < 60) return `${minutes}m ${remainingSeconds}s ago`;
   const hours = Math.floor(minutes / 60);
   return `${hours}h ago`;
 };
 
 const getStatusTitle = (status: string): string => {
   switch (status) {
+    case 'UP':
+      return 'Available - Normal latency';
+    case 'WARNING':
+      return 'Available - Elevated latency';
+    case 'CRITICAL':
+      return 'Available - High latency';
     case 'DOWN':
       return 'Service disruption';
     default:
-      return 'Available';
+      return 'Unknown status';
   }
+};
+
+const copyToClipboard = (text: string) => {
+  navigator.clipboard.writeText(text);
 };
 
 export const StatusPage = () => {
   const { data: statusData, loading, refreshDisplay } = useStatus();
   const { data: config } = useConfig();
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
+  const [, setRefreshTrigger] = useState(0);
 
   useEffect(() => {
     if (!loading && statusData) {
       setLastUpdate(new Date());
     }
   }, [statusData, loading]);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setRefreshTrigger(prev => prev + 1);
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   useEffect(() => {
     if (config) {
@@ -100,6 +119,96 @@ export const StatusPage = () => {
     return <span className="navbar-title">{config.navbarTitle}</span>;
   };
 
+  const getIndicatorSvg = (type: string, color: string) => {
+    switch (type) {
+      case 'SUCCESS':
+        return (
+          <svg width="16" height="16" viewBox="0 0 16 16">
+            <circle cx="8" cy="8" r="8" fill={color} />
+            <path d="M6 8l2 2 4-4" stroke="white" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        );
+      case 'WARN':
+        return (
+          <svg width="16" height="16" viewBox="0 0 16 16">
+            <circle cx="8" cy="8" r="8" fill={color} />
+            <path d="M8 4v5M8 11v1" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+          </svg>
+        );
+      case 'DANGER':
+        return (
+          <svg width="16" height="16" viewBox="0 0 16 16">
+            <circle cx="8" cy="8" r="8" fill={color} />
+            <path d="M8 4v5M8 11v1" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+          </svg>
+        );
+      case 'DOWN':
+        return (
+          <svg width="16" height="16" viewBox="0 0 16 16">
+            <circle cx="8" cy="8" r="8" fill={color} />
+            <path d="M5 5l6 6M11 5l-6 6" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+          </svg>
+        );
+      default:
+        return null;
+    }
+  };
+
+  const renderLegend = () => {
+    const orderedIndicators = config?.indicatorOrder
+      ?.map(type => config.indicators?.find(ind => ind.type === type))
+      .filter((ind): ind is Indicator => ind !== undefined && ind.enabled) || [];
+
+    return (
+      <>
+        {orderedIndicators.map(indicator => (
+          <div key={indicator.type} className="legend-item">
+            <div className="legend-icon">
+              {getIndicatorSvg(indicator.type, indicator.color)}
+            </div>
+            <span>{indicator.label}</span>
+          </div>
+        ))}
+      </>
+    );
+  };
+
+  const getStatusIndicatorType = (health: any): string | null => {
+    if (health.status === 'DOWN') return 'DOWN';
+    if (health.status === 'CRITICAL') {
+      const dangerIndicator = config?.indicators?.find(ind => ind.type === 'DANGER');
+      return dangerIndicator?.enabled ? 'DANGER' : 'WARN';
+    }
+    if (health.status === 'WARNING') return 'WARN';
+    if (health.status === 'UP') return 'SUCCESS';
+    return null;
+  };
+
+  const renderStatusIndicator = (health: any) => {
+    const indicatorType = getStatusIndicatorType(health);
+    const indicator = config?.indicators?.find(ind => ind.type === indicatorType);
+    
+    if (!indicator || !indicator.enabled) return null;
+
+    const showLatencyValues = config?.showLatencyIndicators;
+
+    return (
+      <>
+        <div className="status-icon" style={{ color: indicator.color }}>
+          {getIndicatorSvg(indicator.type, indicator.color)}
+        </div>
+        {showLatencyValues && health.responseTimeMs && (
+          <span className="response-time">{health.responseTimeMs}ms</span>
+        )}
+        {health.successRate !== undefined && (
+          <span className="success-rate" title={`${health.totalCalls || 0} calls`}>
+            {health.successRate}%
+          </span>
+        )}
+      </>
+    );
+  };
+
   if (loading) {
     return (
       <div className="status-page-wrapper" style={{ background: config.pageBgColor || '#f5f5f5' }}>
@@ -157,32 +266,33 @@ export const StatusPage = () => {
           <h1>{config.pageTitle}</h1>
           <p className="status-subtitle">{config.pageSubtitle}</p>
           <p className="status-description">
-            This page provides status information on the services that are part of <a href={config.companyWebsite} target="_blank" rel="noopener noreferrer" className="company-link">{config.companyName || 'our platform'}</a>. 
+            This page provides status information on the services that are part of <a href={config?.companyWebsite} target="_blank" rel="noopener noreferrer" className="company-link">{config?.companyName || 'our platform'}</a>. 
             Check back here to view the current status of the services listed below. 
-            If you are experiencing an issue not listed here, please email <span className="support-email-container"><span className="support-email" onClick={() => navigator.clipboard.writeText(config.supportEmail)}>{config.supportEmail}</span><button className="copy-icon" onClick={() => navigator.clipboard.writeText(config.supportEmail)} title="Copy email to clipboard"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></button></span>
+            If you are experiencing an issue not listed here, please contact us:
           </p>
+          <div className="support-contacts">
+            {config?.supportEmail && (
+              <div className="contact-item">
+                <span>📧 Email: </span>
+                <span className="contact-value" onClick={() => copyToClipboard(config.supportEmail)} title="Click to copy">
+                  {config.supportEmail}
+                </span>
+              </div>
+            )}
+            {config?.supportPhone && (
+              <div className="contact-item">
+                <span>📞 Phone: </span>
+                <a href={`tel:${config.supportPhone}`} className="contact-value">
+                  {config.supportPhone}
+                </a>
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="status-legend-container">
           <div className="status-legend">
-            <div className="legend-item">
-              <div className="legend-icon">
-                <svg width="16" height="16" viewBox="0 0 16 16">
-                  <circle cx="8" cy="8" r="8" fill="#34a853" />
-                  <path d="M6 8l2 2 4-4" stroke="white" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </div>
-              <span>Available</span>
-            </div>
-            <div className="legend-item">
-              <div className="legend-icon">
-                <svg width="16" height="16" viewBox="0 0 16 16">
-                  <circle cx="8" cy="8" r="8" fill="#ea4335" />
-                  <path d="M5 5l6 6M11 5l-6 6" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
-                </svg>
-              </div>
-              <span>Service disruption</span>
-            </div>
+            {renderLegend()}
           </div>
           {lastUpdate && (
             <div className="last-update-text">
@@ -212,34 +322,8 @@ export const StatusPage = () => {
                     return (
                       <td key={region} className="region-status">
                         {health ? (
-                          <div className={`status-indicator ${health.status === 'DOWN' ? 'down' : 'up'}`} title={health.status === 'DOWN' ? 'Service disruption' : 'Available'}>
-                            {health.status === 'DOWN' ? (
-                              <>
-                                <div className="status-icon status-icon-down">
-                                  <svg width="16" height="16" viewBox="0 0 16 16">
-                                    <circle cx="8" cy="8" r="8" fill="#ea4335" />
-                                    <path d="M5 5l6 6M11 5l-6 6" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
-                                  </svg>
-                                </div>
-                                <span className="response-time error-text">Error</span>
-                              </>
-                            ) : (
-                              <>
-                                <div className="status-icon status-icon-up">
-                                  <svg width="16" height="16" viewBox="0 0 16 16">
-                                    <circle cx="8" cy="8" r="8" fill="#34a853" />
-                                    <path
-                                      d="M6 8l2 2 4-4"
-                                      stroke="white"
-                                      strokeWidth="1.5"
-                                      fill="none"
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                    />
-                                  </svg>
-                                </div>
-                              </>
-                            )}
+                          <div className={`status-indicator ${health.status.toLowerCase()}`} title={getStatusTitle(health.status)}>
+                            {renderStatusIndicator(health)}
                           </div>
                         ) : null}
                       </td>
