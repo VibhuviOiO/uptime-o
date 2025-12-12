@@ -42,96 +42,27 @@ public class HttpMetricsService {
             searchName, regionName, datacenterName, agentName);
 
         try {
-            List<HttpMonitor> monitors = httpMonitorRepository.findAll();
-
-            return monitors.stream()
-                .map(monitor -> buildMetricsDTO(monitor, searchName, regionName, datacenterName, agentName))
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+            List<Object[]> results = httpHeartbeatRepository.findAggregatedMetrics(
+                searchName, regionName, datacenterName, agentName
+            );
+            
+            return results.stream()
+                .map(row -> new HttpMetricsDTO(
+                    ((Number) row[0]).longValue(),  // monitor_id
+                    (String) row[1],                 // monitor_name
+                    (Boolean) row[2],                // last_success
+                    ((Number) row[8]).intValue(),    // agent_count
+                    (String) row[5],                 // region_name
+                    (String) row[6],                 // datacenter_name
+                    (String) row[7],                 // agent_name
+                    row[4] != null ? ((java.sql.Timestamp) row[4]).toInstant() : null, // last_checked_time
+                    row[3] != null ? ((Number) row[3]).intValue() : 0  // last_latency_ms
+                ))
+                .collect(Collectors.<HttpMetricsDTO>toList());
         } catch (Exception e) {
             LOG.error("Exception in getAggregatedMetrics() with cause = '{}' and exception = '{}'", e.getCause(), e.getMessage(), e);
             throw e;
         }
     }
 
-    /**
-     * Build metrics DTO for a single monitor
-     */
-    private HttpMetricsDTO buildMetricsDTO(
-        HttpMonitor monitor,
-        String searchName,
-        String regionName,
-        String datacenterName,
-        String agentName
-    ) {
-        // Filter by name
-        if (searchName != null && !searchName.isEmpty()) {
-            if (!monitor.getName().toLowerCase().contains(searchName.toLowerCase())) {
-                return null;
-            }
-        }
-
-        // Get latest heartbeat for this monitor
-        HttpHeartbeat latestHeartbeat = httpHeartbeatRepository
-            .findByMonitorIdOrderByExecutedAtDesc(monitor.getId())
-            .stream()
-            .findFirst()
-            .orElse(null);
-
-        if (latestHeartbeat == null) {
-            return null;
-        }
-
-        // Get agent's datacenter and region information
-        Agent agent = latestHeartbeat.getAgent();
-        if (agent == null) {
-            return null;
-        }
-
-        Datacenter datacenter = agent.getDatacenter();
-        if (datacenter == null) {
-            return null;
-        }
-
-        Region region = datacenter.getRegion();
-
-        // Filter by region
-        if (regionName != null && !regionName.isEmpty()) {
-            if (region == null || !region.getName().equalsIgnoreCase(regionName)) {
-                return null;
-            }
-        }
-
-        // Filter by datacenter
-        if (datacenterName != null && !datacenterName.isEmpty()) {
-            if (!datacenter.getName().equalsIgnoreCase(datacenterName)) {
-                return null;
-            }
-        }
-
-        // Filter by agent
-        if (agentName != null && !agentName.isEmpty()) {
-            if (!agent.getName().toLowerCase().contains(agentName.toLowerCase())) {
-                return null;
-            }
-        }
-
-        // Count unique agents checking this monitor
-        Integer agentCount = httpHeartbeatRepository.countDistinctAgentsByMonitorId(monitor.getId());
-
-        // Build DTO
-        HttpMetricsDTO dto = new HttpMetricsDTO(
-            monitor.getId(),
-            monitor.getName(),
-            latestHeartbeat.getSuccess(),
-            agentCount != null ? agentCount : 0,
-            region != null ? region.getName() : "-",
-            datacenter.getName(),
-            agent.getName(),
-            latestHeartbeat.getExecutedAt(),
-            latestHeartbeat.getResponseTimeMs() != null ? latestHeartbeat.getResponseTimeMs() : 0
-        );
-
-        return dto;
-    }
 }

@@ -127,3 +127,6 @@ SUCCESS_THRESHOLD_LOW=0.6
 INDICATOR_WARN_THRESHOLD=500
 INDICATOR_DANGER_THRESHOLD=1000
 ```
+
+
+ docker exec postgres psql -U uptimeo -d uptimeo -c "SELECT DATE_TRUNC('minute', executed_at) as minute, COUNT(*) as heartbeat_count FROM api_heartbeats WHERE monitor_id = 1001 AND executed_at > NOW() - INTERVAL '5 minutes' GROUP BY minute ORDER BY minute DESC;"

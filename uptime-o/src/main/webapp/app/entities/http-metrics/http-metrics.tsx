@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { Button, Input, Row, Col, Table, Badge, Card, CardHeader, CardBody } from 'reactstrap';
@@ -17,6 +17,9 @@ export const HttpMetrics = () => {
   const [selectedRegion, setSelectedRegion] = useState('');
   const [selectedDatacenter, setSelectedDatacenter] = useState('');
   const [selectedAgent, setSelectedAgent] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [timeRange, setTimeRange] = useState('1h');
   const [regions, setRegions] = useState<string[]>([]);
   const [datacenters, setDatacenters] = useState<string[]>([]);
   const [agents, setAgents] = useState<string[]>([]);
@@ -28,23 +31,23 @@ export const HttpMetrics = () => {
   const fetchMetrics = async () => {
     setLoading(true);
     try {
-      const data = await HttpMetricsService.getAggregatedMetrics({
-        searchName,
-        regionName: selectedRegion || undefined,
-        datacenterName: selectedDatacenter || undefined,
-        agentName: selectedAgent || undefined,
-      });
+      const timeFilter = getTimeRangeFilter();
+      // Use existing service method signature
+      const data = await HttpMetricsService.getAggregatedMetrics(searchName, selectedRegion, selectedDatacenter, selectedAgent);
       setMetrics(data);
-      setFilteredMetrics(data);
 
-      // Extract unique values for filter dropdowns
-      const uniqueRegions = Array.from(new Set(data.map(m => m.regionName).filter(Boolean)));
-      const uniqueDatacenters = Array.from(new Set(data.map(m => m.datacenterName).filter(Boolean)));
-      const uniqueAgents = Array.from(new Set(data.flatMap(m => [m.agentName]).filter(Boolean)));
+      // Extract unique values for filter dropdowns (only once on initial load)
+      if (regions.length === 0) {
+        const uniqueRegions = Array.from(new Set(data.map((m: HttpMetricsDTO) => m.regionName).filter(Boolean)));
+        const uniqueDatacenters = Array.from(new Set(data.map((m: HttpMetricsDTO) => m.datacenterName).filter(Boolean)));
+        const uniqueAgents = Array.from(new Set(data.flatMap((m: HttpMetricsDTO) => [m.agentName]).filter(Boolean)));
+        setRegions(uniqueRegions);
+        setDatacenters(uniqueDatacenters);
+        setAgents(uniqueAgents);
+      }
 
-      setRegions(uniqueRegions);
-      setDatacenters(uniqueDatacenters);
-      setAgents(uniqueAgents);
+      // Apply filters client-side
+      applyFilters(data);
     } catch (error) {
       console.error('Error fetching HTTP metrics:', error);
     } finally {
@@ -52,21 +55,30 @@ export const HttpMetrics = () => {
     }
   };
 
-  const handleSearch = async () => {
-    setLoading(true);
-    try {
-      const data = await HttpMetricsService.getAggregatedMetrics({
-        searchName,
-        regionName: selectedRegion || undefined,
-        datacenterName: selectedDatacenter || undefined,
-        agentName: selectedAgent || undefined,
-      });
-      setFilteredMetrics(data);
-    } catch (error) {
-      console.error('Error searching HTTP metrics:', error);
-    } finally {
-      setLoading(false);
+  const applyFilters = (data: HttpMetricsDTO[]) => {
+    let filtered = data;
+
+    if (searchName) {
+      filtered = filtered.filter(m => m.monitorName.toLowerCase().includes(searchName.toLowerCase()));
     }
+
+    if (selectedRegion) {
+      filtered = filtered.filter(m => m.regionName === selectedRegion);
+    }
+
+    if (selectedDatacenter) {
+      filtered = filtered.filter(m => m.datacenterName === selectedDatacenter);
+    }
+
+    if (selectedAgent) {
+      filtered = filtered.filter(m => m.agentName.toLowerCase().includes(selectedAgent.toLowerCase()));
+    }
+
+    setFilteredMetrics(filtered);
+  };
+
+  const handleSearch = () => {
+    applyFilters(metrics);
   };
 
   const handleReset = () => {
@@ -74,7 +86,42 @@ export const HttpMetrics = () => {
     setSelectedRegion('');
     setSelectedDatacenter('');
     setSelectedAgent('');
-    setFilteredMetrics(metrics);
+    setStartDate('');
+    setEndDate('');
+    setTimeRange('1h');
+    applyFilters(metrics);
+  };
+
+  const getTimeRangeFilter = () => {
+    if (startDate && endDate) {
+      return { startTime: startDate, endTime: endDate };
+    }
+
+    const now = new Date();
+    const start = new Date();
+
+    switch (timeRange) {
+      case '1h':
+        start.setHours(now.getHours() - 1);
+        break;
+      case '6h':
+        start.setHours(now.getHours() - 6);
+        break;
+      case '24h':
+        start.setDate(now.getDate() - 1);
+        break;
+      case '7d':
+        start.setDate(now.getDate() - 7);
+        break;
+      default:
+        start.setHours(now.getHours() - 1);
+        break;
+    }
+
+    return {
+      startTime: start.toISOString(),
+      endTime: now.toISOString(),
+    };
   };
 
   const formatLastChecked = (timestamp: string | null | undefined) => {
@@ -82,6 +129,19 @@ export const HttpMetrics = () => {
     const date = new Date(timestamp);
     return date.toLocaleString();
   };
+
+  // Memoize stats calculation
+  const stats = useMemo(() => {
+    const upCount = filteredMetrics.filter(m => m.lastSuccess).length;
+    const downCount = filteredMetrics.filter(m => !m.lastSuccess).length;
+    const avgLatency =
+      filteredMetrics.length > 0
+        ? Math.round(filteredMetrics.reduce((sum, m) => sum + (m.lastLatencyMs || 0), 0) / filteredMetrics.length)
+        : 0;
+    const totalCount = filteredMetrics.length;
+
+    return { upCount, downCount, avgLatency, totalCount };
+  }, [filteredMetrics]);
 
   return (
     <div className="http-metrics-container">
@@ -92,7 +152,7 @@ export const HttpMetrics = () => {
             <div className="icon-dot success"></div>
           </div>
           <div className="stat-content">
-            <div className="stat-value">{filteredMetrics.filter(m => m.lastSuccess).length}</div>
+            <div className="stat-value">{stats.upCount}</div>
             <div className="stat-label">Services UP</div>
           </div>
         </div>
@@ -102,7 +162,7 @@ export const HttpMetrics = () => {
             <div className="icon-dot failed"></div>
           </div>
           <div className="stat-content">
-            <div className="stat-value">{filteredMetrics.filter(m => !m.lastSuccess).length}</div>
+            <div className="stat-value">{stats.downCount}</div>
             <div className="stat-label">Services DOWN</div>
           </div>
         </div>
@@ -112,15 +172,7 @@ export const HttpMetrics = () => {
             <span className="stat-icon-symbol">⚡</span>
           </div>
           <div className="stat-content">
-            <div className="stat-value">
-              {filteredMetrics.length > 0
-                ? (() => {
-                    const total = filteredMetrics.reduce((sum, m) => sum + (m.lastLatencyMs || 0), 0);
-                    return Math.round(total / filteredMetrics.length);
-                  })()
-                : 0}
-              ms
-            </div>
+            <div className="stat-value">{stats.avgLatency}ms</div>
             <div className="stat-label">Avg Latency</div>
           </div>
         </div>
@@ -130,7 +182,7 @@ export const HttpMetrics = () => {
             <span className="stat-icon-symbol">📊</span>
           </div>
           <div className="stat-content">
-            <div className="stat-value">{filteredMetrics.length}</div>
+            <div className="stat-value">{stats.totalCount}</div>
             <div className="stat-label">Total Monitors</div>
           </div>
         </div>
@@ -156,7 +208,53 @@ export const HttpMetrics = () => {
           <div className="advanced-filters">
             <div className="filters-content">
               <Row className="g-2">
-                <Col md="3">
+                <Col md="2">
+                  <div className="filter-group">
+                    <label className="filter-label">Time Range</label>
+                    <Input
+                      type="select"
+                      value={timeRange}
+                      onChange={e => setTimeRange(e.target.value)}
+                      bsSize="sm"
+                      className="filter-select"
+                    >
+                      <option value="1h">Last Hour</option>
+                      <option value="6h">Last 6 Hours</option>
+                      <option value="24h">Last 24 Hours</option>
+                      <option value="7d">Last 7 Days</option>
+                      <option value="custom">Custom Range</option>
+                    </Input>
+                  </div>
+                </Col>
+                {timeRange === 'custom' && (
+                  <>
+                    <Col md="2">
+                      <div className="filter-group">
+                        <label className="filter-label">Start Date</label>
+                        <Input
+                          type="datetime-local"
+                          value={startDate}
+                          onChange={e => setStartDate(e.target.value)}
+                          bsSize="sm"
+                          className="filter-input"
+                        />
+                      </div>
+                    </Col>
+                    <Col md="2">
+                      <div className="filter-group">
+                        <label className="filter-label">End Date</label>
+                        <Input
+                          type="datetime-local"
+                          value={endDate}
+                          onChange={e => setEndDate(e.target.value)}
+                          bsSize="sm"
+                          className="filter-input"
+                        />
+                      </div>
+                    </Col>
+                  </>
+                )}
+                <Col md="2">
                   <div className="filter-group">
                     <label className="filter-label">Monitor</label>
                     <Input
@@ -169,7 +267,7 @@ export const HttpMetrics = () => {
                     />
                   </div>
                 </Col>
-                <Col md="3">
+                <Col md="2">
                   <div className="filter-group">
                     <label className="filter-label">Region</label>
                     <div className="select-wrapper">
@@ -191,7 +289,7 @@ export const HttpMetrics = () => {
                     </div>
                   </div>
                 </Col>
-                <Col md="3">
+                <Col md="2">
                   <div className="filter-group">
                     <label className="filter-label">Datacenter</label>
                     <div className="select-wrapper">
@@ -213,7 +311,7 @@ export const HttpMetrics = () => {
                     </div>
                   </div>
                 </Col>
-                <Col md="3">
+                <Col md="2">
                   <div className="filter-group">
                     <label className="filter-label">Agent</label>
                     <div className="select-wrapper">

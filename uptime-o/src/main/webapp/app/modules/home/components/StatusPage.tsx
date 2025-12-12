@@ -1,10 +1,15 @@
 import React, { useEffect, useState, useRef } from 'react';
+import { Button, Modal, ModalHeader, ModalBody, ModalFooter, Input, Label, FormGroup, Row, Col } from 'reactstrap';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faGear, faSave, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
 import '../styles/status-page.scss';
 
 interface RegionHealth {
   status: string;
   responseTimeMs: number;
+  successRate?: number;
+  totalCalls?: number;
   lastChecked?: string;
 }
 
@@ -47,10 +52,12 @@ const getStatusTitle = (status: string): string => {
   }
 };
 
-export const StatusPage = () => {
+export const PrivateStatusPage = () => {
   const [statusData, setStatusData] = useState<StatusPageData | null>(null);
+
   const [loading, setLoading] = useState(true);
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
+
   const abortControllerRef = useRef<AbortController | null>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -119,12 +126,9 @@ export const StatusPage = () => {
   return (
     <div className="status-page">
       <div className="status-header">
-        <h1>Service Status</h1>
-        <p className="status-subtitle">Real-time monitoring across all regions</p>
-        <p className="status-description">
-          This page provides status information on the services that are part of our platform. Check back here to view the current status of
-          the services listed below.
-        </p>
+        <h1>Service Status - Internal Dashboard</h1>
+        <p className="status-subtitle">Internal monitoring dashboard with full details</p>
+        <p className="status-description">This internal dashboard provides comprehensive status information for all monitored services.</p>
       </div>
 
       <div className="status-legend-container">
@@ -263,4 +267,5 @@ export const StatusPage = () => {
   );
 };
 
-export default StatusPage;
+export default PrivateStatusPage;
+export { PrivateStatusPage as StatusPage };

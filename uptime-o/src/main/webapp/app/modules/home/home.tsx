@@ -1,12 +1,12 @@
 import './home.scss';
 
 import React from 'react';
-import StatusPage from './components/StatusPage';
+import { PrivateStatusPage } from './components/StatusPage';
 
 export const Home = () => {
   return (
     <div className="dashboard-home">
-      <StatusPage />
+      <PrivateStatusPage />
     </div>
   );
 };

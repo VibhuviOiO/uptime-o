@@ -12,7 +12,6 @@ import {
   faServer,
   faClock,
   faRobot,
-  faPalette,
 } from '@fortawesome/free-solid-svg-icons';
 import { useAppSelector } from 'app/config/store';
 import { hasAnyAuthority } from 'app/shared/auth/private-route';
@@ -28,7 +27,7 @@ import { DatacentersTab } from './datacenters-tab';
 import { InstancesTab } from './instances-tab';
 import { SchedulesTab } from './schedules-tab';
 import { AgentsTab } from './agents-tab';
-import BrandingTab from 'app/entities/branding/branding-tab';
+
 import './settings.scss';
 
 export type SettingsTab =
@@ -39,7 +38,6 @@ export type SettingsTab =
   | 'instances'
   | 'schedules'
   | 'agents'
-  | 'branding'
   | 'user'
   | 'user-roles'
   | 'api-keys';
@@ -60,7 +58,7 @@ export const SettingsPage = () => {
       'instances',
       'schedules',
       'agents',
-      'branding',
+
       'user',
       'user-roles',
       'api-keys',
@@ -77,7 +75,7 @@ export const SettingsPage = () => {
           tab === 'instances' ||
           tab === 'schedules' ||
           tab === 'agents' ||
-          tab === 'branding')
+          false)
       ) {
         navigate('/account/settings/profile');
         return;
@@ -109,8 +107,7 @@ export const SettingsPage = () => {
         return isAdmin ? <SchedulesTab /> : <ProfileTab />;
       case 'agents':
         return isAdmin ? <AgentsTab /> : <ProfileTab />;
-      case 'branding':
-        return isAdmin ? <BrandingTab /> : <ProfileTab />;
+
       case 'user':
         return isAdmin ? <UserManagementTab /> : <ProfileTab />;
       case 'user-roles':
@@ -170,10 +167,6 @@ export const SettingsPage = () => {
                   <button className={`nav-link ${activeTab === 'agents' ? 'active' : ''}`} onClick={() => handleTabChange('agents')}>
                     <FontAwesomeIcon icon={faRobot} className="me-2" />
                     Agents
-                  </button>
-                  <button className={`nav-link ${activeTab === 'branding' ? 'active' : ''}`} onClick={() => handleTabChange('branding')}>
-                    <FontAwesomeIcon icon={faPalette} className="me-2" />
-                    Branding
                   </button>
                 </>
               )}
