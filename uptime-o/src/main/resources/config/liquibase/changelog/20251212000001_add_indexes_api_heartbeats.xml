@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="20251212000001-1" author="system">
+        <comment>Add performance indexes to api_heartbeats table</comment>
+        
+        <sql>
+            CREATE INDEX IF NOT EXISTS idx_api_heartbeats_monitor_id ON api_heartbeats(monitor_id);
+            CREATE INDEX IF NOT EXISTS idx_api_heartbeats_executed_at ON api_heartbeats(executed_at);
+            CREATE INDEX IF NOT EXISTS idx_api_heartbeats_monitor_executed ON api_heartbeats(monitor_id, executed_at DESC);
+            CREATE INDEX IF NOT EXISTS idx_api_heartbeats_agent_id ON api_heartbeats(agent_id);
+        </sql>
+        
+    </changeSet>
+
+</databaseChangeLog>

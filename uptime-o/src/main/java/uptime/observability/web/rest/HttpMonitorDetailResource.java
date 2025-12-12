@@ -31,14 +31,15 @@ public class HttpMonitorDetailResource {
      */
     @GetMapping("/{id}/details")
     public ResponseEntity<MonitorDetailDTO> getMonitorDetail(@PathVariable Long id) {
-        LOG.debug("REST request to get monitor detail for ID: {}", id);
+        LOG.info("REST request to get monitor detail for ID: {}", id);
         
         try {
             MonitorDetailDTO detail = monitorDetailService.getMonitorDetail(id);
+            LOG.info("Successfully fetched monitor detail for ID: {}", id);
             return ResponseEntity.ok(detail);
-        } catch (RuntimeException e) {
-            LOG.error("Error fetching monitor detail for ID: {}", id, e);
-            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            LOG.error("Error fetching monitor detail for ID: {}, error: {}", id, e.getMessage(), e);
+            return ResponseEntity.status(500).build();
         }
     }
 
@@ -115,6 +116,34 @@ public class HttpMonitorDetailResource {
         } catch (RuntimeException e) {
             LOG.error("Error fetching time-series data for monitor ID: {}", id, e);
             return ResponseEntity.notFound().build();
+        }
+    }
+
+    /**
+     * GET /api/http-monitors/{id}/complete : Get all monitor data in one call
+     */
+    @GetMapping("/{id}/complete")
+    public ResponseEntity<MonitorCompleteDataDTO> getCompleteMonitorData(
+        @PathVariable Long id,
+        @RequestParam(required = false, defaultValue = "30m") String timeRange,
+        @RequestParam(required = false) String agentRegion
+    ) {
+        LOG.info("REST request to get complete monitor data for ID: {}", id);
+        
+        try {
+            Instant end = Instant.now();
+            Instant start = calculateStartTime(timeRange, end);
+            
+            // Get all data in parallel
+            MonitorDetailDTO detail = monitorDetailService.getMonitorDetail(id);
+            List<AgentMetricsDTO> agentMetrics = monitorDetailService.getAgentMetrics(id, start, end, agentRegion);
+            List<TimeSeriesDataDTO> timeSeriesData = monitorDetailService.getTimeSeriesData(id, start, end, agentRegion);
+            
+            MonitorCompleteDataDTO completeData = new MonitorCompleteDataDTO(detail, agentMetrics, timeSeriesData);
+            return ResponseEntity.ok(completeData);
+        } catch (Exception e) {
+            LOG.error("Error fetching complete monitor data for ID: {}", id, e);
+            return ResponseEntity.status(500).build();
         }
     }
 

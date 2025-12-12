@@ -22,7 +22,7 @@ import tech.jhipster.web.util.ResponseUtil;
 import uptime.observability.repository.HttpHeartbeatRepository;
 import uptime.observability.service.HttpHeartbeatService;
 import uptime.observability.service.dto.HttpHeartbeatDTO;
-import uptime.observability.service.dto.HttpMonitorAggregationDTO;
+
 import uptime.observability.web.rest.errors.BadRequestAlertException;
 
 /**
@@ -179,14 +179,5 @@ public class HttpHeartbeatResource {
             .build();
     }
 
-    /**
-     * {@code GET  /http-heartbeats/aggregated} : get aggregated apiHeartbeats.
-     *
-     * @param range the time range for aggregation.
-     * @return the list of aggregated apiHeartbeats.
-     */
-    @GetMapping("/aggregated")
-    public List<HttpMonitorAggregationDTO> getAggregatedHeartbeats(@RequestParam(defaultValue = "5min") String range) {
-        return apiHeartbeatService.getAggregatedHeartbeats(range);
-    }
+
 }

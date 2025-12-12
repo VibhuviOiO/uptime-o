@@ -94,55 +94,43 @@ const MonitorDetail: React.FC = () => {
   }, [id]);
 
   useEffect(() => {
-    fetchAgentMetrics();
-    fetchTimeSeriesData();
+    const timeoutId = setTimeout(() => {
+      fetchData();
+    }, 300); // Debounce API calls
+    return () => clearTimeout(timeoutId);
   }, [id, timeRange, selectedRegion]);
 
   useEffect(() => {
     if (autoRefresh) {
-      const interval = setInterval(() => {
-        fetchAgentMetrics();
-        fetchTimeSeriesData();
-      }, 30000);
+      const interval = setInterval(fetchData, 30000);
       return () => clearInterval(interval);
     }
   }, [autoRefresh, timeRange, selectedRegion]);
 
-  const fetchMonitorDetail = async () => {
-    try {
-      const response = await axios.get(`/api/http-monitors/${id}/details`);
-      setMonitor(response.data);
-    } catch (error) {
-      console.error('Error fetching monitor details:', error);
-    }
+  // Initial load uses the combined endpoint
+  const fetchMonitorDetail = () => {
+    fetchData();
   };
 
-  const fetchAgentMetrics = async () => {
+  const fetchData = async () => {
     try {
       setLoading(true);
       const params: any = { timeRange };
       if (selectedRegion !== 'all') {
         params.agentRegion = selectedRegion;
       }
-      const response = await axios.get(`/api/http-monitors/${id}/agent-metrics`, { params });
-      setAgentMetrics(response.data);
+
+      // Single API call for all data
+      const response = await axios.get(`/api/http-monitors/${id}/complete`, { params });
+      const data = response.data;
+
+      setMonitor(data.monitor);
+      setAgentMetrics(data.agentMetrics);
+      setTimeSeriesData(data.timeSeriesData);
     } catch (error) {
-      console.error('Error fetching agent metrics:', error);
+      console.error('Error fetching data:', error);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const fetchTimeSeriesData = async () => {
-    try {
-      const params: any = { timeRange };
-      if (selectedRegion !== 'all') {
-        params.agentRegion = selectedRegion;
-      }
-      const response = await axios.get(`/api/http-monitors/${id}/time-series`, { params });
-      setTimeSeriesData(response.data);
-    } catch (error) {
-      console.error('Error fetching time series data:', error);
     }
   };
 
@@ -288,15 +276,7 @@ const MonitorDetail: React.FC = () => {
             <Button color={autoRefresh ? 'success' : 'secondary'} size="sm" outline onClick={() => setAutoRefresh(!autoRefresh)}>
               <FontAwesomeIcon icon={faRefresh} spin={autoRefresh} />
             </Button>
-            <Button
-              color="primary"
-              size="sm"
-              outline
-              onClick={() => {
-                fetchAgentMetrics();
-                fetchTimeSeriesData();
-              }}
-            >
+            <Button color="primary" size="sm" outline onClick={fetchData}>
               <FontAwesomeIcon icon={faRefresh} /> Refresh
             </Button>
           </div>
@@ -314,18 +294,18 @@ const MonitorDetail: React.FC = () => {
             <FontAwesomeIcon icon={faGlobe} className="metadata-icon" />
             <span className="metadata-label">Protocol</span>
             <Badge color="info" className="metadata-badge">
-              {monitor.protocol}
+              {monitor.protocol || 'HTTP'}
             </Badge>
           </div>
           <div className="metadata-item">
             <FontAwesomeIcon icon={faMapMarkerAlt} className="metadata-icon" />
             <span className="metadata-label">Regions</span>
-            <span className="metadata-value">{monitor.regions.length}</span>
+            <span className="metadata-value">{monitor.regions?.length || 0}</span>
           </div>
           <div className="metadata-item">
             <FontAwesomeIcon icon={faClock} className="metadata-icon" />
             <span className="metadata-label">Interval</span>
-            <span className="metadata-value">{monitor.frequency}s</span>
+            <span className="metadata-value">{monitor.frequency || 60}s</span>
           </div>
           <div className="metadata-item uptime-item">
             <FontAwesomeIcon icon={faChartLine} className="metadata-icon" />
@@ -343,33 +323,17 @@ const MonitorDetail: React.FC = () => {
         <div className="filter-group">
           <label className="filter-label">TIME RANGE</label>
           <div className="time-range-buttons">
-            <Button color={timeRange === '5m' ? 'primary' : 'secondary'} size="sm" outline onClick={() => setTimeRange('5m')}>
-              5m
-            </Button>
-            <Button color={timeRange === '15m' ? 'primary' : 'secondary'} size="sm" outline onClick={() => setTimeRange('15m')}>
-              15m
-            </Button>
-            <Button color={timeRange === '30m' ? 'primary' : 'secondary'} size="sm" outline onClick={() => setTimeRange('30m')}>
-              30m
-            </Button>
-            <Button color={timeRange === '1h' ? 'primary' : 'secondary'} size="sm" outline onClick={() => setTimeRange('1h')}>
-              1h
-            </Button>
-            <Button color={timeRange === '4h' ? 'primary' : 'secondary'} size="sm" outline onClick={() => setTimeRange('4h')}>
-              4h
-            </Button>
-            <Button color={timeRange === '24h' ? 'primary' : 'secondary'} size="sm" outline onClick={() => setTimeRange('24h')}>
-              24h
-            </Button>
-            <Button color={timeRange === '2d' ? 'primary' : 'secondary'} size="sm" outline onClick={() => setTimeRange('2d')}>
-              2d
-            </Button>
-            <Button color={timeRange === '7d' ? 'primary' : 'secondary'} size="sm" outline onClick={() => setTimeRange('7d')}>
-              7d
-            </Button>
-            <Button color={timeRange === '30d' ? 'primary' : 'secondary'} size="sm" outline onClick={() => setTimeRange('30d')}>
-              30d
-            </Button>
+            {['5m', '15m', '30m', '1h', '4h', '24h', '2d', '7d', '30d'].map(range => (
+              <Button
+                key={range}
+                color={timeRange === range ? 'primary' : 'secondary'}
+                size="sm"
+                outline={timeRange !== range}
+                onClick={() => setTimeRange(range)}
+              >
+                {range}
+              </Button>
+            ))}
           </div>
         </div>
 
@@ -402,9 +366,7 @@ const MonitorDetail: React.FC = () => {
             const chartData = prepareChartData(agent.agentName);
             const hasFailures = agent.failedChecks > 0;
             const totalChecks = agent.totalChecks;
-            const changePercent = '+0.1%'; // Mock data
 
-            // Handler for View History button
             const handleViewHistory = () => {
               const agentHistory = timeSeriesData.filter(d => d.agentName === agent.agentName);
               setSelectedAgentHistory(agentHistory);
@@ -415,11 +377,8 @@ const MonitorDetail: React.FC = () => {
             return (
               <Card key={agent.agentName} className="agent-card">
                 <CardBody>
-                  {/* Agent Header - Two Column Layout */}
                   <div className="agent-header">
-                    {/* Left Side: Agent Info + Stats */}
                     <div className="agent-info-section">
-                      {/* Title and Status */}
                       <div className="agent-title-row">
                         <h2 className="agent-name">{agent.agentRegion}</h2>
                         <div className={`status-indicator ${hasFailures ? 'status-down' : 'status-up'}`}>
@@ -430,9 +389,7 @@ const MonitorDetail: React.FC = () => {
                         </Button>
                       </div>
 
-                      {/* Info Tiles Row */}
                       <div className="info-tiles">
-                        {/* Agent Badge Tile */}
                         <div className="info-tile agent-tile">
                           <div className="tile-icon">
                             <FontAwesomeIcon icon={faServer} />
@@ -443,7 +400,6 @@ const MonitorDetail: React.FC = () => {
                           </div>
                         </div>
 
-                        {/* Last Checked Tile */}
                         <div className="info-tile time-tile">
                           <div className="tile-icon">
                             <FontAwesomeIcon icon={faClock} />
@@ -454,7 +410,6 @@ const MonitorDetail: React.FC = () => {
                           </div>
                         </div>
 
-                        {/* Checks Tile */}
                         <div className="info-tile stat-tile">
                           <div className="tile-icon">
                             <FontAwesomeIcon icon={faHeartbeat} />
@@ -465,7 +420,6 @@ const MonitorDetail: React.FC = () => {
                           </div>
                         </div>
 
-                        {/* Availability Tile */}
                         <div className="info-tile stat-tile availability">
                           <div className="tile-icon">
                             <FontAwesomeIcon icon={faCheckCircle} />
@@ -476,7 +430,6 @@ const MonitorDetail: React.FC = () => {
                           </div>
                         </div>
 
-                        {/* P95 Tile */}
                         <div className="info-tile stat-tile p95">
                           <div className="tile-icon">
                             <FontAwesomeIcon icon={faTachometerAlt} />
@@ -487,7 +440,6 @@ const MonitorDetail: React.FC = () => {
                           </div>
                         </div>
 
-                        {/* P99 Tile */}
                         <div className="info-tile stat-tile p99">
                           <div className="tile-icon">
                             <FontAwesomeIcon icon={faTachometerAlt} />
@@ -501,7 +453,6 @@ const MonitorDetail: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Bar Chart */}
                   <div className="agent-chart">
                     <GenericChart
                       type="bar"
@@ -519,7 +470,6 @@ const MonitorDetail: React.FC = () => {
         )}
       </div>
 
-      {/* Monitor History Modal */}
       <MonitorHistoryModal
         isOpen={isHistoryModalOpen}
         onClose={() => setIsHistoryModalOpen(false)}

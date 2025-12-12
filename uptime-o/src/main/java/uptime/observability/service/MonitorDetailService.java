@@ -31,13 +31,14 @@ public class MonitorDetailService {
      * Get detailed monitor information with statistics
      */
     public MonitorDetailDTO getMonitorDetail(Long monitorId) {
-        LOG.debug("Fetching monitor detail for ID: {}", monitorId);
-
         HttpMonitor monitor = httpMonitorRepository.findById(monitorId)
             .orElseThrow(() -> new RuntimeException("Monitor not found with id: " + monitorId));
 
-        // Get all heartbeats for this monitor
+        // Get recent heartbeats only (last 1000 for performance)
         List<HttpHeartbeat> heartbeats = httpHeartbeatRepository.findByMonitorIdOrderByExecutedAtDesc(monitorId);
+        if (heartbeats.size() > 1000) {
+            heartbeats = heartbeats.subList(0, 1000);
+        }
 
         // Calculate statistics
         Long totalChecks = (long) heartbeats.size();
@@ -108,8 +109,6 @@ public class MonitorDetailService {
      * Get agent-wise metrics breakdown for a monitor
      */
     public List<AgentMetricsDTO> getAgentMetrics(Long monitorId, Instant startTime, Instant endTime, String agentRegion) {
-        LOG.debug("Fetching agent metrics for monitor: {}, startTime: {}, endTime: {}, region: {}", 
-            monitorId, startTime, endTime, agentRegion);
 
         // Get heartbeats filtered by time range
         List<HttpHeartbeat> heartbeats = httpHeartbeatRepository
@@ -219,8 +218,6 @@ public class MonitorDetailService {
      * Get time-series data for charts
      */
     public List<TimeSeriesDataDTO> getTimeSeriesData(Long monitorId, Instant startTime, Instant endTime, String agentRegion) {
-        LOG.debug("Fetching time-series data for monitor: {}, startTime: {}, endTime: {}, region: {}", 
-            monitorId, startTime, endTime, agentRegion);
 
         List<HttpHeartbeat> heartbeats = httpHeartbeatRepository
             .findByMonitorIdAndExecutedAtBetweenOrderByExecutedAtDesc(
@@ -239,7 +236,11 @@ public class MonitorDetailService {
                 .collect(Collectors.toList());
         }
 
-        return heartbeats.stream()
+        // Limit to 500 records for performance
+        List<HttpHeartbeat> limitedHeartbeats = heartbeats.size() > 500 ? 
+            heartbeats.subList(0, 500) : heartbeats;
+
+        return limitedHeartbeats.stream()
             .map(h -> {
                 Agent agent = h.getAgent();
                 Region region = agent != null && agent.getDatacenter() != null ? 

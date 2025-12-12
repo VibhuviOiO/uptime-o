@@ -6,7 +6,7 @@ import ErrorBoundaryRoutes from 'app/shared/error/error-boundary-routes';
 import HttpMonitor from './http-monitor';
 
 import HttpHeartbeat from './http-heartbeat';
-import HttpHeartbeatAggregated from './http-heartbeat/http-heartbeat-aggregated';
+
 import HttpMetrics from './http-metrics/http-metrics';
 import HttpMetricsModern from './http-metrics/http-metrics-modern';
 import HttpMetricsProfessional from './http-metrics/http-metrics-professional';
@@ -25,7 +25,7 @@ export default () => {
         <Route path="http-monitor/*" element={<HttpMonitor />} />
 
         <Route path="http-heartbeats/*" element={<HttpHeartbeat />} />
-        <Route path="http-heartbeat-aggregated" element={<HttpHeartbeatAggregated />} />
+
         <Route path="http-metrics" element={<HttpMetricsProfessional />} />
         <Route path="http-metrics-modern" element={<HttpMetricsModern />} />
         <Route path="http-metrics-classic" element={<HttpMetrics />} />

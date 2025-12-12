@@ -2,7 +2,16 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Input, Row, Col, Table, Card, CardBody } from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch, faSync, faFilter, faChartLine, faServer, faClock } from '@fortawesome/free-solid-svg-icons';
+import {
+  faSearch,
+  faSync,
+  faFilter,
+  faChartLine,
+  faServer,
+  faClock,
+  faCheckCircle,
+  faTimesCircle,
+} from '@fortawesome/free-solid-svg-icons';
 import { HttpMetricsService } from './http-metrics.service';
 import { HttpMetricsDTO } from './http-metrics.model';
 import './http-metrics-professional.scss';
@@ -17,12 +26,12 @@ export const HttpMetricsProfessional = () => {
 
   useEffect(() => {
     fetchMetrics();
-  }, []);
+  }, [timeRange]);
 
   const fetchMetrics = async () => {
     setLoading(true);
     try {
-      const data = await HttpMetricsService.getAggregatedMetrics();
+      const data = await HttpMetricsService.getAggregatedMetrics(timeRange);
       setMetrics(data);
     } catch (error) {
       console.error('Error fetching metrics:', error);
@@ -72,151 +81,128 @@ export const HttpMetricsProfessional = () => {
         <div className="header-content">
           <h1 className="page-title">
             <FontAwesomeIcon icon={faChartLine} className="title-icon" />
-            HTTP Service Monitoring
+            API Monitoring
           </h1>
-          <p className="page-description">Monitor the health and performance of your HTTP services in real-time</p>
         </div>
         <div className="header-actions">
-          <Button color="primary" size="sm" onClick={fetchMetrics} disabled={loading} className="refresh-button">
-            <FontAwesomeIcon icon={faSync} spin={loading} /> Refresh Data
+          <Button color="secondary" outline size="sm" onClick={fetchMetrics} disabled={loading} className="refresh-button">
+            <FontAwesomeIcon icon={faSync} spin={loading} />
           </Button>
         </div>
       </div>
 
-      {/* Statistics Overview */}
-      <Row className="stats-section">
-        <Col md="3">
-          <Card className="stat-card stat-up">
-            <CardBody>
-              <div className="stat-content">
-                <div className="stat-icon">
-                  <FontAwesomeIcon icon={faServer} />
-                </div>
-                <div className="stat-details">
-                  <div className="stat-number">{stats.upCount}</div>
-                  <div className="stat-label">Services Online</div>
-                </div>
-              </div>
-            </CardBody>
-          </Card>
-        </Col>
-        <Col md="3">
-          <Card className="stat-card stat-down">
-            <CardBody>
-              <div className="stat-content">
-                <div className="stat-icon">
-                  <FontAwesomeIcon icon={faServer} />
-                </div>
-                <div className="stat-details">
-                  <div className="stat-number">{stats.downCount}</div>
-                  <div className="stat-label">Services Offline</div>
-                </div>
-              </div>
-            </CardBody>
-          </Card>
-        </Col>
-        <Col md="3">
-          <Card className="stat-card stat-latency">
-            <CardBody>
-              <div className="stat-content">
-                <div className="stat-icon">
-                  <FontAwesomeIcon icon={faClock} />
-                </div>
-                <div className="stat-details">
-                  <div className="stat-number">{formatLatency(stats.avgLatency)}</div>
-                  <div className="stat-label">Avg Response Time</div>
-                </div>
-              </div>
-            </CardBody>
-          </Card>
-        </Col>
-        <Col md="3">
-          <Card className="stat-card stat-total">
-            <CardBody>
-              <div className="stat-content">
-                <div className="stat-icon">
-                  <FontAwesomeIcon icon={faChartLine} />
-                </div>
-                <div className="stat-details">
-                  <div className="stat-number">{stats.totalCount}</div>
-                  <div className="stat-label">Total Services</div>
-                </div>
-              </div>
-            </CardBody>
-          </Card>
-        </Col>
-      </Row>
+      {/* Filters Section - Full Width Layout */}
+      <div className="filters-section mb-4">
+        <div className="filters-container">
+          <div className="filter-group search-group">
+            <Input
+              type="text"
+              placeholder="Search services..."
+              value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
+              className="search-input"
+            />
+          </div>
 
-      {/* Filters Section */}
-      <Card className="filters-card">
-        <CardBody>
-          <Row className="align-items-end">
-            <Col md="4">
-              <div className="form-group">
-                <label className="form-label">Search Services</label>
-                <div className="input-group">
-                  <span className="input-group-text">
-                    <FontAwesomeIcon icon={faSearch} />
-                  </span>
-                  <Input
-                    type="text"
-                    placeholder="Enter service name..."
-                    value={searchTerm}
-                    onChange={e => setSearchTerm(e.target.value)}
-                    className="form-control"
-                  />
-                </div>
-              </div>
-            </Col>
-            <Col md="3">
-              <div className="form-group">
-                <label className="form-label">Region</label>
-                <Input type="select" value={selectedRegion} onChange={e => setSelectedRegion(e.target.value)}>
-                  <option value="">All Regions</option>
-                  {regions.map(region => (
-                    <option key={region} value={region}>
-                      {region}
-                    </option>
-                  ))}
-                </Input>
-              </div>
-            </Col>
-            <Col md="3">
-              <div className="form-group">
-                <label className="form-label">Time Range</label>
-                <Input type="select" value={timeRange} onChange={e => setTimeRange(e.target.value)}>
-                  <option value="1h">Last Hour</option>
-                  <option value="6h">Last 6 Hours</option>
-                  <option value="24h">Last 24 Hours</option>
-                  <option value="7d">Last 7 Days</option>
-                </Input>
-              </div>
-            </Col>
-            <Col md="2">
+          <div className="filter-group region-group">
+            <Input
+              type="select"
+              value={selectedRegion}
+              onChange={e => setSelectedRegion(e.target.value)}
+              className="region-select"
+              bsSize="sm"
+            >
+              <option value="">All Regions</option>
+              {regions.map(region => (
+                <option key={region} value={region}>
+                  {region}
+                </option>
+              ))}
+            </Input>
+          </div>
+
+          <div className="filter-group time-range-group">
+            <div className="time-range-buttons">
+              <Button
+                color={timeRange === '1h' ? 'primary' : 'secondary'}
+                size="sm"
+                outline={timeRange !== '1h'}
+                onClick={() => setTimeRange('1h')}
+              >
+                1h
+              </Button>
+              <Button
+                color={timeRange === '6h' ? 'primary' : 'secondary'}
+                size="sm"
+                outline={timeRange !== '6h'}
+                onClick={() => setTimeRange('6h')}
+              >
+                6h
+              </Button>
+              <Button
+                color={timeRange === '24h' ? 'primary' : 'secondary'}
+                size="sm"
+                outline={timeRange !== '24h'}
+                onClick={() => setTimeRange('24h')}
+              >
+                24h
+              </Button>
+              <Button
+                color={timeRange === '7d' ? 'primary' : 'secondary'}
+                size="sm"
+                outline={timeRange !== '7d'}
+                onClick={() => setTimeRange('7d')}
+              >
+                7d
+              </Button>
+            </div>
+          </div>
+
+          <div className="filter-group actions-group">
+            <div className="action-buttons">
+              <Button color="primary" size="sm" onClick={fetchMetrics} className="action-btn">
+                <FontAwesomeIcon icon={faSearch} /> Search
+              </Button>
               <Button
                 color="secondary"
                 outline
+                size="sm"
                 onClick={() => {
                   setSearchTerm('');
                   setSelectedRegion('');
                   setTimeRange('1h');
                 }}
+                className="action-btn"
               >
                 <FontAwesomeIcon icon={faFilter} /> Clear
               </Button>
-            </Col>
-          </Row>
-        </CardBody>
-      </Card>
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* Services Table */}
       <Card className="services-table-card">
-        <CardBody>
-          <div className="table-header">
-            <h5 className="table-title">Service Status Overview</h5>
-            <small className="table-subtitle">
-              Showing {filteredMetrics.length} of {metrics.length} services
-            </small>
+        <CardBody className="p-3">
+          <div className="table-header mb-3">
+            <h6 className="table-title mb-0">Service Status Overview</h6>
+            <div className="header-stats">
+              <div className="stat-tile-small online">
+                <FontAwesomeIcon icon={faCheckCircle} className="stat-icon" />
+                <span className="stat-value">{stats.upCount}</span>
+                <span className="stat-label">Online</span>
+              </div>
+              <div className="stat-tile-small offline">
+                <FontAwesomeIcon icon={faTimesCircle} className="stat-icon" />
+                <span className="stat-value">{stats.downCount}</span>
+                <span className="stat-label">Offline</span>
+              </div>
+              <div className="stat-tile-small total">
+                <FontAwesomeIcon icon={faChartLine} className="stat-icon" />
+                <span className="stat-value">{stats.totalCount}</span>
+                <span className="stat-label">Total</span>
+              </div>
+            </div>
           </div>
 
           {loading ? (
@@ -232,17 +218,17 @@ export const HttpMetricsProfessional = () => {
             </div>
           ) : (
             <div className="table-responsive">
-              <Table className="services-table" hover>
-                <thead>
+              <Table className="services-table table-sm" hover>
+                <thead className="table-light">
                   <tr>
-                    <th>Service Name</th>
-                    <th>Status</th>
-                    <th>Region</th>
-                    <th>Datacenter</th>
-                    <th>Response Time</th>
-                    <th>Agents</th>
-                    <th>Last Checked</th>
-                    <th>Actions</th>
+                    <th className="small">Service Name</th>
+                    <th className="small">Status</th>
+                    <th className="small">Region</th>
+                    <th className="small">Datacenter</th>
+                    <th className="small">Response Time</th>
+                    <th className="small">Agents</th>
+                    <th className="small">Last Checked</th>
+                    <th className="small">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -251,33 +237,41 @@ export const HttpMetricsProfessional = () => {
                     return (
                       <tr key={metric.monitorId} className="service-row">
                         <td>
-                          <div className="service-name-cell">
-                            <strong>{metric.monitorName}</strong>
-                            <small className="service-type">HTTP Monitor</small>
+                          <div>
+                            <div className="fw-bold small">{metric.monitorName}</div>
+                            <small className="text-muted">HTTP Monitor</small>
                           </div>
                         </td>
                         <td>
-                          <span className={`status-badge ${status.class}`}>{status.text}</span>
-                        </td>
-                        <td>{metric.regionName || '-'}</td>
-                        <td>{metric.datacenterName || '-'}</td>
-                        <td>
-                          <span className="latency-value">{formatLatency(metric.lastLatencyMs)}</span>
-                        </td>
-                        <td>
-                          <span className="agent-count">{metric.agentCount}</span>
+                          <span
+                            className={`badge ${status.class === 'status-up' ? 'bg-success' : status.class === 'status-down' ? 'bg-danger' : 'bg-warning'}`}
+                          >
+                            {status.text}
+                          </span>
                         </td>
                         <td>
-                          <small className="last-checked">{formatLastChecked(metric.lastCheckedTime)}</small>
+                          <small>{metric.regionName || '-'}</small>
+                        </td>
+                        <td>
+                          <small>{metric.datacenterName || '-'}</small>
+                        </td>
+                        <td>
+                          <span className="small fw-bold">{formatLatency(metric.lastLatencyMs)}</span>
+                        </td>
+                        <td>
+                          <span className="badge bg-secondary">{metric.agentCount}</span>
+                        </td>
+                        <td>
+                          <small className="text-muted">{formatLastChecked(metric.lastCheckedTime)}</small>
                         </td>
                         <td>
                           <Button
                             color="link"
                             size="sm"
                             onClick={() => navigate(`/http-monitor-detail/${metric.monitorId}`)}
-                            className="view-details-btn"
+                            className="p-1 small"
                           >
-                            View Details
+                            Details
                           </Button>
                         </td>
                       </tr>

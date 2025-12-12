@@ -38,31 +38,23 @@ public class HttpMetricsService {
         String datacenterName,
         String agentName
     ) {
-        LOG.debug("Fetching aggregated HTTP metrics with filters - search: {}, region: {}, datacenter: {}, agent: {}",
-            searchName, regionName, datacenterName, agentName);
-
-        try {
-            List<Object[]> results = httpHeartbeatRepository.findAggregatedMetrics(
-                searchName, regionName, datacenterName, agentName
-            );
-            
-            return results.stream()
-                .map(row -> new HttpMetricsDTO(
-                    ((Number) row[0]).longValue(),  // monitor_id
-                    (String) row[1],                 // monitor_name
-                    (Boolean) row[2],                // last_success
-                    ((Number) row[8]).intValue(),    // agent_count
-                    (String) row[5],                 // region_name
-                    (String) row[6],                 // datacenter_name
-                    (String) row[7],                 // agent_name
-                    row[4] != null ? ((java.sql.Timestamp) row[4]).toInstant() : null, // last_checked_time
-                    row[3] != null ? ((Number) row[3]).intValue() : 0  // last_latency_ms
-                ))
-                .collect(Collectors.<HttpMetricsDTO>toList());
-        } catch (Exception e) {
-            LOG.error("Exception in getAggregatedMetrics() with cause = '{}' and exception = '{}'", e.getCause(), e.getMessage(), e);
-            throw e;
-        }
+        List<Object[]> results = httpHeartbeatRepository.findAggregatedMetrics(
+            searchName, regionName, datacenterName, agentName
+        );
+        
+        return results.stream()
+            .map(row -> new HttpMetricsDTO(
+                ((Number) row[0]).longValue(),  // monitor_id
+                (String) row[1],                 // monitor_name
+                (Boolean) row[2],                // last_success
+                ((Number) row[8]).intValue(),    // agent_count
+                (String) row[5],                 // region_name
+                (String) row[6],                 // datacenter_name
+                (String) row[7],                 // agent_name
+                row[4] != null ? ((java.sql.Timestamp) row[4]).toInstant() : null, // last_checked_time
+                row[3] != null ? ((Number) row[3]).intValue() : 0  // last_latency_ms
+            ))
+            .collect(Collectors.<HttpMetricsDTO>toList());
     }
 
 }

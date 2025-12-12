@@ -32,6 +32,8 @@ public interface HttpHeartbeatRepository extends JpaRepository<HttpHeartbeat, Lo
     @Query("SELECT COUNT(DISTINCT h.agent.id) FROM HttpHeartbeat h WHERE h.monitor.id = :monitorId")
     Integer countDistinctAgentsByMonitorId(Long monitorId);
 
+
+
     @Query(value = """
         WITH latest_heartbeats AS (
           SELECT 

@@ -28,6 +28,7 @@
     <include file="config/liquibase/changelog/20251114000003_added_entity_PingHeartbeat.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20251215000001_add_additional_urls_to_http_monitor.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20251211000001_add_calls_per_interval_to_api_monitors.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20251212000001_add_indexes_api_heartbeats.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-changelog - JHipster will add liquibase changelogs here -->
     <include file="config/liquibase/changelog/20251025202837_added_entity_constraints_HttpMonitor.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20251025202839_added_entity_constraints_Datacenter.xml" relativeToChangelogFile="false"/>

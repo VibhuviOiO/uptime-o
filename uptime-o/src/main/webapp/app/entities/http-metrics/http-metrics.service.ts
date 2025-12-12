@@ -23,23 +23,50 @@ export interface PaginatedResponse<T> {
 export class HttpMetricsService {
   private static readonly API_URL = '/api/http-metrics';
 
-  // Use existing method signature
+  // Use existing method signature with timeRange support
   static async getAggregatedMetrics(
+    timeRange?: string,
     searchName?: string,
     regionName?: string,
     datacenterName?: string,
     agentName?: string,
   ): Promise<HttpMetricsDTO[]> {
-    const response = await axios.get(`${this.API_URL}/paginated`, {
-      params: {
-        search: searchName,
-        region: regionName,
-        datacenter: datacenterName,
-        agent: agentName,
-        page: 0,
-        size: 1000,
-      },
-    });
+    const params: any = {
+      search: searchName,
+      region: regionName,
+      datacenter: datacenterName,
+      agent: agentName,
+      page: 0,
+      size: 1000,
+    };
+
+    // Convert timeRange to startTime/endTime
+    if (timeRange) {
+      const now = new Date();
+      let startTime: Date;
+
+      switch (timeRange) {
+        case '1h':
+          startTime = new Date(now.getTime() - 60 * 60 * 1000);
+          break;
+        case '6h':
+          startTime = new Date(now.getTime() - 6 * 60 * 60 * 1000);
+          break;
+        case '24h':
+          startTime = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+          break;
+        case '7d':
+          startTime = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+          break;
+        default:
+          startTime = new Date(now.getTime() - 60 * 60 * 1000); // Default to 1h
+      }
+
+      params.startTime = startTime.toISOString();
+      params.endTime = now.toISOString();
+    }
+
+    const response = await axios.get(`${this.API_URL}/paginated`, { params });
     return response.data.content || response.data;
   }
 
