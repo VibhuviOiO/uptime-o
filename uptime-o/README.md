@@ -259,7 +259,7 @@ docker run -d \
   --name agent-va \
   --network host \
   -e AGENT_ID="1151" \
-  -e API_BASE_URL="http://host.docker.internal:8080" \
+  -e API_BASE_URL="https://host.docker.internal:8080" \
   -e QUEUE_PATH="/data/queue" \
   -e CONFIG_RELOAD_INTERVAL="1m" \
   -e API_KEY="uptimeo_WRoiXfzcc8XIyEnIHh4dpbtL6susRo00W4JfsmDUMEc" \
@@ -271,7 +271,7 @@ docker run -d \
   --name agent-sf \
   --network host \
   -e AGENT_ID="1651" \
-  -e API_BASE_URL="http://host.docker.internal:8080" \
+  -e API_BASE_URL="https://host.docker.internal:8080" \
   -e QUEUE_PATH="/data/queue" \
   -e CONFIG_RELOAD_INTERVAL="1m" \
   -e API_KEY="uptimeo_WRoiXfzcc8XIyEnIHh4dpbtL6susRo00W4JfsmDUMEc" \

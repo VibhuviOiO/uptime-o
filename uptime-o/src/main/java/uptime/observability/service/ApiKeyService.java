@@ -141,7 +141,7 @@ public class ApiKeyService {
                 return false;
             }
             
-            ApiKey apiKey = apiKeyOpt.get();
+            ApiKey apiKey = apiKeyOpt.orElseThrow();
             
             if (!apiKey.isActive()) {
                 log.debug("API Key {} is inactive", apiKey.getId());

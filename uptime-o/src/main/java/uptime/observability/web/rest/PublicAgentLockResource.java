@@ -41,7 +41,7 @@ public class PublicAgentLockResource {
         Instant now = Instant.now();
 
         if (existingLock.isPresent()) {
-            AgentLock lock = existingLock.get();
+            AgentLock lock = existingLock.orElseThrow();
             // Check if lock is expired
             if (lock.getExpiresAt().isAfter(now)) {
                 LOG.debug("Lock for agent {} is held by another instance", id);
