@@ -113,7 +113,7 @@ func (c *Client) retryWithBackoff(operation func() error, maxRetries int, operat
 
 // GetMonitors fetches monitors assigned to the agent with retry logic
 func (c *Client) GetMonitors(agentID int) ([]models.Monitor, []models.Schedule, error) {
-	url := fmt.Sprintf("%s/api/public/monitors?agentId=%d", c.BaseURL, agentID)
+	url := fmt.Sprintf("%s/api/agent/monitors?agentId=%d", c.BaseURL, agentID)
 
 	var apiMonitors []MonitorResponse
 
@@ -217,7 +217,7 @@ func (c *Client) GetMonitors(agentID int) ([]models.Monitor, []models.Schedule, 
 
 // SubmitHeartbeat submits a single heartbeat to the API with retry logic
 func (c *Client) SubmitHeartbeat(hb *models.Heartbeat) error {
-	url := fmt.Sprintf("%s/api/public/heartbeats", c.BaseURL)
+	url := fmt.Sprintf("%s/api/agent/heartbeats", c.BaseURL)
 
 	// Convert heartbeat to request format
 	req := c.convertHeartbeatToRequest(hb)
@@ -256,7 +256,7 @@ func (c *Client) SubmitHeartbeat(hb *models.Heartbeat) error {
 
 // AcquireLock tries to acquire leadership lock via API
 func (c *Client) AcquireLock(agentID int) (bool, error) {
-	url := fmt.Sprintf("%s/api/public/agents/%d/lock", c.BaseURL, agentID)
+	url := fmt.Sprintf("%s/api/agent/lock?agentId=%d", c.BaseURL, agentID)
 
 	req, err := http.NewRequest("POST", url, nil)
 	if err != nil {
@@ -283,7 +283,7 @@ func (c *Client) AcquireLock(agentID int) (bool, error) {
 
 // ReleaseLock releases the leadership lock via API
 func (c *Client) ReleaseLock(agentID int) error {
-	url := fmt.Sprintf("%s/api/public/agents/%d/lock", c.BaseURL, agentID)
+	url := fmt.Sprintf("%s/api/agent/lock?agentId=%d", c.BaseURL, agentID)
 
 	req, err := http.NewRequest("DELETE", url, nil)
 	if err != nil {
@@ -312,7 +312,7 @@ func (c *Client) SubmitHeartbeatBatch(heartbeats []*models.Heartbeat) error {
 		return nil
 	}
 
-	url := fmt.Sprintf("%s/api/public/heartbeats/batch", c.BaseURL)
+	url := fmt.Sprintf("%s/api/agent/heartbeats/batch", c.BaseURL)
 
 	// Convert heartbeats to request format
 	requests := make([]HeartbeatRequest, len(heartbeats))

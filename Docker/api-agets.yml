@@ -4,8 +4,6 @@ services:
     container_name: agent-va
     volumes:
     - ./tmp/data/agent-va:/data
-    env_file:
-    - ./.env
     environment:
       AGENT_ID: "1152" # create agent and update the values here
       API_BASE_URL: "http://uptimeo-app:8080"
@@ -24,8 +22,6 @@ services:
   agent-sf:
     image: uptimeo-api-agent:latest
     container_name: agent-sf
-    env_file:
-    - ./.env
     volumes:
     - ./tmp/data/agent-sf:/data
     environment:

@@ -24,6 +24,11 @@ type APIHeartbeatCollector struct {
 	queueMutex     sync.Mutex
 	maxQueueSize   int
 	queueFilePath  string
+	// Batch processing
+	batchQueue     []*models.Heartbeat
+	batchMutex     sync.Mutex
+	batchSize      int
+	batchTimeout   time.Duration
 }
 
 func NewAPIHeartbeatCollector(ctx context.Context, agent models.Agent, cfg *models.Config, apiClient *api.Client) *APIHeartbeatCollector {
@@ -59,6 +64,10 @@ func NewAPIHeartbeatCollector(ctx context.Context, agent models.Agent, cfg *mode
 		heartbeatQueue: make([]*models.Heartbeat, 0),
 		maxQueueSize:   1000, // Store up to 1000 heartbeats when API is down
 		queueFilePath:  queuePath,
+		// Batch processing
+		batchQueue:   make([]*models.Heartbeat, 0),
+		batchSize:    50,                    // Max heartbeats per batch
+		batchTimeout: 5 * time.Second,       // Max wait time before sending batch
 	}
 
 	// Load existing queue from disk if available
@@ -66,8 +75,9 @@ func NewAPIHeartbeatCollector(ctx context.Context, agent models.Agent, cfg *mode
 		collector.loadQueueFromDisk()
 	}
 
-	// Start background queue flusher
+	// Start background processors
 	go collector.queueFlusher()
+	go collector.batchProcessor()
 
 	return collector
 }
@@ -199,12 +209,73 @@ func (c *APIHeartbeatCollector) queueHeartbeat(hb *models.Heartbeat) {
 	c.saveQueueToDisk()
 }
 
-// submitHeartbeatWithFallback tries to submit immediately, falls back to queueing if it fails
-func (c *APIHeartbeatCollector) submitHeartbeatWithFallback(hb *models.Heartbeat) {
-	if err := c.APIClient.SubmitHeartbeat(hb); err != nil {
-		logrus.Warnf("Failed to submit heartbeat for monitor %d: %v. Queuing for later.", hb.MonitorID, err)
-		c.queueHeartbeat(hb)
+// batchProcessor handles batch submission of heartbeats
+func (c *APIHeartbeatCollector) batchProcessor() {
+	defer func() {
+		if r := recover(); r != nil {
+			logrus.Errorf("Panic in batch processor: %v", r)
+		}
+	}()
+
+	ticker := time.NewTicker(c.batchTimeout)
+	defer ticker.Stop()
+
+	for {
+		select {
+		case <-ticker.C:
+			c.flushBatch()
+		case <-c.Ctx.Done():
+			// Flush remaining batch before exiting
+			c.flushBatch()
+			return
+		}
 	}
+}
+
+// flushBatch sends all batched heartbeats
+func (c *APIHeartbeatCollector) flushBatch() {
+	c.batchMutex.Lock()
+	if len(c.batchQueue) == 0 {
+		c.batchMutex.Unlock()
+		return
+	}
+
+	// Take a copy of the batch
+	heartbeats := make([]*models.Heartbeat, len(c.batchQueue))
+	copy(heartbeats, c.batchQueue)
+	batchSize := len(heartbeats)
+	c.batchQueue = make([]*models.Heartbeat, 0) // Clear batch
+	c.batchMutex.Unlock()
+
+	// Try to submit batch
+	if err := c.APIClient.SubmitHeartbeatBatch(heartbeats); err != nil {
+		logrus.Warnf("Failed to submit heartbeat batch (%d items): %v. Queuing for later.", batchSize, err)
+		// Add failed batch to persistent queue
+		for _, hb := range heartbeats {
+			c.queueHeartbeat(hb)
+		}
+		return
+	}
+
+	logrus.Debugf("Successfully submitted batch of %d heartbeats", batchSize)
+}
+
+// addToBatch adds a heartbeat to the batch queue
+func (c *APIHeartbeatCollector) addToBatch(hb *models.Heartbeat) {
+	c.batchMutex.Lock()
+	c.batchQueue = append(c.batchQueue, hb)
+	batchSize := len(c.batchQueue)
+	c.batchMutex.Unlock()
+
+	// If batch is full, flush immediately
+	if batchSize >= c.batchSize {
+		c.flushBatch()
+	}
+}
+
+// submitHeartbeatWithFallback adds heartbeat to batch for efficient submission
+func (c *APIHeartbeatCollector) submitHeartbeatWithFallback(hb *models.Heartbeat) {
+	c.addToBatch(hb)
 }
 
 func (c *APIHeartbeatCollector) Start() {
