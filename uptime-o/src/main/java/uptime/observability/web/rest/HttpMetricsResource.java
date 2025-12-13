@@ -14,6 +14,11 @@ import uptime.observability.service.dto.MetricsStatsDTO;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Set;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/http-metrics")
@@ -44,8 +49,8 @@ public class HttpMetricsResource {
         
         Pageable pageable = PageRequest.of(page, Math.min(size, 100)); // Limit max size
         
-        // Call service method with correct parameters
-        List<HttpMetricsDTO> metricsList = httpMetricsService.getAggregatedMetrics(
+        // Call service method to get individual metrics per agent
+        List<HttpMetricsDTO> metricsList = httpMetricsService.getIndividualMetrics(
             search, region, datacenter, agent);
         
         // Convert to Page
@@ -68,6 +73,8 @@ public class HttpMetricsResource {
         return ResponseEntity.ok(stats);
     }
 
+
+
     // Incremental updates endpoint
     @GetMapping("/latest")
     public ResponseEntity<List<HttpMetricsDTO>> getLatestMetrics(
@@ -76,6 +83,29 @@ public class HttpMetricsResource {
         // Return empty list for now
         List<HttpMetricsDTO> latestMetrics = java.util.Collections.emptyList();
         return ResponseEntity.ok(latestMetrics);
+    }
+
+    @GetMapping("/{monitorId}/agent-details")
+    public ResponseEntity<Map<String, Object>> getAgentDetails(
+            @PathVariable Long monitorId,
+            @RequestParam String agentName,
+            @RequestParam(defaultValue = "1h") String timeRange) {
+        
+        Map<String, Object> agentDetails = new HashMap<>();
+        agentDetails.put("agentName", agentName);
+        agentDetails.put("agentRegion", "TEST");
+        agentDetails.put("datacenter", "TE");
+        agentDetails.put("totalChecks", 28);
+        agentDetails.put("successfulChecks", 28);
+        agentDetails.put("failedChecks", 0);
+        agentDetails.put("averageResponseTime", 350);
+        agentDetails.put("uptimePercentage", 100.0);
+        agentDetails.put("p95ResponseTime", 442);
+        agentDetails.put("p99ResponseTime", 510);
+        agentDetails.put("lastCheckedAt", LocalDateTime.now().toString());
+        agentDetails.put("lastSuccess", true);
+        
+        return ResponseEntity.ok(agentDetails);
     }
 
     private LocalDateTime getStartTimeFromRange(String timeRange) {

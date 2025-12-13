@@ -16,7 +16,7 @@ public class WebsiteProperties {
     private String keywords = "uptime,monitoring,observability,http,heartbeat";
     private String author = "UptimeO Team";
     private String faviconPath = "/content/images/favicon.ico";
-    private String logoPath = "/content/images/logo-jhipster.png";
+    private String logoPath = "/content/images/logo.png";
     private Integer logoWidth = 200;
     private Integer logoHeight = 50;
     private String footerTitle = "Powered by UptimeO";

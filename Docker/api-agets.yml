@@ -7,10 +7,11 @@ services:
     env_file:
     - ./.env
     environment:
-      AGENT_ID: "1151" # create agent and update the values here
+      AGENT_ID: "1152" # create agent and update the values here
       API_BASE_URL: "http://uptimeo-app:8080"
       QUEUE_PATH: "/data/queue"
       CONFIG_RELOAD_INTERVAL: "1m"
+      API_KEY: uptimeo_aHKcTtcY14FVEtl5U5T3uuuiw9KeVwnZSnLJpX2lgig
     restart: unless-stopped
     healthcheck:
       test: [ "CMD-SHELL", "pgrep agent || exit 1" ]
@@ -28,10 +29,11 @@ services:
     volumes:
     - ./tmp/data/agent-sf:/data
     environment:
-      AGENT_ID: "1801" # create agent and update the values here
+      AGENT_ID: "1151" # create agent and update the values here
       API_BASE_URL: "http://uptimeo-app:8080"
       QUEUE_PATH: "/data/queue"
       CONFIG_RELOAD_INTERVAL: "1m"
+      API_KEY: uptimeo_aHKcTtcY14FVEtl5U5T3uuuiw9KeVwnZSnLJpX2lgig
     restart: unless-stopped
     healthcheck:
       test: [ "CMD-SHELL", "pgrep agent || exit 1" ]

@@ -1,0 +1,81 @@
+services:
+  uptimeo-status:
+    image: ghcr.io/vibhuvioio/uptimeo-statuspage:latest
+    container_name: uptimeo-status
+    environment:
+      # Database Configuration
+      DB_CONN_STRING: postgres://uptimeo:uptimeo@postgres:5432/uptimeo?sslmode=disable
+      
+      # Server Configuration
+      PORT: 8077
+      CORS_ORIGIN: ""
+      
+      # Branding
+      NAVBAR_TITLE: "Vibhuvi OiO"
+      STATUS_PAGE_TITLE: "Vibhuvi OiO Health Status"
+      STATUS_PAGE_SUBTITLE: "Real-time monitoring dashboard for Vibhuvi OiO services"
+      LOGO_URL: "https://jinnabalu.com/assets/img/logo.png"
+      LOGO_DISPLAY_MODE: "both"
+      FAVICON_URL: "https://jinnabalu.com/assets/img/logo.png"
+      FOOTER_TEXT: "Powered by Algonomy"
+      
+      # Theme Colors
+      NAVBAR_BG_COLOR: "#ffffff"
+      NAVBAR_TEXT_COLOR: "#202124"
+      FOOTER_BG_COLOR: "#ffffff"
+      FOOTER_TEXT_COLOR: "#5f6368"
+      PAGE_BG_COLOR: "#f5f5f5"
+      
+      # SEO Meta Tags
+      META_DESCRIPTION: "Real-time service status monitoring"
+      META_KEYWORDS: "uptime, status, monitoring"
+      META_AUTHOR: ""
+      
+      # Navigation Links
+      NAVBAR_LINK_TEXT: "Console"
+      NAVBAR_LINK_URL: "https://console.vibhuvioio.com"
+      
+      # Company Information
+      COMPANY_NAME: "Vibhuvi OiO"
+      COMPANY_WEBSITE: "https://www.vibhuvioio.com"
+      SUPPORT_EMAIL: "hello@vibhuvioio.com"
+      
+      # Success Rate Thresholds
+      STATUS_SAMPLE_SIZE: 20
+      SUCCESS_THRESHOLD_HIGH: 0.8
+      SUCCESS_THRESHOLD_LOW: 0.6
+      
+      # UI View Behavior
+      SHOW_LATENCY_INDICATORS: true
+      
+      # Status Indicators
+      INDICATOR_SUCCESS_ENABLED: true
+      INDICATOR_SUCCESS_LABEL: "Available"
+      INDICATOR_SUCCESS_COLOR: "#34a853"
+      
+      INDICATOR_WARN_ENABLED: true
+      INDICATOR_WARN_LABEL: "Elevated latency"
+      INDICATOR_WARN_THRESHOLD: 300
+      INDICATOR_WARN_COLOR: "#fbbc04"
+      
+      INDICATOR_DANGER_ENABLED: false
+      INDICATOR_DANGER_LABEL: "High latency"
+      INDICATOR_DANGER_THRESHOLD: 400
+      INDICATOR_DANGER_COLOR: "#ff6d00"
+      
+      INDICATOR_DOWN_ENABLED: true
+      INDICATOR_DOWN_LABEL: "Service disruption"
+      INDICATOR_DOWN_COLOR: "#ea4335"
+      
+      # Indicator Display Order
+      INDICATOR_ORDER: "SUCCESS,WARN,DANGER,DOWN"
+    ports:
+      - "8077:8077"
+    restart: unless-stopped
+    networks:
+      - uptimeo
+
+networks:
+  uptimeo:
+    name: uptimeo
+    external: true

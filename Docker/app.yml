@@ -2,13 +2,30 @@ services:
   uptimeo-app:
     image: uptimeo:latest
     container_name: uptimeo-app
-    env_file:
-    - ./.env
+    volumes:
+    - ./tmp/logs:/logs
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/uptimeo
       SPRING_DATASOURCE_USERNAME: uptimeo
       SPRING_DATASOURCE_PASSWORD: uptimeo
-      SPRING_PROFILES_ACTIVE: prod
+      SPRING_PROFILES_ACTIVE: prod,api-docs
+      WEBSITE_TITLE: "RR Uptime"
+      WEBSITE_DESCRIPTION: "Uptime Monitoring and Observability Platform"
+      WEBSITE_KEYWORDS: "uptime,monitoring,observability,http,heartbeat"
+      WEBSITE_AUTHOR: "UptimeO Team"
+      WEBSITE_FAVICONPATH: "/content/images/favicon.ico"
+      WEBSITE_LOGOPATH: "/content/images/logo.png"
+      WEBSITE_LOGOWIDTH: 50
+      WEBSITE_LOGOHEIGHT: 30
+      WEBSITE_FOOTERTITLE: "Powered by Algonomy"
+      LOGGING_LEVEL_ROOT: INFO
+      LOGGING_FILE_MAX_SIZE: 100MB
+      LOGGING_FILE_MAX_HISTORY: 30
+      LOGGING_FILE_NAME: /var/log/uptimeo/application.log
+      JAVA_OPTS: -Xms1024m -Xmx2048m -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp/heap_dump.hprof
+      SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE: 20
+      SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE: 5
+      SPRING_LIQUIBASE_ENABLED: true
     ports:
     - "8080:8080"
     restart: unless-stopped

@@ -232,6 +232,9 @@ application:
       # Website branding configuration - can be overridden via environment variables
 website:
   title: ${WEBSITE_TITLE:UptimeO}
+  description: ${WEBSITE_DESCRIPTION:Uptime Monitoring and Observability Platform}
+  keywords: ${WEBSITE_KEYWORDS:uptime,monitoring,observability,http,heartbeat}
+  author: ${WEBSITE_AUTHOR:UptimeO Team}
   headerData: ${WEBSITE_HEADERDATA:}
   faviconPath: ${WEBSITE_FAVICONPATH:/content/images/favicon.ico}
   logoPath: ${WEBSITE_LOGOPATH:/content/images/logo.png}

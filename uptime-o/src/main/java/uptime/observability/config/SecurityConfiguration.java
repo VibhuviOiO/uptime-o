@@ -76,10 +76,10 @@ public class SecurityConfiguration {
                     .requestMatchers(mvc.pattern("/api/activate")).permitAll()
                     .requestMatchers(mvc.pattern("/api/account/reset-password/init")).permitAll()
                     .requestMatchers(mvc.pattern("/api/account/reset-password/finish")).permitAll()
+                    .requestMatchers(mvc.pattern("/api/website-settings")).permitAll()
 
-
-                    .requestMatchers(mvc.pattern("/api/http-metrics/**")).permitAll()
-                    .requestMatchers(mvc.pattern("/api/http-monitors/*/complete")).permitAll()
+                    .requestMatchers(mvc.pattern("/api/http-metrics/**")).hasAnyAuthority(AuthoritiesConstants.API_AGENT, AuthoritiesConstants.USER, AuthoritiesConstants.ADMIN)
+                    .requestMatchers(mvc.pattern("/api/http-monitors/*/complete")).hasAnyAuthority(AuthoritiesConstants.API_AGENT, AuthoritiesConstants.USER, AuthoritiesConstants.ADMIN)
                     .requestMatchers(mvc.pattern("/api/public/heartbeats/**")).hasAnyAuthority(AuthoritiesConstants.API_AGENT, AuthoritiesConstants.USER, AuthoritiesConstants.ADMIN)
                     .requestMatchers(mvc.pattern("/api/public/monitors/**")).hasAnyAuthority(AuthoritiesConstants.API_AGENT, AuthoritiesConstants.USER, AuthoritiesConstants.ADMIN)
                     .requestMatchers(mvc.pattern("/api/public/agents/**")).hasAnyAuthority(AuthoritiesConstants.API_AGENT, AuthoritiesConstants.USER, AuthoritiesConstants.ADMIN)

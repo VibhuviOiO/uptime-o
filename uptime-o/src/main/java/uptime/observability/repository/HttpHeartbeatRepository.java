@@ -77,4 +77,41 @@ public interface HttpHeartbeatRepository extends JpaRepository<HttpHeartbeat, Lo
         @org.springframework.data.repository.query.Param("datacenterName") String datacenterName,
         @org.springframework.data.repository.query.Param("agentName") String agentName
     );
+
+    @Query(value = """
+        WITH latest_heartbeats_per_agent AS (
+          SELECT 
+            h.*,
+            ROW_NUMBER() OVER (PARTITION BY h.monitor_id, h.agent_id ORDER BY h.executed_at DESC) as rn
+          FROM api_heartbeats h
+        )
+        SELECT 
+          m.id as monitor_id,
+          m.name as monitor_name,
+          h.success as last_success,
+          h.response_time_ms as last_latency_ms,
+          h.executed_at as last_checked_time,
+          r.name as region_name,
+          d.name as datacenter_name,
+          a.name as agent_name,
+          1 as agent_count
+        FROM api_monitors m
+        INNER JOIN latest_heartbeats_per_agent h ON m.id = h.monitor_id AND h.rn = 1
+        INNER JOIN agents a ON h.agent_id = a.id
+        INNER JOIN datacenters d ON a.datacenter_id = d.id
+        INNER JOIN regions r ON d.region_id = r.id
+        WHERE 1=1
+          AND (:searchName IS NULL OR :searchName = '' OR LOWER(m.name) LIKE LOWER(CONCAT('%', :searchName, '%')))
+          AND (:regionName IS NULL OR :regionName = '' OR LOWER(r.name) = LOWER(:regionName))
+          AND (:datacenterName IS NULL OR :datacenterName = '' OR LOWER(d.name) = LOWER(:datacenterName))
+          AND (:agentName IS NULL OR :agentName = '' OR LOWER(a.name) LIKE LOWER(CONCAT('%', :agentName, '%')))
+        ORDER BY m.name, a.name
+        """, nativeQuery = true)
+    List<Object[]> findIndividualMetrics(
+        @org.springframework.data.repository.query.Param("searchName") String searchName,
+        @org.springframework.data.repository.query.Param("regionName") String regionName,
+        @org.springframework.data.repository.query.Param("datacenterName") String datacenterName,
+        @org.springframework.data.repository.query.Param("agentName") String agentName
+    );
+
 }

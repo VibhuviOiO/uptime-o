@@ -103,7 +103,7 @@ module.exports = async options =>
       ),
       new WebpackNotifierPlugin({
         title: 'Uptime O',
-        contentImage: path.join(__dirname, 'logo-jhipster.png'),
+        contentImage: path.join(__dirname, 'logo.png'),
       }),
     ].filter(Boolean),
   });
