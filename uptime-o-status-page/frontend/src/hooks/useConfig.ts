@@ -30,6 +30,7 @@ export interface AppConfig {
   footerBgColor: string;
   footerTextColor: string;
   pageBgColor: string;
+  refreshTime?: string;
   showLatencyIndicators: boolean;
   indicators: Indicator[];
   indicatorOrder: string[];

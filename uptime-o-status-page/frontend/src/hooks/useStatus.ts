@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useConfig } from './useConfig';
 
 export interface Indicator {
   type: string;
@@ -27,33 +28,24 @@ export interface StatusResponse {
   regions: string[];
 }
 
-const parseRefreshTime = (value: string | number): { ms: number; display: string } => {
-  if (typeof value === 'number') {
-    return { ms: value * 1000, display: `${value}s` };
-  }
-  
-  const match = value.match(/^(\d+)\s*(s|m|h|hour|hours|minute|minutes|second|seconds)?$/i);
-  if (!match) {
-    return { ms: 30000, display: '30s' };
-  }
+const parseRefreshTime = (value: string): { ms: number; display: string } => {
+  const match = value.match(/^(\d+)\s*(s|m|h)?$/i);
+  if (!match) return { ms: 120000, display: '2m' };
   
   const num = parseInt(match[1]);
   const unit = (match[2] || 's').toLowerCase();
   
-  if (unit.startsWith('h')) {
-    return { ms: num * 3600000, display: `${num}h` };
-  } else if (unit.startsWith('m')) {
-    return { ms: num * 60000, display: `${num}m` };
-  } else {
-    return { ms: num * 1000, display: `${num}s` };
-  }
+  if (unit === 'h') return { ms: num * 3600000, display: `${num}h` };
+  if (unit === 'm') return { ms: num * 60000, display: `${num}m` };
+  return { ms: num * 1000, display: `${num}s` };
 };
 
 export function useStatus() {
   const [data, setData] = useState<StatusResponse>({ apis: [], regions: [] });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { ms: refreshInterval, display: refreshDisplay } = parseRefreshTime(import.meta.env.VITE_STATUS_PAGE_REFRESH_TIME || '2m');
+  const { data: config } = useConfig();
+  const { ms: refreshInterval, display: refreshDisplay } = parseRefreshTime(config?.refreshTime || '2m');
 
   useEffect(() => {
     async function fetchStatus() {

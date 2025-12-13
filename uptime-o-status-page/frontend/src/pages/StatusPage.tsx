@@ -200,11 +200,6 @@ export const StatusPage = () => {
         {showLatencyValues && health.responseTimeMs && (
           <span className="response-time">{health.responseTimeMs}ms</span>
         )}
-        {health.successRate !== undefined && (
-          <span className="success-rate" title={`${health.totalCalls || 0} calls`}>
-            {health.successRate}%
-          </span>
-        )}
       </>
     );
   };

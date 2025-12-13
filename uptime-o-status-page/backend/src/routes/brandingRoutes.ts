@@ -28,6 +28,7 @@ router.get('/', (req, res) => {
     footerBgColor: process.env.FOOTER_BG_COLOR || '#ffffff',
     footerTextColor: process.env.FOOTER_TEXT_COLOR || '#5f6368',
     pageBgColor: process.env.PAGE_BG_COLOR || '#f5f5f5',
+    refreshTime: process.env.STATUS_PAGE_REFRESH_TIME || '2m',
     ...viewConfig,
   });
 });
