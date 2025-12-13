@@ -16,6 +16,15 @@ export const InfrastructureMenuItems = () => (
 // Monitoring Section
 export const MonitoringMenuItems = () => (
   <>
+    <MenuItem icon="tachometer-alt" to="/" data-cy="dashboard">
+      Dashboard
+    </MenuItem>
+    <MenuItem icon="list" to="/monitors" data-cy="monitors">
+      Monitor List
+    </MenuItem>
+    <MenuItem icon="chart-line" to="/dashboard" data-cy="visualization">
+      Visualization
+    </MenuItem>
     <MenuItem icon="globe" to="/http-monitor" data-cy="http-monitors">
       HTTP Monitors
     </MenuItem>

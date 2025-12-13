@@ -3,7 +3,7 @@ services:
     image: uptimeo:latest
     container_name: uptimeo-app
     volumes:
-    - ./tmp/logs:/logs
+    - ./logs:/logs:Z
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/uptimeo
       SPRING_DATASOURCE_USERNAME: uptimeo
@@ -19,16 +19,23 @@ services:
       WEBSITE_LOGOHEIGHT: 30
       WEBSITE_FOOTERTITLE: "Powered by Algonomy"
       LOGGING_LEVEL_ROOT: INFO
-      LOGGING_FILE_MAX_SIZE: 100MB
-      LOGGING_FILE_MAX_HISTORY: 30
-      LOGGING_FILE_NAME: /var/log/uptimeo/application.log
-      JAVA_OPTS: -Xms1024m -Xmx2048m -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp/heap_dump.hprof
-      SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE: 20
-      SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE: 5
+      JAVA_OPTS: -Xms512m -Xmx1024m -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp/heap_dump.hprof
+      SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE: 10
+      SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE: 2
+      SPRING_DATASOURCE_HIKARI_CONNECTION_TIMEOUT: 30000
+      SPRING_DATASOURCE_HIKARI_IDLE_TIMEOUT: 600000
       SPRING_LIQUIBASE_ENABLED: true
     ports:
     - "8080:8080"
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 1.5G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
     networks:
     - uptimeo
 networks:

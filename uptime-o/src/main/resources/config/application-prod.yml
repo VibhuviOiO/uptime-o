@@ -15,9 +15,14 @@
 
 logging:
   level:
-    ROOT: INFO
-    tech.jhipster: INFO
-    uptime.observability: INFO
+    ROOT: WARN
+    tech.jhipster: WARN
+    uptime.observability: WARN
+    org.hibernate.SQL: WARN
+    org.hibernate.type.descriptor.sql.BasicBinder: WARN
+    org.springframework.web: WARN
+    org.springframework.security: WARN
+    com.zaxxer.hikari: WARN
 
 management:
   prometheus:

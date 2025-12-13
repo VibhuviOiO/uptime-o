@@ -25,10 +25,12 @@ public interface HttpHeartbeatMapper extends EntityMapper<HttpHeartbeatDTO, Http
     @Named("apiMonitorId")
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
+    @Mapping(target = "name", source = "name")
     HttpMonitorDTO toDtoHttpMonitorId(HttpMonitor apiMonitor);
 
     @Named("agentId")
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
+    @Mapping(target = "name", source = "name")
     AgentDTO toDtoAgentId(Agent agent);
 }

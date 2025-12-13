@@ -11,26 +11,7 @@
     <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
     <include resource="org/springframework/boot/logging/logback/console-appender.xml" />
 
-    <!-- Production profile: File logging with rotation -->
-    <springProfile name="prod">
-        <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-            <file>logs/uptimeo.log</file>
-            <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-                <fileNamePattern>logs/uptimeo-%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
-                <maxFileSize>100MB</maxFileSize>
-                <maxHistory>30</maxHistory>
-                <totalSizeCap>3GB</totalSizeCap>
-            </rollingPolicy>
-            <encoder>
-                <pattern>${FILE_LOG_PATTERN}</pattern>
-            </encoder>
-        </appender>
 
-        <appender name="ASYNC" class="ch.qos.logback.classic.AsyncAppender">
-            <queueSize>512</queueSize>
-            <appender-ref ref="FILE"/>
-        </appender>
-    </springProfile>
 
     <logger name="uptime.observability" level="INFO"/>
 
@@ -81,11 +62,10 @@
         </root>
     </springProfile>
     
-    <!-- Production profile: Console + File with async -->
+    <!-- Production profile: Console only -->
     <springProfile name="prod">
         <root level="${log.level}">
             <appender-ref ref="CONSOLE" />
-            <appender-ref ref="ASYNC" />
         </root>
     </springProfile>
     

@@ -4,16 +4,11 @@ import { Route } from 'react-router';
 import ErrorBoundaryRoutes from 'app/shared/error/error-boundary-routes';
 
 import HttpMonitor from './http-monitor';
-
 import HttpHeartbeat from './http-heartbeat';
-
-import HttpMetrics from './http-metrics/http-metrics';
-import HttpMetricsModern from './http-metrics/http-metrics-modern';
 import HttpMetricsProfessional from './http-metrics/http-metrics-professional';
 import MonitorDetail from './http-monitor-detail/monitor-detail';
 import AuditLog from './audit-log';
-
-import PingHeartbeat from './ping-heartbeat';
+import VisualizationDashboard from '../modules/dashboard/visualization-dashboard';
 /* jhipster-needle-add-route-import - JHipster will add routes here */
 
 export default () => {
@@ -23,16 +18,11 @@ export default () => {
         {/* prettier-ignore */}
 
         <Route path="http-monitor/*" element={<HttpMonitor />} />
-
         <Route path="http-heartbeats/*" element={<HttpHeartbeat />} />
-
-        <Route path="http-metrics" element={<HttpMetricsProfessional />} />
-        <Route path="http-metrics-modern" element={<HttpMetricsModern />} />
-        <Route path="http-metrics-classic" element={<HttpMetrics />} />
+        <Route path="monitors" element={<HttpMetricsProfessional />} />
+        <Route path="dashboard" element={<VisualizationDashboard />} />
         <Route path="http-monitor-detail/:id" element={<MonitorDetail />} />
         <Route path="audit-log/*" element={<AuditLog />} />
-
-        <Route path="ping-heartbeat/*" element={<PingHeartbeat />} />
         {/* jhipster-needle-add-route-path - JHipster will add routes here */}
       </ErrorBoundaryRoutes>
     </div>

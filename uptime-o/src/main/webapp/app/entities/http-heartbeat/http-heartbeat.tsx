@@ -1,13 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Button, Table } from 'reactstrap';
-import { JhiItemCount, JhiPagination, TextFormat, getPaginationState } from 'react-jhipster';
+import React, { useEffect, useState, useMemo } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { Button, Modal, ModalHeader, ModalBody, Collapse } from 'reactstrap';
+import { JhiItemCount, JhiPagination, getPaginationState } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSort, faSortDown, faSortUp } from '@fortawesome/free-solid-svg-icons';
 import { APP_DATE_FORMAT } from 'app/config/constants';
 import { ASC, DESC, ITEMS_PER_PAGE, SORT } from 'app/shared/util/pagination.constants';
 import { overridePaginationStateWithQueryParams } from 'app/shared/util/entity-utils';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
+import HeartbeatDetails from './HeartbeatDetails';
+import './http-heartbeat.scss';
 
 import { getEntities } from './http-heartbeat.reducer';
 
@@ -17,13 +18,17 @@ export const HttpHeartbeat = () => {
   const pageLocation = useLocation();
   const navigate = useNavigate();
 
-  const [paginationState, setPaginationState] = useState(
-    overridePaginationStateWithQueryParams(getPaginationState(pageLocation, ITEMS_PER_PAGE, 'id'), pageLocation.search),
-  );
+  const [paginationState, setPaginationState] = useState({
+    ...overridePaginationStateWithQueryParams(getPaginationState(pageLocation, ITEMS_PER_PAGE, 'executedAt'), pageLocation.search),
+    order: DESC,
+  });
 
   const apiHeartbeatList = useAppSelector(state => state.apiHeartbeat.entities);
   const loading = useAppSelector(state => state.apiHeartbeat.loading);
   const totalItems = useAppSelector(state => state.apiHeartbeat.totalItems);
+
+  const [selectedRecord, setSelectedRecord] = useState<any>(null);
+  const [collapsedMonitors, setCollapsedMonitors] = useState<Set<string>>(new Set());
 
   const getAllEntities = () => {
     dispatch(
@@ -62,14 +67,6 @@ export const HttpHeartbeat = () => {
     }
   }, [pageLocation.search]);
 
-  const sort = p => () => {
-    setPaginationState({
-      ...paginationState,
-      order: paginationState.order === ASC ? DESC : ASC,
-      sort: p,
-    });
-  };
-
   const handlePagination = currentPage =>
     setPaginationState({
       ...paginationState,
@@ -80,187 +77,166 @@ export const HttpHeartbeat = () => {
     sortEntities();
   };
 
-  const getSortIconByFieldName = (fieldName: string) => {
-    const sortFieldName = paginationState.sort;
-    const order = paginationState.order;
-    if (sortFieldName !== fieldName) {
-      return faSort;
+  const getStatusClass = (record: any) => {
+    if (!record.success) return 'failed';
+    if (record.responseTimeMs >= (record.criticalThresholdMs || 1000)) return 'critical';
+    if (record.responseTimeMs >= (record.warningThresholdMs || 500)) return 'warning';
+    return 'healthy';
+  };
+
+  const groupedByMonitor = useMemo(() => {
+    const monitorGroups = new Map<string, any[]>();
+    apiHeartbeatList.forEach(record => {
+      const monitorName = record.monitor?.name || 'Unknown Monitor';
+      if (!monitorGroups.has(monitorName)) {
+        monitorGroups.set(monitorName, []);
+      }
+      monitorGroups.get(monitorName).push(record);
+    });
+
+    const result = Array.from(monitorGroups.entries()).map(([monitorName, records], index) => {
+      const agentGroups = new Map<string, any[]>();
+      let healthy = 0,
+        warning = 0,
+        critical = 0,
+        failed = 0;
+
+      records.forEach(record => {
+        const agentName = record.agent?.name || 'Unknown Agent';
+        if (!agentGroups.has(agentName)) {
+          agentGroups.set(agentName, []);
+        }
+        agentGroups.get(agentName).push(record);
+
+        const status = getStatusClass(record);
+        if (status === 'healthy') healthy++;
+        else if (status === 'warning') warning++;
+        else if (status === 'critical') critical++;
+        else if (status === 'failed') failed++;
+      });
+
+      return {
+        monitorName,
+        statusCounts: { healthy, warning, critical, failed },
+        agents: Array.from(agentGroups.entries()).map(([agentName, agentRecords]) => ({
+          agentName,
+          records: agentRecords.sort((a, b) => new Date(b.executedAt).getTime() - new Date(a.executedAt).getTime()),
+        })),
+      };
+    });
+
+    if (result.length > 1 && collapsedMonitors.size === 0) {
+      const collapsed = new Set(result.slice(1).map(m => m.monitorName));
+      setCollapsedMonitors(collapsed);
     }
-    return order === ASC ? faSortUp : faSortDown;
+
+    return result;
+  }, [apiHeartbeatList]);
+
+  const openDetailModal = (record: any) => {
+    setSelectedRecord(record);
+  };
+
+  const toggleMonitor = (monitorName: string) => {
+    setCollapsedMonitors(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(monitorName)) {
+        newSet.delete(monitorName);
+      } else {
+        newSet.add(monitorName);
+      }
+      return newSet;
+    });
   };
 
   return (
-    <div>
-      <h2 id="http-heartbeat-heading" data-cy="HttpHeartbeatHeading">
-        HTTP Heartbeats
-        <div className="d-flex justify-content-end">
-          <Button className="me-2" color="info" onClick={handleSyncList} disabled={loading}>
-            <FontAwesomeIcon icon="sync" spin={loading} /> Refresh list
+    <div className="http-heartbeat-page">
+      <div className="page-header">
+        <div className="header-left">
+          <h2>HTTP Heartbeats</h2>
+          <Button color="info" size="sm" onClick={handleSyncList} disabled={loading}>
+            <FontAwesomeIcon icon="sync" spin={loading} /> Refresh
           </Button>
-          <Link to="/http-heartbeats/new" className="btn btn-primary jh-create-entity" id="jh-create-entity" data-cy="entityCreateButton">
-            <FontAwesomeIcon icon="plus" />
-            &nbsp; Create a new HTTP Heartbeat
-          </Link>
         </div>
-      </h2>
-      <div className="table-responsive">
-        {apiHeartbeatList && apiHeartbeatList.length > 0 ? (
-          <Table responsive>
-            <thead>
-              <tr>
-                <th className="hand" onClick={sort('id')}>
-                  ID <FontAwesomeIcon icon={getSortIconByFieldName('id')} />
-                </th>
-                <th className="hand" onClick={sort('executedAt')}>
-                  Executed At <FontAwesomeIcon icon={getSortIconByFieldName('executedAt')} />
-                </th>
-                <th className="hand" onClick={sort('success')}>
-                  Success <FontAwesomeIcon icon={getSortIconByFieldName('success')} />
-                </th>
-                <th className="hand" onClick={sort('responseTimeMs')}>
-                  Response Time Ms <FontAwesomeIcon icon={getSortIconByFieldName('responseTimeMs')} />
-                </th>
-                <th className="hand" onClick={sort('responseSizeBytes')}>
-                  Response Size Bytes <FontAwesomeIcon icon={getSortIconByFieldName('responseSizeBytes')} />
-                </th>
-                <th className="hand" onClick={sort('responseStatusCode')}>
-                  Response Status Code <FontAwesomeIcon icon={getSortIconByFieldName('responseStatusCode')} />
-                </th>
-                <th className="hand" onClick={sort('responseContentType')}>
-                  Response Content Type <FontAwesomeIcon icon={getSortIconByFieldName('responseContentType')} />
-                </th>
-                <th className="hand" onClick={sort('responseServer')}>
-                  Response Server <FontAwesomeIcon icon={getSortIconByFieldName('responseServer')} />
-                </th>
-                <th className="hand" onClick={sort('responseCacheStatus')}>
-                  Response Cache Status <FontAwesomeIcon icon={getSortIconByFieldName('responseCacheStatus')} />
-                </th>
-                <th className="hand" onClick={sort('dnsLookupMs')}>
-                  Dns Lookup Ms <FontAwesomeIcon icon={getSortIconByFieldName('dnsLookupMs')} />
-                </th>
-                <th className="hand" onClick={sort('tcpConnectMs')}>
-                  Tcp Connect Ms <FontAwesomeIcon icon={getSortIconByFieldName('tcpConnectMs')} />
-                </th>
-                <th className="hand" onClick={sort('tlsHandshakeMs')}>
-                  Tls Handshake Ms <FontAwesomeIcon icon={getSortIconByFieldName('tlsHandshakeMs')} />
-                </th>
-                <th className="hand" onClick={sort('timeToFirstByteMs')}>
-                  Time To First Byte Ms <FontAwesomeIcon icon={getSortIconByFieldName('timeToFirstByteMs')} />
-                </th>
-                <th className="hand" onClick={sort('warningThresholdMs')}>
-                  Warning Threshold Ms <FontAwesomeIcon icon={getSortIconByFieldName('warningThresholdMs')} />
-                </th>
-                <th className="hand" onClick={sort('criticalThresholdMs')}>
-                  Critical Threshold Ms <FontAwesomeIcon icon={getSortIconByFieldName('criticalThresholdMs')} />
-                </th>
-                <th className="hand" onClick={sort('errorType')}>
-                  Error Type <FontAwesomeIcon icon={getSortIconByFieldName('errorType')} />
-                </th>
-                <th className="hand" onClick={sort('errorMessage')}>
-                  Error Message <FontAwesomeIcon icon={getSortIconByFieldName('errorMessage')} />
-                </th>
-                <th className="hand" onClick={sort('rawRequestHeaders')}>
-                  Raw Request Headers <FontAwesomeIcon icon={getSortIconByFieldName('rawRequestHeaders')} />
-                </th>
-                <th className="hand" onClick={sort('rawResponseHeaders')}>
-                  Raw Response Headers <FontAwesomeIcon icon={getSortIconByFieldName('rawResponseHeaders')} />
-                </th>
-                <th className="hand" onClick={sort('rawResponseBody')}>
-                  Raw Response Body <FontAwesomeIcon icon={getSortIconByFieldName('rawResponseBody')} />
-                </th>
-                <th>
-                  Monitor <FontAwesomeIcon icon="sort" />
-                </th>
-                <th>
-                  Agent <FontAwesomeIcon icon="sort" />
-                </th>
-                <th />
-              </tr>
-            </thead>
-            <tbody>
-              {apiHeartbeatList.map((apiHeartbeat, i) => (
-                <tr key={`entity-${i}`} data-cy="entityTable">
-                  <td>
-                    <Button tag={Link} to={`/http-heartbeats/${apiHeartbeat.id}`} color="link" size="sm">
-                      {apiHeartbeat.id}
-                    </Button>
-                  </td>
-                  <td>
-                    {apiHeartbeat.executedAt ? <TextFormat type="date" value={apiHeartbeat.executedAt} format={APP_DATE_FORMAT} /> : null}
-                  </td>
-                  <td>{apiHeartbeat.success ? 'true' : 'false'}</td>
-                  <td>{apiHeartbeat.responseTimeMs}</td>
-                  <td>{apiHeartbeat.responseSizeBytes}</td>
-                  <td>{apiHeartbeat.responseStatusCode}</td>
-                  <td>{apiHeartbeat.responseContentType}</td>
-                  <td>{apiHeartbeat.responseServer}</td>
-                  <td>{apiHeartbeat.responseCacheStatus}</td>
-                  <td>{apiHeartbeat.dnsLookupMs}</td>
-                  <td>{apiHeartbeat.tcpConnectMs}</td>
-                  <td>{apiHeartbeat.tlsHandshakeMs}</td>
-                  <td>{apiHeartbeat.timeToFirstByteMs}</td>
-                  <td>{apiHeartbeat.warningThresholdMs}</td>
-                  <td>{apiHeartbeat.criticalThresholdMs}</td>
-                  <td>{apiHeartbeat.errorType}</td>
-                  <td>{apiHeartbeat.errorMessage}</td>
-                  <td>{apiHeartbeat.rawRequestHeaders ? JSON.stringify(apiHeartbeat.rawRequestHeaders) : ''}</td>
-                  <td>{apiHeartbeat.rawResponseHeaders ? JSON.stringify(apiHeartbeat.rawResponseHeaders) : ''}</td>
-                  <td>{apiHeartbeat.rawResponseBody ? JSON.stringify(apiHeartbeat.rawResponseBody) : ''}</td>
-                  <td>
-                    {apiHeartbeat.monitor ? <Link to={`/http-monitor/${apiHeartbeat.monitor.id}`}>{apiHeartbeat.monitor.id}</Link> : ''}
-                  </td>
-                  <td>{apiHeartbeat.agent ? <Link to={`/agent/${apiHeartbeat.agent.id}`}>{apiHeartbeat.agent.id}</Link> : ''}</td>
-                  <td className="text-end">
-                    <div className="btn-group flex-btn-group-container">
-                      <Button tag={Link} to={`/http-heartbeats/${apiHeartbeat.id}`} color="info" size="sm" data-cy="entityDetailsButton">
-                        <FontAwesomeIcon icon="eye" /> <span className="d-none d-md-inline">View</span>
-                      </Button>
-                      <Button
-                        tag={Link}
-                        to={`/http-heartbeats/${apiHeartbeat.id}/edit?page=${paginationState.activePage}&sort=${paginationState.sort},${paginationState.order}`}
-                        color="primary"
-                        size="sm"
-                        data-cy="entityEditButton"
-                      >
-                        <FontAwesomeIcon icon="pencil-alt" /> <span className="d-none d-md-inline">Edit</span>
-                      </Button>
-                      <Button
-                        onClick={() =>
-                          (window.location.href = `/http-heartbeats/${apiHeartbeat.id}/delete?page=${paginationState.activePage}&sort=${paginationState.sort},${paginationState.order}`)
-                        }
-                        color="danger"
-                        size="sm"
-                        data-cy="entityDeleteButton"
-                      >
-                        <FontAwesomeIcon icon="trash" /> <span className="d-none d-md-inline">Delete</span>
-                      </Button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
-        ) : (
-          !loading && <div className="alert alert-warning">No HTTP Heartbeats found</div>
-        )}
+        <div className="legend">
+          <div className="legend-item">
+            <div className="legend-dot healthy"></div>
+            <span>Healthy</span>
+          </div>
+          <div className="legend-item">
+            <div className="legend-dot warning"></div>
+            <span>Warning</span>
+          </div>
+          <div className="legend-item">
+            <div className="legend-dot critical"></div>
+            <span>Critical</span>
+          </div>
+          <div className="legend-item">
+            <div className="legend-dot failed"></div>
+            <span>Failed</span>
+          </div>
+        </div>
       </div>
-      {totalItems ? (
-        <div className={apiHeartbeatList && apiHeartbeatList.length > 0 ? '' : 'd-none'}>
-          <div className="justify-content-center d-flex">
-            <JhiItemCount page={paginationState.activePage} total={totalItems} itemsPerPage={paginationState.itemsPerPage} />
-          </div>
-          <div className="justify-content-center d-flex">
-            <JhiPagination
-              activePage={paginationState.activePage}
-              onSelect={handlePagination}
-              maxButtons={5}
-              itemsPerPage={paginationState.itemsPerPage}
-              totalItems={totalItems}
-            />
-          </div>
+
+      <div className="heartbeat-cards-section">
+        <div className="monitor-cards-container">
+          {groupedByMonitor.map(({ monitorName, statusCounts, agents }) => (
+            <div key={monitorName} className="monitor-card">
+              <div className="monitor-card-header" onClick={() => toggleMonitor(monitorName)}>
+                <h3 className="monitor-card-title">{monitorName}</h3>
+                <div className="header-right">
+                  <div className="status-indicators">
+                    {statusCounts.healthy > 0 && <span className="status-badge healthy">{statusCounts.healthy}</span>}
+                    {statusCounts.warning > 0 && <span className="status-badge warning">{statusCounts.warning}</span>}
+                    {statusCounts.critical > 0 && <span className="status-badge critical">{statusCounts.critical}</span>}
+                    {statusCounts.failed > 0 && <span className="status-badge failed">{statusCounts.failed}</span>}
+                  </div>
+                  <FontAwesomeIcon icon={collapsedMonitors.has(monitorName) ? 'chevron-down' : 'chevron-up'} />
+                </div>
+              </div>
+              <Collapse isOpen={!collapsedMonitors.has(monitorName)}>
+                <div className="agent-groups">
+                  {agents.map(({ agentName, records }) => (
+                    <div key={agentName} className="agent-group">
+                      <h4 className="agent-group-title">{agentName}</h4>
+                      <div className="squares-grid">
+                        {records.map((record, index) => (
+                          <div
+                            key={record.id || index}
+                            className={`status-square ${getStatusClass(record)} ${selectedRecord?.id === record.id ? 'selected' : ''}`}
+                            title={`${new Date(record.executedAt).toLocaleString()} - ${record.responseTimeMs}ms`}
+                            onClick={() => openDetailModal(record)}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </Collapse>
+            </div>
+          ))}
         </div>
-      ) : (
-        ''
+      </div>
+
+      <Modal isOpen={!!selectedRecord} toggle={() => setSelectedRecord(null)} size="lg">
+        <ModalHeader toggle={() => setSelectedRecord(null)}>Heartbeat Details</ModalHeader>
+        <ModalBody>{selectedRecord && <HeartbeatDetails record={selectedRecord} onClose={() => setSelectedRecord(null)} />}</ModalBody>
+      </Modal>
+
+      {totalItems > 0 && (
+        <div
+          className="justify-content-center d-flex"
+          style={{ marginTop: '20px', gap: '20px', flexDirection: 'column', alignItems: 'center' }}
+        >
+          <JhiItemCount page={paginationState.activePage} total={totalItems} itemsPerPage={paginationState.itemsPerPage} />
+          <JhiPagination
+            activePage={paginationState.activePage}
+            onSelect={handlePagination}
+            maxButtons={5}
+            itemsPerPage={paginationState.itemsPerPage}
+            totalItems={totalItems}
+          />
+        </div>
       )}
     </div>
   );

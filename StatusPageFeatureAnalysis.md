@@ -235,3 +235,37 @@ Not a full incident management platform, but a **real-time monitoring dashboard*
 **Launch with current features, gather feedback, iterate based on real user needs.**
 
 Don't try to compete with StatusPage.io feature-for-feature. Instead, own the "automated, simple, self-hosted" niche.
+
+
+
+ podman tag ghcr.io/vibhuvioio/uptimeo-apiagent:latest docker-repo.richrelevance.com/uptimeo-apiagent:latest
+[root@dlls-cass-26 uptime-observabiltity]# podman push docker-repo.richrelevance.com/uptimeo-apiagent:latest
+Getting image source signatures
+Copying blob b6f9519c069d done   |
+Copying blob 5aa68bbbc67e done   |
+Copying blob 4f4fb700ef54 skipped: already exists
+Copying blob 8bd438c3186b done   |
+Copying config b1581d937b done   |
+Writing manifest to image destination
+
+
+podman tag ghcr.io/vibhuvioio/uptimeo-apiagent:latest docker-repo.richrelevance.com/uptimeo-apiagent:latest
+podman push docker-repo.richrelevance.com/uptimeo-apiagent:latest
+
+podman tag ghcr.io/vibhuvioio/uptime-o-app docker-repo.richrelevance.com/uptime-o-app
+podman push docker-repo.richrelevance.com/uptime-o-app
+
+podman pull ghcr.io/vibhuvioio/uptimeo-statuspage
+
+podman tag ghcr.io/vibhuvioio/uptimeo-statuspage docker-repo.richrelevance.com/uptime-statuspage
+podman push docker-repo.richrelevance.com/uptime-statuspage
+
+app-test.yaml  app.yml  internal-statuspage.yml  postgres.yml  statuspage.yml
+
+
+I ran the container 
+
+docker run -d   --name uptimeo-agent   --restart unless-stopped   -v /tmp/uptimeo-agent:/data   -v /root/uptimeo-agent/resolv.conf:/etc/resolv.conf:ro,Z   -e AGENT_ID="1151"   -e API_BASE_URL="http://10.102.5.206:8088"   -e QUEUE_PATH="/data/queue"   -e CONFIG_RELOAD_INTERVAL="5m"   -e API_KEY="uptimeo_UiwyHLRoO2dihtVhNpwO4Xs5Ln781V1yhW2lGXaFQjs"   --health-cmd="pgrep agent || exit 1"   --health-interval=10s   --health-timeout=5s   --health-retries=5   ghcr.io/vibhuvioio/uptimeo-agent:latest
+
+before: now i have to 
+

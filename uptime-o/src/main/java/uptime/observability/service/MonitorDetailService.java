@@ -34,11 +34,9 @@ public class MonitorDetailService {
         HttpMonitor monitor = httpMonitorRepository.findById(monitorId)
             .orElseThrow(() -> new RuntimeException("Monitor not found with id: " + monitorId));
 
-        // Get recent heartbeats only (last 1000 for performance)
+        // Get recent heartbeats with LIMIT in query
         List<HttpHeartbeat> heartbeats = httpHeartbeatRepository.findByMonitorIdOrderByExecutedAtDesc(monitorId);
-        if (heartbeats.size() > 1000) {
-            heartbeats = heartbeats.subList(0, 1000);
-        }
+        heartbeats = heartbeats.stream().limit(1000).collect(Collectors.toList());
 
         // Calculate statistics
         Long totalChecks = (long) heartbeats.size();
@@ -109,14 +107,21 @@ public class MonitorDetailService {
      * Get agent-wise metrics breakdown for a monitor
      */
     public List<AgentMetricsDTO> getAgentMetrics(Long monitorId, Instant startTime, Instant endTime, String agentRegion) {
+        // Fetch monitor ONCE outside loop
+        HttpMonitor monitor = httpMonitorRepository.findById(monitorId).orElse(null);
+        Integer warningThreshold = monitor != null && monitor.getSchedule() != null ? monitor.getSchedule().getThresholdsWarning() : null;
+        Integer criticalThreshold = monitor != null && monitor.getSchedule() != null ? monitor.getSchedule().getThresholdsCritical() : null;
 
-        // Get heartbeats filtered by time range
+        // Get heartbeats with LIMIT
         List<HttpHeartbeat> heartbeats = httpHeartbeatRepository
             .findByMonitorIdAndExecutedAtBetweenOrderByExecutedAtDesc(
                 monitorId, 
                 startTime != null ? startTime : Instant.EPOCH, 
                 endTime != null ? endTime : Instant.now()
-            );
+            )
+            .stream()
+            .limit(5000) // Hard limit to prevent OOM
+            .collect(Collectors.toList());
 
         // Filter by region if specified
         if (agentRegion != null && !agentRegion.isEmpty() && !agentRegion.equalsIgnoreCase("all")) {
@@ -143,10 +148,6 @@ public class MonitorDetailService {
             Agent agent = agentHeartbeats.get(0).getAgent();
             Datacenter datacenter = agent.getDatacenter();
             Region region = datacenter != null ? datacenter.getRegion() : null;
-
-            HttpMonitor monitor = httpMonitorRepository.findById(monitorId).orElse(null);
-            Integer warningThreshold = monitor != null && monitor.getSchedule() != null ? monitor.getSchedule().getThresholdsWarning() : null;
-            Integer criticalThreshold = monitor != null && monitor.getSchedule() != null ? monitor.getSchedule().getThresholdsCritical() : null;
 
             Long totalChecks = (long) agentHeartbeats.size();
             Long successfulChecks = agentHeartbeats.stream().filter(h -> Boolean.TRUE.equals(h.getSuccess())).count();
@@ -237,10 +238,8 @@ public class MonitorDetailService {
         }
 
         // Limit to 500 records for performance
-        List<HttpHeartbeat> limitedHeartbeats = heartbeats.size() > 500 ? 
-            heartbeats.subList(0, 500) : heartbeats;
-
-        return limitedHeartbeats.stream()
+        return heartbeats.stream()
+            .limit(500)
             .map(h -> {
                 Agent agent = h.getAgent();
                 Region region = agent != null && agent.getDatacenter() != null ? 

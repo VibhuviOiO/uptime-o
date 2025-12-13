@@ -144,7 +144,9 @@ public class HttpHeartbeatResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of apiHeartbeats in body.
      */
     @GetMapping("")
-    public ResponseEntity<List<HttpHeartbeatDTO>> getAllHttpHeartbeats(@org.springdoc.core.annotations.ParameterObject Pageable pageable) {
+    public ResponseEntity<List<HttpHeartbeatDTO>> getAllHttpHeartbeats(
+        @org.springdoc.core.annotations.ParameterObject Pageable pageable
+    ) {
         LOG.debug("REST request to get a page of HttpHeartbeats");
         Page<HttpHeartbeatDTO> page = apiHeartbeatService.findAll(pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);

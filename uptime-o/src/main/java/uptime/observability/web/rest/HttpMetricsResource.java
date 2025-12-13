@@ -47,7 +47,7 @@ public class HttpMetricsResource {
             endTime = LocalDateTime.now();
         }
         
-        Pageable pageable = PageRequest.of(page, Math.min(size, 100)); // Limit max size
+        Pageable pageable = PageRequest.of(page, Math.min(size, 50)); // Limit max size to 50
         
         // Call service method to get individual metrics per agent
         List<HttpMetricsDTO> metricsList = httpMetricsService.getIndividualMetrics(

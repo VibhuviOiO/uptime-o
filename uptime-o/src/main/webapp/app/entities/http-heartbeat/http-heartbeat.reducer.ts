@@ -20,8 +20,8 @@ const apiUrl = 'api/http-heartbeats';
 
 export const getEntities = createAsyncThunk(
   'apiHeartbeat/fetch_entity_list',
-  async ({ page, size, sort }: IQueryParams) => {
-    const requestUrl = `${apiUrl}?${sort ? `page=${page}&size=${size}&sort=${sort}&` : ''}cacheBuster=${new Date().getTime()}`;
+  async (params: IQueryParams) => {
+    const requestUrl = `${apiUrl}?${params.sort ? `page=${params.page}&size=${params.size}&sort=${params.sort}&` : ''}cacheBuster=${new Date().getTime()}`;
     return axios.get<IHttpHeartbeat[]>(requestUrl);
   },
   { serializeError: serializeAxiosError },

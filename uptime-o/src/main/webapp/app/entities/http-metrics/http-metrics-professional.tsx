@@ -1,46 +1,14 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Input, Row, Col, Table, Card, CardBody, Dropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
+import { Button, Input, Table, Card, CardBody, Dropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faSearch,
-  faSync,
-  faFilter,
-  faChartLine,
-  faServer,
-  faClock,
-  faCheckCircle,
-  faTimesCircle,
-  faChevronDown,
-  faChevronRight,
-  faHeartbeat,
-  faTachometerAlt,
-  faEllipsisV,
-  faHistory,
-  faEye,
-  faChartBar,
-} from '@fortawesome/free-solid-svg-icons';
+import { faSync, faFilter, faChartLine, faServer, faEllipsisV, faHistory, faChartBar } from '@fortawesome/free-solid-svg-icons';
 import { HttpMetricsService } from './http-metrics.service';
 import { HttpMetricsDTO } from './http-metrics.model';
 import axios from 'axios';
-import GenericChart from '../../shared/charts/GenericChart';
+
 import MonitorHistoryModal from '../http-monitor-detail/MonitorHistoryModal';
 import './http-metrics-professional.scss';
-
-interface AgentDetail {
-  agentName: string;
-  agentRegion: string;
-  datacenter: string;
-  totalChecks: number;
-  successfulChecks: number;
-  failedChecks: number;
-  averageResponseTime: number;
-  uptimePercentage: number;
-  p95ResponseTime: number;
-  p99ResponseTime: number;
-  lastCheckedAt: string;
-  lastSuccess: boolean;
-}
 
 export const HttpMetricsProfessional = () => {
   const navigate = useNavigate();
@@ -49,18 +17,16 @@ export const HttpMetricsProfessional = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedRegion, setSelectedRegion] = useState('');
   const [timeRange, setTimeRange] = useState('30m');
-  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
-  const [agentDetails, setAgentDetails] = useState<Record<string, AgentDetail>>({});
-  const [loadingDetails, setLoadingDetails] = useState<Set<string>>(new Set());
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
-  const [selectedAgentName, setSelectedAgentName] = useState<string>('');
-  const [selectedMonitorId, setSelectedMonitorId] = useState<number>(0);
-  const [agentMetricsData, setAgentMetricsData] = useState<Record<string, any>>({});
+  const [selectedAgentName, setSelectedAgentName] = useState('');
+  const [selectedMonitorId, setSelectedMonitorId] = useState(0);
+  const [agentMetricsData, setAgentMetricsData] = useState<Record<string, Map<string, any>>>({});
   const [dropdownOpen, setDropdownOpen] = useState<Record<string, boolean>>({});
-  const [timeSeriesData, setTimeSeriesData] = useState<Record<string, any[]>>({});
+
   const [allRegions, setAllRegions] = useState<string[]>([]);
   const [historyRecords, setHistoryRecords] = useState<any[]>([]);
-  const [loadingHistory, setLoadingHistory] = useState(false);
+  const [currentPage, setCurrentPage] = useState(0);
+  const PAGE_SIZE = 50;
   useEffect(() => {
     fetchMetrics();
   }, [timeRange, searchTerm, selectedRegion]);
@@ -132,6 +98,14 @@ export const HttpMetricsProfessional = () => {
     );
   }, [metrics, searchTerm, selectedRegion]);
 
+  // Paginate filtered metrics
+  const paginatedMetrics = useMemo(() => {
+    const start = currentPage * PAGE_SIZE;
+    return filteredMetrics.slice(start, start + PAGE_SIZE);
+  }, [filteredMetrics, currentPage]);
+
+  const totalPages = Math.ceil(filteredMetrics.length / PAGE_SIZE);
+
   const getStatusBadge = (success: boolean, latency: number, lastCheckedTime: string | null, currentTimeRange: string) => {
     // No data available
     if (!lastCheckedTime) return { class: 'status-stale', text: 'NO DATA' };
@@ -149,235 +123,63 @@ export const HttpMetricsProfessional = () => {
     return { class: 'status-up', text: 'ONLINE' };
   };
 
-  const formatLatency = (ms: number) => `${ms}ms`;
-
   const formatLastChecked = (timestamp: string | null) => {
     if (!timestamp) return 'Never';
     return new Date(timestamp).toLocaleString();
   };
 
-  const getMetricValue = (monitorId: number, agentName: string, field: string, defaultValue: any) => {
-    const agentMetrics = agentMetricsData[monitorId];
-    if (!agentMetrics || !Array.isArray(agentMetrics)) return defaultValue;
-
-    const agentData = agentMetrics.find((agent: any) => agent.agentName === agentName);
-    return agentData ? agentData[field] : defaultValue;
-  };
-
   useEffect(() => {
-    // Clear existing data when filters change
     setAgentMetricsData({});
-    setTimeSeriesData({});
   }, [timeRange, selectedRegion]);
 
   useEffect(() => {
-    // Fetch agent metrics for all monitors after main metrics are loaded
+    // Fetch agent metrics for all monitors in ONE batch call
     if (metrics.length > 0) {
       const uniqueMonitorIds = Array.from(new Set(metrics.map(m => m.monitorId)));
-      uniqueMonitorIds.forEach(monitorId => {
-        fetchAgentMetrics(monitorId);
-      });
+      fetchBatchAgentMetrics(uniqueMonitorIds);
     }
   }, [metrics]);
 
-  const toggleRowExpansion = async (monitorId: number, agentName: string) => {
-    const rowKey = `${monitorId}-${agentName}`;
-    const newExpanded = new Set(expandedRows);
-
-    if (expandedRows.has(rowKey)) {
-      newExpanded.delete(rowKey);
-    } else {
-      newExpanded.add(rowKey);
-      if (!agentDetails[rowKey]) {
-        await fetchAgentDetails(monitorId, agentName, rowKey);
-      }
-    }
-    setExpandedRows(newExpanded);
-  };
-
-  const prepareChartData = (monitorId: number, agentName: string) => {
-    const agentData = timeSeriesData[monitorId] || [];
-    const filteredData = agentData.filter((d: any) => d.agentName === agentName);
-
-    const now = new Date();
-    let timeRangeMs: number;
-    switch (timeRange) {
-      case '5m':
-        timeRangeMs = 5 * 60 * 1000;
-        break;
-      case '15m':
-        timeRangeMs = 15 * 60 * 1000;
-        break;
-      case '30m':
-        timeRangeMs = 30 * 60 * 1000;
-        break;
-      case '1h':
-        timeRangeMs = 60 * 60 * 1000;
-        break;
-      case '4h':
-        timeRangeMs = 4 * 60 * 60 * 1000;
-        break;
-      case '24h':
-        timeRangeMs = 24 * 60 * 60 * 1000;
-        break;
-      case '2d':
-        timeRangeMs = 2 * 24 * 60 * 60 * 1000;
-        break;
-      case '7d':
-        timeRangeMs = 7 * 24 * 60 * 60 * 1000;
-        break;
-      case '30d':
-        timeRangeMs = 30 * 24 * 60 * 60 * 1000;
-        break;
-      default:
-        timeRangeMs = 30 * 60 * 1000;
-    }
-
-    const startTime = new Date(now.getTime() - timeRangeMs);
-    const numBuckets = 50;
-    const bucketSize = timeRangeMs / numBuckets;
-
-    return Array.from({ length: numBuckets }, (_, i) => {
-      const bucketStart = startTime.getTime() + i * bucketSize;
-      const bucketEnd = bucketStart + bucketSize;
-      const bucketStartDate = new Date(bucketStart);
-
-      const bucketRecords = filteredData.filter((r: any) => {
-        const recordTime = new Date(r.timestamp).getTime();
-        return recordTime >= bucketStart && recordTime < bucketEnd;
-      });
-
-      let healthy = 0;
-      let warning = 0;
-      let critical = 0;
-      let failed = 0;
-
-      bucketRecords.forEach((r: any) => {
-        if (!r.success) {
-          failed++;
-        } else {
-          const rt = r.responseTimeMs || 0;
-          if (rt >= 1000) {
-            critical++;
-          } else if (rt >= 500) {
-            warning++;
-          } else {
-            healthy++;
-          }
-        }
-      });
-
-      return {
-        index: i,
-        time: bucketStartDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }),
-        timestamp: bucketStartDate.toLocaleString(),
-        healthy,
-        warning,
-        critical,
-        failed,
-        total: bucketRecords.length,
+  const fetchBatchAgentMetrics = async (monitorIds: number[]) => {
+    try {
+      const params = {
+        monitorIds: monitorIds.join(','),
+        timeRange,
+        agentRegion: selectedRegion !== '' ? selectedRegion : undefined,
       };
-    });
-  };
+      const response = await axios.get('/api/http-monitors/batch', { params });
+      const batchData = response.data;
 
-  const fetchAgentMetrics = async (monitorId: number) => {
-    try {
-      const params = { timeRange, agentRegion: selectedRegion !== '' ? selectedRegion : undefined };
-      const response = await axios.get(`/api/http-monitors/${monitorId}/complete`, { params });
-      const data = response.data;
+      const newAgentMetricsData: Record<string, Map<string, any>> = {};
 
-      if (data.agentMetrics && data.agentMetrics.length > 0) {
-        setAgentMetricsData(prev => ({ ...prev, [monitorId]: data.agentMetrics }));
-      }
-      if (data.timeSeriesData) {
-        setTimeSeriesData(prev => ({ ...prev, [monitorId]: data.timeSeriesData }));
-      }
-    } catch (error) {
-      console.error('Error fetching agent metrics:', error);
-    }
-  };
-
-  const fetchAgentDetails = async (monitorId: number, agentName: string, rowKey: string) => {
-    try {
-      setLoadingDetails(prev => new Set(prev).add(rowKey));
-
-      const params = { timeRange, agentRegion: selectedRegion !== '' ? selectedRegion : undefined };
-      const response = await axios.get(`/api/http-monitors/${monitorId}/complete`, { params });
-      const data = response.data;
-
-      if (data.agentMetrics && data.agentMetrics.length > 0) {
-        const agentData = data.agentMetrics.find((agent: any) => agent.agentName === agentName);
-        if (agentData) {
-          setAgentDetails(prev => ({ ...prev, [rowKey]: agentData }));
+      Object.entries(batchData).forEach(([monitorId, data]: [string, any]) => {
+        if (data.agentMetrics && data.agentMetrics.length > 0) {
+          const agentMap: Map<string, any> = new Map(data.agentMetrics.map((a: any) => [a.agentName, a]));
+          newAgentMetricsData[monitorId] = agentMap;
         }
-      }
-    } catch (error) {
-      console.error('Error fetching agent details:', error);
-    } finally {
-      setLoadingDetails(prev => {
-        const newSet = new Set(prev);
-        newSet.delete(rowKey);
-        return newSet;
       });
+
+      setAgentMetricsData(newAgentMetricsData);
+    } catch (error) {
+      console.error('Error fetching batch agent metrics:', error);
     }
   };
 
   const fetchHistoryData = async (monitorId: number, agentName: string) => {
     try {
-      setLoadingHistory(true);
       const params = { timeRange, agentRegion: selectedRegion !== '' ? selectedRegion : undefined };
       const response = await axios.get(`/api/http-monitors/${monitorId}/complete`, { params });
       const data = response.data;
 
       if (data.timeSeriesData && data.timeSeriesData.length > 0) {
-        const agentHistory = data.timeSeriesData.filter((record: any) => record.agentName === agentName);
-        setHistoryRecords(agentHistory);
+        setHistoryRecords(data.timeSeriesData.filter((record: any) => record.agentName === agentName));
       } else {
         setHistoryRecords([]);
       }
     } catch (error) {
       console.error('Error fetching history data:', error);
       setHistoryRecords([]);
-    } finally {
-      setLoadingHistory(false);
     }
-  };
-
-  const renderAgentDetails = (monitorId: number, agentName: string) => {
-    const rowKey = `${monitorId}-${agentName}`;
-    const details = agentDetails[rowKey];
-    const isLoading = loadingDetails.has(rowKey);
-
-    if (isLoading) {
-      return (
-        <tr>
-          <td colSpan={16} className="agent-details-cell">
-            <div className="loading-details">Loading agent details...</div>
-          </td>
-        </tr>
-      );
-    }
-
-    if (!details) return null;
-
-    return (
-      <tr>
-        <td colSpan={17} className="agent-details-cell">
-          <div className="agent-details-container">
-            <div className="agent-chart">
-              <GenericChart
-                type="bar"
-                data={prepareChartData(monitorId, agentName)}
-                xKey="time"
-                yKeys={['healthy', 'warning', 'critical', 'failed']}
-                colors={['#10b981', '#fbbf24', '#f97316', '#ef4444']}
-                height={140}
-              />
-            </div>
-          </div>
-        </td>
-      </tr>
-    );
   };
 
   return (
@@ -493,10 +295,7 @@ export const HttpMetricsProfessional = () => {
                     <th className="small">Agent</th>
                     <th className="small">Checks</th>
                     <th className="small">Latest Latency</th>
-                    <th className="small">Latest TTFB</th>
-                    <th className="small">Latest HTTP Status</th>
-                    <th className="small">Latest Response Size</th>
-                    <th className="small">Latest Server</th>
+
                     <th className="small">Last Checked</th>
                     <th className="small">Uptime</th>
                     <th className="small">P95</th>
@@ -505,11 +304,17 @@ export const HttpMetricsProfessional = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredMetrics.map(metric => {
+                  {paginatedMetrics.map(metric => {
+                    const rowKey = `${metric.monitorId}-${metric.agentName}`;
                     const status = getStatusBadge(metric.lastSuccess, metric.lastLatencyMs, metric.lastCheckedTime, timeRange);
                     const isStale = status.class === 'status-stale';
-                    const rowKey = `${metric.monitorId}-${metric.agentName}`;
-                    const isExpanded = expandedRows.has(rowKey);
+
+                    const agentMap = agentMetricsData[metric.monitorId];
+                    const agentData = agentMap?.get(metric.agentName);
+                    const totalChecks = agentData?.totalChecks ?? 0;
+                    const uptime = agentData?.uptimePercentage ?? 0;
+                    const p95 = agentData?.p95ResponseTime ?? 0;
+                    const p99 = agentData?.p99ResponseTime ?? 0;
 
                     return (
                       <React.Fragment key={rowKey}>
@@ -532,121 +337,23 @@ export const HttpMetricsProfessional = () => {
                             <span className="agent-name">{metric.agentName || 'N/A'}</span>
                           </td>
                           <td>
-                            <span className="text-muted small">{getMetricValue(metric.monitorId, metric.agentName, 'totalChecks', 0)}</span>
+                            <span className="text-muted small">{totalChecks}</span>
                           </td>
                           <td>
-                            <span className="text-muted small">
-                              {(() => {
-                                // If agent is offline/stale, show N/A for all latest data
-                                if (isStale) return 'N/A';
+                            <span className="text-muted small">{metric.lastLatencyMs ? `${metric.lastLatencyMs}ms` : 'N/A'}</span>
+                          </td>
 
-                                const agentData = getMetricValue(metric.monitorId, metric.agentName, 'lastResponseTime', null);
-                                if (!agentData && !timeSeriesData[metric.monitorId]) return 'N/A';
-
-                                // Get latest record from time series data (most recent by timestamp)
-                                const agentRecords =
-                                  timeSeriesData[metric.monitorId]?.filter((r: any) => r.agentName === metric.agentName) || [];
-                                const latestRecord = agentRecords.sort(
-                                  (a: any, b: any) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
-                                )[0];
-                                if (!latestRecord)
-                                  return agentData ? `${agentData}ms` : metric.lastLatencyMs ? `${metric.lastLatencyMs}ms` : 'N/A';
-
-                                const dns = latestRecord.dnsLookupMs || 0;
-                                const tcp = latestRecord.tcpConnectMs || 0;
-                                const tls = latestRecord.tlsHandshakeMs || 0;
-                                const response = latestRecord.responseTimeMs || 0;
-                                const total = dns + tcp + tls + response;
-
-                                return `${total}ms (${dns}+${tcp}+${tls}+${response})`;
-                              })()}
-                            </span>
-                          </td>
-                          <td>
-                            <span className="text-muted small">
-                              {(() => {
-                                if (isStale) return 'N/A';
-                                const agentRecords =
-                                  timeSeriesData[metric.monitorId]?.filter((r: any) => r.agentName === metric.agentName) || [];
-                                const latestRecord = agentRecords.sort(
-                                  (a: any, b: any) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
-                                )[0];
-                                const ttfb = latestRecord?.timeToFirstByteMs;
-                                return ttfb ? `${ttfb}ms` : 'N/A';
-                              })()}
-                            </span>
-                          </td>
-                          <td>
-                            <span className="text-muted small">
-                              {(() => {
-                                if (isStale) return 'N/A';
-                                const agentRecords =
-                                  timeSeriesData[metric.monitorId]?.filter((r: any) => r.agentName === metric.agentName) || [];
-                                const latestRecord = agentRecords.sort(
-                                  (a: any, b: any) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
-                                )[0];
-                                const httpStatus = latestRecord?.responseStatusCode;
-                                return httpStatus ? httpStatus : 'N/A';
-                              })()}
-                            </span>
-                          </td>
-                          <td>
-                            <span className="text-muted small">
-                              {(() => {
-                                if (isStale) return 'N/A';
-                                const agentRecords =
-                                  timeSeriesData[metric.monitorId]?.filter((r: any) => r.agentName === metric.agentName) || [];
-                                const latestRecord = agentRecords.sort(
-                                  (a: any, b: any) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
-                                )[0];
-                                const size = latestRecord?.responseSizeBytes;
-                                return size ? `${(size / 1024).toFixed(1)}KB` : 'N/A';
-                              })()}
-                            </span>
-                          </td>
-                          <td>
-                            <span className="text-muted small">
-                              {(() => {
-                                if (isStale) return 'N/A';
-                                const agentRecords =
-                                  timeSeriesData[metric.monitorId]?.filter((r: any) => r.agentName === metric.agentName) || [];
-                                const latestRecord = agentRecords.sort(
-                                  (a: any, b: any) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
-                                )[0];
-                                const server = latestRecord?.responseServer;
-                                return server || 'N/A';
-                              })()}
-                            </span>
-                          </td>
                           <td>
                             <span className="last-checked text-muted small">{formatLastChecked(metric.lastCheckedTime)}</span>
                           </td>
                           <td>
-                            <span className="text-success small">
-                              {(() => {
-                                const uptime = getMetricValue(metric.monitorId, metric.agentName, 'uptimePercentage', 0);
-                                return typeof uptime === 'number' ? uptime.toFixed(1) : '0.0';
-                              })()}
-                              %
-                            </span>
+                            <span className="text-success small">{uptime.toFixed(1)}%</span>
                           </td>
                           <td>
-                            <span className="text-muted small">
-                              {(() => {
-                                const p95 = getMetricValue(metric.monitorId, metric.agentName, 'p95ResponseTime', 0);
-                                return typeof p95 === 'number' ? Math.round(p95) : 0;
-                              })()}
-                              ms
-                            </span>
+                            <span className="text-muted small">{Math.round(p95)}ms</span>
                           </td>
                           <td>
-                            <span className="text-muted small">
-                              {(() => {
-                                const p99 = getMetricValue(metric.monitorId, metric.agentName, 'p99ResponseTime', 0);
-                                return typeof p99 === 'number' ? Math.round(p99) : 0;
-                              })()}
-                              ms
-                            </span>
+                            <span className="text-muted small">{Math.round(p99)}ms</span>
                           </td>
                           <td>
                             <Dropdown
@@ -657,13 +364,9 @@ export const HttpMetricsProfessional = () => {
                                 <FontAwesomeIcon icon={faEllipsisV} />
                               </DropdownToggle>
                               <DropdownMenu>
-                                <DropdownItem onClick={() => toggleRowExpansion(metric.monitorId, metric.agentName)}>
-                                  <FontAwesomeIcon icon={faChartBar} className="me-2" />
-                                  View Metrics
-                                </DropdownItem>
                                 <DropdownItem onClick={() => navigate(`/http-monitor-detail/${metric.monitorId}`)}>
-                                  <FontAwesomeIcon icon={faEye} className="me-2" />
-                                  View Agent Aggregated Data
+                                  <FontAwesomeIcon icon={faChartBar} className="me-2" />
+                                  View Charts & Metrics
                                 </DropdownItem>
                                 <DropdownItem
                                   onClick={async () => {
@@ -680,12 +383,36 @@ export const HttpMetricsProfessional = () => {
                             </Dropdown>
                           </td>
                         </tr>
-                        {isExpanded && renderAgentDetails(metric.monitorId, metric.agentName)}
                       </React.Fragment>
                     );
                   })}
                 </tbody>
               </Table>
+            </div>
+          )}
+          {!loading && filteredMetrics.length > PAGE_SIZE && (
+            <div className="d-flex justify-content-between align-items-center mt-3 px-3">
+              <div className="text-muted small">
+                Showing {currentPage * PAGE_SIZE + 1}-{Math.min((currentPage + 1) * PAGE_SIZE, filteredMetrics.length)} of{' '}
+                {filteredMetrics.length}
+              </div>
+              <div className="btn-group">
+                <Button size="sm" outline disabled={currentPage === 0} onClick={() => setCurrentPage(0)}>
+                  First
+                </Button>
+                <Button size="sm" outline disabled={currentPage === 0} onClick={() => setCurrentPage(p => p - 1)}>
+                  Prev
+                </Button>
+                <Button size="sm" outline disabled>
+                  {currentPage + 1} / {totalPages}
+                </Button>
+                <Button size="sm" outline disabled={currentPage >= totalPages - 1} onClick={() => setCurrentPage(p => p + 1)}>
+                  Next
+                </Button>
+                <Button size="sm" outline disabled={currentPage >= totalPages - 1} onClick={() => setCurrentPage(totalPages - 1)}>
+                  Last
+                </Button>
+              </div>
             </div>
           )}
         </CardBody>
