@@ -10,6 +10,9 @@ services:
       PORT: 8077
       CORS_ORIGIN: ""
 
+      # Frontend Refresh Interval (seconds)
+      VITE_STATUS_PAGE_REFRESH_TIME: 30
+
       # Branding
       NAVBAR_TITLE: "Vibhuvi OiO"
       STATUS_PAGE_TITLE: "Vibhuvi OiO Health Status"
@@ -17,7 +20,7 @@ services:
       LOGO_URL: "https://jinnabalu.com/assets/img/logo.png"
       LOGO_DISPLAY_MODE: "both"
       FAVICON_URL: "https://jinnabalu.com/assets/img/logo.png"
-      FOOTER_TEXT: "Powered by Algonomy"
+      FOOTER_TEXT: "Powered by Vibhuvi"
 
       # Theme Colors
       NAVBAR_BG_COLOR: "#ffffff"

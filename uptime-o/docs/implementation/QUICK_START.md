@@ -13,7 +13,7 @@
 
 ### Step 1: Build the Backend
 ```bash
-cd /Users/jinnabalaiah/algonomy/practice/UptimeO/uptime-o
+cd /Users/jinnabalaiah/vibhuvi/practice/UptimeO/uptime-o
 mvn clean install
 # Or for just compile: mvn clean compile
 ```

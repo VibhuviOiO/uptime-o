@@ -6,7 +6,6 @@
 
 #### 1. Build Verification
 ```bash
-cd /Users/jinnabalaiah/algonomy/practice/UptimeO/uptime-o
 mvn clean compile
 # Expected: BUILD SUCCESS
 ```
